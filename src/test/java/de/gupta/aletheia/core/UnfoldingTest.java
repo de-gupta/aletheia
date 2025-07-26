@@ -1328,6 +1328,21 @@ class UnfoldingTest
 					.isFalse();
 		}
 
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("emptinessComparisonTestCases")
+		@DisplayName("should handle emptiness comparison correctly")
+		<T, U> void shouldHandleEmptinessComparisonCorrectly(String description, Unfolding<T> first,
+															 Unfolding<U> second, boolean shouldBeEqual)
+		{
+			assertThat(first.equals(second))
+					.as(description)
+					.isEqualTo(shouldBeEqual);
+
+			assertThat(second.equals(first))
+					.as(description + " (symmetric check)")
+					.isEqualTo(shouldBeEqual);
+		}
+
 		private static Stream<Arguments> hashCodeConsistencyTestCases()
 		{
 			Unfolding<String> unfolding1 = Unfolding.of("test");
@@ -1387,6 +1402,36 @@ class UnfoldingTest
 							listUnfolding1, differentListUnfolding, false),
 					new EqualityTestCase<>("Unfoldings with different types but similar values should not be equal",
 							integerUnfolding, stringNumberUnfolding, false)
+			).map(tc -> Arguments.of(tc.description, tc.first, tc.second, tc.shouldBeEqual));
+		}
+
+		private static Stream<Arguments> emptinessComparisonTestCases()
+		{
+			Unfolding<String> emptyStringUnfolding = Unfolding.empty();
+			Unfolding<Integer> emptyIntegerUnfolding = Unfolding.empty();
+			Unfolding<String> presentStringUnfolding = Unfolding.of("test");
+			Unfolding<Integer> presentIntegerUnfolding = Unfolding.of(42);
+			Unfolding<String> emptyStringValueUnfolding = Unfolding.of("");
+
+			return Stream.of(
+					new EqualityTestCase<>("Empty unfoldings of same type should be equal",
+							emptyStringUnfolding, emptyStringUnfolding, true),
+					new EqualityTestCase<>("Empty unfoldings of different types should be equal",
+							emptyStringUnfolding, emptyIntegerUnfolding, true),
+					new EqualityTestCase<>("Present unfolding should not equal empty unfolding (string)",
+							presentStringUnfolding, emptyStringUnfolding, false),
+					new EqualityTestCase<>("Empty unfolding should not equal present unfolding (string)",
+							emptyStringUnfolding, presentStringUnfolding, false),
+					new EqualityTestCase<>("Present unfolding should not equal empty unfolding (integer)",
+							presentIntegerUnfolding, emptyIntegerUnfolding, false),
+					new EqualityTestCase<>("Empty unfolding should not equal present unfolding (string)",
+							emptyStringUnfolding, presentStringUnfolding, false),
+					new EqualityTestCase<>("Empty unfolding should not equal present unfolding (integer)",
+							emptyIntegerUnfolding, presentIntegerUnfolding, false),
+					new EqualityTestCase<>("Unfolding with empty string value should not equal empty unfolding",
+							emptyStringValueUnfolding, emptyStringUnfolding, false),
+					new EqualityTestCase<>("Empty unfolding should not equal unfolding with empty string value",
+							emptyStringUnfolding, emptyStringValueUnfolding, false)
 			).map(tc -> Arguments.of(tc.description, tc.first, tc.second, tc.shouldBeEqual));
 		}
 
