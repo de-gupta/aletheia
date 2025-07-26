@@ -1023,6 +1023,65 @@ class UnfoldingTest
 	}
 
 	@Nested
+	@DisplayName("Tests for stream() method")
+	class StreamTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("presentValueTestCases")
+		@DisplayName("should convert present value to non-empty stream")
+		<T> void shouldConvertPresentValueToNonEmptyStream(String description, Unfolding<T> unfolding, T expectedValue)
+		{
+			Stream<T> result = unfolding.stream();
+
+			assertThat(result).isNotNull();
+			assertThat(result).containsExactly(expectedValue);
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("emptyUnfoldingTestCases")
+		@DisplayName("should convert empty unfolding to empty stream")
+		<T> void shouldConvertEmptyUnfoldingToEmptyStream(String description, Unfolding<T> unfolding)
+		{
+			Stream<T> result = unfolding.stream();
+
+			assertThat(result).isNotNull();
+			assertThat(result).isEmpty();
+		}
+
+		private static Stream<Arguments> presentValueTestCases()
+		{
+			return Stream.of(
+					new PresentTestCase<>("String value should be converted to stream with that value",
+							Unfolding.of("test"), "test"),
+					new PresentTestCase<>("Integer value should be converted to stream with that value",
+							Unfolding.of(42), 42),
+					new PresentTestCase<>("Boolean value should be converted to stream with that value",
+							Unfolding.of(true), true)
+			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedValue));
+		}
+
+		private static Stream<Arguments> emptyUnfoldingTestCases()
+		{
+			return Stream.of(
+					new EmptyTestCase<>("Empty String unfolding should convert to empty stream",
+							Unfolding.<String>empty()),
+					new EmptyTestCase<>("Empty Integer unfolding should convert to empty stream",
+							Unfolding.<Integer>empty()),
+					new EmptyTestCase<>("Empty Boolean unfolding should convert to empty stream",
+							Unfolding.<Boolean>empty())
+			).map(tc -> Arguments.of(tc.description, tc.unfolding));
+		}
+
+		private record PresentTestCase<T>(String description, Unfolding<T> unfolding, T expectedValue)
+		{
+		}
+
+		private record EmptyTestCase<T>(String description, Unfolding<T> unfolding)
+		{
+		}
+	}
+
+	@Nested
 	@DisplayName("Tests for equals() and hashCode() methods")
 	class EqualsAndHashCodeTests
 	{
