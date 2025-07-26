@@ -13,7 +13,7 @@ public final class Unfolding<T>
 
 	private final T value;
 
-	public T get()
+	public T reveal()
 	{
 		if (value == null)
 		{

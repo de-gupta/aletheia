@@ -218,7 +218,8 @@ class UnfoldingTest
 			Unfolding<R> result = unfolding.evolve(mapper);
 
 			assertThat(result.isPresent()).as("refold() for %s should result in present unfolding", unfolding).isTrue();
-			assertThat(result.get()).as("refold() result value should match expected").isEqualTo(expectedResult.get());
+			assertThat(result.reveal()).as("refold() result value should match expected")
+									   .isEqualTo(expectedResult.reveal());
 		}
 
 		@ParameterizedTest(name = "{0}")
@@ -287,7 +288,8 @@ class UnfoldingTest
 
 			assertThat(result.isPresent()).as("develop() for %s with predicate should result in present unfolding",
 					unfolding).isTrue();
-			assertThat(result.get()).as("develop() result value should match expected").isEqualTo(expectedResult.get());
+			assertThat(result.reveal()).as("develop() result value should match expected")
+									   .isEqualTo(expectedResult.reveal());
 		}
 
 		@ParameterizedTest(name = "{0}")
@@ -378,7 +380,8 @@ class UnfoldingTest
 
 			assertThat(result.isPresent()).as("evolve() for %s with predicate should result in present unfolding",
 					unfolding).isTrue();
-			assertThat(result.get()).as("evolve() result value should match expected").isEqualTo(expectedResult.get());
+			assertThat(result.reveal()).as("evolve() result value should match expected")
+									   .isEqualTo(expectedResult.reveal());
 		}
 
 		@ParameterizedTest(name = "{0}")
@@ -469,7 +472,8 @@ class UnfoldingTest
 
 			assertThat(result.isPresent()).as("discern() for %s with matching predicate should remain present",
 					unfolding).isTrue();
-			assertThat(result.get()).as("discern() result value should match original").isEqualTo(unfolding.get());
+			assertThat(result.reveal()).as("discern() result value should match original")
+									   .isEqualTo(unfolding.reveal());
 		}
 
 		@ParameterizedTest(name = "{0}")
@@ -573,16 +577,17 @@ class UnfoldingTest
 	}
 
 	@Nested
-	@DisplayName("Tests for get() method")
-	class GetTests
+	@DisplayName("Tests for reveal() method")
+	class RevealTests
 	{
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("successTestCases")
 		@DisplayName("should return value for present unfolding")
 		<T> void shouldReturnValue(String description, Unfolding<T> unfolding, T expectedValue)
 		{
-			T result = unfolding.get();
-			assertThat(result).as("get() for %s should return %s", unfolding, expectedValue).isEqualTo(expectedValue);
+			T result = unfolding.reveal();
+			assertThat(result).as("reveal() for %s should return %s", unfolding, expectedValue)
+							  .isEqualTo(expectedValue);
 		}
 
 		@ParameterizedTest(name = "{0}")
@@ -590,9 +595,9 @@ class UnfoldingTest
 		@DisplayName("should throw exception for empty unfolding")
 		<T> void shouldThrowException(String description, Unfolding<T> unfolding)
 		{
-			assertThatThrownBy(unfolding::get).as("get() for %s should throw IllegalStateException", unfolding)
-											  .isInstanceOf(IllegalStateException.class)
-											  .hasMessageContaining("Unfolding is empty");
+			assertThatThrownBy(unfolding::reveal).as("reveal() for %s should throw IllegalStateException", unfolding)
+												 .isInstanceOf(IllegalStateException.class)
+												 .hasMessageContaining("Unfolding is empty");
 		}
 
 		private static Stream<Arguments> successTestCases()
@@ -713,7 +718,7 @@ class UnfoldingTest
 
 				assertThat(unfolding.isPresent()).as("of() with non-null value should create present unfolding")
 												 .isTrue();
-				assertThat(unfolding.get()).as("of() should store the provided value").isEqualTo(value);
+				assertThat(unfolding.reveal()).as("of() should store the provided value").isEqualTo(value);
 			}
 
 			@DisplayName("should create empty unfolding for null value")
@@ -723,8 +728,8 @@ class UnfoldingTest
 				Unfolding<String> unfolding = Unfolding.of(null);
 
 				assertThat(unfolding.isEmpty()).as("of() with null value should create empty unfolding").isTrue();
-				assertThatThrownBy(unfolding::get).as("get() on empty unfolding should throw exception")
-												  .isInstanceOf(IllegalStateException.class);
+				assertThatThrownBy(unfolding::reveal).as("reveal() on empty unfolding should throw exception")
+													 .isInstanceOf(IllegalStateException.class);
 			}
 
 			@DisplayName("should create unfolding with primitive value")
@@ -736,7 +741,7 @@ class UnfoldingTest
 
 				assertThat(unfolding.isPresent()).as("of() with primitive value should create present unfolding")
 												 .isTrue();
-				assertThat(unfolding.get()).as("of() should store the provided primitive value").isEqualTo(value);
+				assertThat(unfolding.reveal()).as("of() should store the provided primitive value").isEqualTo(value);
 			}
 		}
 
@@ -752,8 +757,8 @@ class UnfoldingTest
 
 				assertThat(unfolding.isEmpty()).as("empty() should create empty unfolding").isTrue();
 				assertThat(unfolding.isPresent()).as("empty() should create unfolding that is not present").isFalse();
-				assertThatThrownBy(unfolding::get).as("get() on empty unfolding should throw exception")
-												  .isInstanceOf(IllegalStateException.class);
+				assertThatThrownBy(unfolding::reveal).as("reveal() on empty unfolding should throw exception")
+													 .isInstanceOf(IllegalStateException.class);
 			}
 
 			@DisplayName("should return same instance for multiple calls")
