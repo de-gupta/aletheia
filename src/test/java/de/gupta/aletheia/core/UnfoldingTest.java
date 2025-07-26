@@ -1082,6 +1082,66 @@ class UnfoldingTest
 	}
 
 	@Nested
+	@DisplayName("Tests for toString() method")
+	class ToStringTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("presentValueTestCases")
+		@DisplayName("should return formatted string for present values")
+		<T> void shouldReturnFormattedStringForPresentValues(String description, Unfolding<T> unfolding,
+															 String expectedResult)
+		{
+			String result = unfolding.toString();
+
+			assertThat(result).as("toString() for %s should return expected formatted string", unfolding)
+							  .isEqualTo(expectedResult);
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("emptyUnfoldingTestCases")
+		@DisplayName("should return formatted string for empty unfolding")
+		<T> void shouldReturnFormattedStringForEmptyUnfolding(String description, Unfolding<T> unfolding)
+		{
+			String result = unfolding.toString();
+
+			assertThat(result).as("toString() for empty unfolding should return expected formatted string")
+							  .isEqualTo("Unfolding[null]");
+		}
+
+		private static Stream<Arguments> presentValueTestCases()
+		{
+			return Stream.of(
+					new PresentTestCase<>("String value should be formatted correctly",
+							Unfolding.of("test"), "Unfolding[test]"),
+					new PresentTestCase<>("Integer value should be formatted correctly",
+							Unfolding.of(42), "Unfolding[42]"),
+					new PresentTestCase<>("Boolean value should be formatted correctly",
+							Unfolding.of(true), "Unfolding[true]")
+			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedResult));
+		}
+
+		private static Stream<Arguments> emptyUnfoldingTestCases()
+		{
+			return Stream.of(
+					new EmptyTestCase<>("Empty String unfolding should be formatted correctly",
+							Unfolding.<String>empty()),
+					new EmptyTestCase<>("Empty Integer unfolding should be formatted correctly",
+							Unfolding.<Integer>empty()),
+					new EmptyTestCase<>("Empty Boolean unfolding should be formatted correctly",
+							Unfolding.<Boolean>empty())
+			).map(tc -> Arguments.of(tc.description, tc.unfolding));
+		}
+
+		private record PresentTestCase<T>(String description, Unfolding<T> unfolding, String expectedResult)
+		{
+		}
+
+		private record EmptyTestCase<T>(String description, Unfolding<T> unfolding)
+		{
+		}
+	}
+
+	@Nested
 	@DisplayName("Tests for equals() and hashCode() methods")
 	class EqualsAndHashCodeTests
 	{
