@@ -23,10 +23,10 @@ public final class Unfolding<T>
 		return value;
 	}
 
-	public <R> Unfolding<R> refold(Function<? super T, ? extends R> mapper)
+	public <R> Unfolding<R> refold(Function<? super T, ? extends R> folding)
 	{
-		Objects.requireNonNull(mapper, "mapper must not be null");
-		return isEmpty() ? empty() : of(mapper.apply(value));
+		Objects.requireNonNull(folding, "Folding must not be null");
+		return isEmpty() ? empty() : of(folding.apply(value));
 	}
 
 	public boolean isEmpty()
@@ -49,20 +49,20 @@ public final class Unfolding<T>
 		return new Unfolding<>(value);
 	}
 
-	public Unfolding<T> develop(Predicate<? super T> judge, Function<? super T, ? extends T> then)
+	public Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development)
 	{
-		Objects.requireNonNull(judge, "judge must not be null");
-		Objects.requireNonNull(then, "then must not be null");
+		Objects.requireNonNull(judgement, "judgement must not be null");
+		Objects.requireNonNull(development, "development must not be null");
 
-		return isEmpty() ? this : judge.test(value) ? of(then.apply(value)) : this;
+		return isEmpty() ? this : judgement.test(value) ? of(development.apply(value)) : this;
 	}
 
-	public <R> Unfolding<R> evolve(Predicate<? super T> predicate, Function<? super T, ? extends R> mapper)
+	public <R> Unfolding<R> evolve(Predicate<? super T> judgement, Function<? super T, ? extends R> evolution)
 	{
-		Objects.requireNonNull(predicate, "predicate must not be null");
-		Objects.requireNonNull(mapper, "mapper must not be null");
+		Objects.requireNonNull(judgement, "judgement must not be null");
+		Objects.requireNonNull(evolution, "evolution must not be null");
 
-		return isEmpty() ? empty() : predicate.test(value) ? of(mapper.apply(value)) : empty();
+		return isEmpty() ? empty() : judgement.test(value) ? of(evolution.apply(value)) : empty();
 	}
 
 	public Stream<T> stream()
@@ -70,27 +70,27 @@ public final class Unfolding<T>
 		return isEmpty() ? Stream.empty() : Stream.of(value);
 	}
 
-	public <R> Unfolding<R> cleave(final Predicate<? super T> judge,
-								   final Function<? super T, ? extends R> then,
-								   final Function<? super T, ? extends R> otherwise)
+	public <R> Unfolding<R> cleave(final Predicate<? super T> judgement,
+								   final Function<? super T, ? extends R> reward,
+								   final Function<? super T, ? extends R> punishment)
 	{
-		Objects.requireNonNull(judge, "judge must not be null");
-		Objects.requireNonNull(then, "then must not be null");
-		Objects.requireNonNull(otherwise, "otherwise must not be null");
+		Objects.requireNonNull(judgement, "judgement must not be null");
+		Objects.requireNonNull(reward, "reward must not be null");
+		Objects.requireNonNull(punishment, "punishment must not be null");
 
-		return isEmpty() ? empty() : judge.test(value) ? of(then.apply(value)) : of(otherwise.apply(value));
+		return isEmpty() ? empty() : judgement.test(value) ? of(reward.apply(value)) : of(punishment.apply(value));
 	}
 
-	public Unfolding<T> discern(Predicate<? super T> predicate)
+	public Unfolding<T> discern(Predicate<? super T> judgement)
 	{
-		Objects.requireNonNull(predicate, "predicate must not be null");
-		return isEmpty() ? this : predicate.test(value) ? this : empty();
+		Objects.requireNonNull(judgement, "judgement must not be null");
+		return isEmpty() ? this : judgement.test(value) ? this : empty();
 	}
 
-	public Unfolding<T> unlace(Consumer<? super T> consumer)
+	public Unfolding<T> unlace(Consumer<? super T> impregnator)
 	{
-		Objects.requireNonNull(consumer, "consumer must not be null");
-		if (isPresent()) consumer.accept(value);
+		Objects.requireNonNull(impregnator, "impregnator must not be null");
+		if (isPresent()) impregnator.accept(value);
 		return this;
 	}
 
@@ -99,22 +99,22 @@ public final class Unfolding<T>
 		return !isEmpty();
 	}
 
-	public <R> R concludeWith(Function<? super T, ? extends R> extractor)
+	public <R> R concludeWith(Function<? super T, ? extends R> conclusion)
 	{
-		Objects.requireNonNull(extractor, "extractor must not be null");
+		Objects.requireNonNull(conclusion, "conclusion must not be null");
 		if (isEmpty()) throw new IllegalStateException("Unfolding is empty");
-		return extractor.apply(value);
+		return conclusion.apply(value);
 	}
 
-	public T alternatively(Supplier<? extends T> fallback)
+	public T alternatively(Supplier<? extends T> alternate)
 	{
-		Objects.requireNonNull(fallback, "fallback supplier must not be null");
-		return isPresent() ? value : fallback.get();
+		Objects.requireNonNull(alternate, "alternate supplier must not be null");
+		return isPresent() ? value : alternate.get();
 	}
 
-	public T alternatively(T fallback)
+	public T alternatively(T alternate)
 	{
-		return isPresent() ? value : fallback;
+		return isPresent() ? value : alternate;
 	}
 
 	public Optional<T> optional()

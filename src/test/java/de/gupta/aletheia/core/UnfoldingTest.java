@@ -242,7 +242,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.refold(nullMapper))
 					.as("refold() with null mapper should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("mapper must not be null");
+					.hasMessageContaining("Folding must not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
@@ -407,8 +407,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.evolve(nullPredicate, mapper))
 					.as("evolve() with null predicate should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining(
-							"predicate must not be null");
+					.hasMessageContaining("judge must not be null");
 		}
 
 		@DisplayName("should throw exception for null mapper")
