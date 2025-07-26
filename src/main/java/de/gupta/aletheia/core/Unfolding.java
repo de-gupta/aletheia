@@ -13,26 +13,6 @@ public final class Unfolding<T>
 
 	private final T value;
 
-	private Unfolding(T value)
-	{
-		this.value = value;
-	}
-
-	public static <T> Unfolding<T> of(T value)
-	{
-		if (value == null)
-		{
-			return empty();
-		}
-		return new Unfolding<>(value);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T> Unfolding<T> empty()
-	{
-		return (Unfolding<T>) EMPTY;
-	}
-
 	public T get()
 	{
 		if (value == null)
@@ -46,6 +26,26 @@ public final class Unfolding<T>
 	{
 		Objects.requireNonNull(mapper, "mapper must not be null");
 		return isEmpty() ? empty() : of(mapper.apply(value));
+	}
+
+	public boolean isEmpty()
+	{
+		return this == EMPTY;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> Unfolding<T> empty()
+	{
+		return (Unfolding<T>) EMPTY;
+	}
+
+	public static <T> Unfolding<T> of(T value)
+	{
+		if (value == null)
+		{
+			return empty();
+		}
+		return new Unfolding<>(value);
 	}
 
 	public Unfolding<T> mapIf(Predicate<? super T> predicate, Function<? super T, ? extends T> mapper)
@@ -64,7 +64,7 @@ public final class Unfolding<T>
 		return isEmpty() ? empty() : predicate.test(value) ? of(mapper.apply(value)) : empty();
 	}
 
-	public Unfolding<T> filter(Predicate<? super T> predicate)
+	public Unfolding<T> discern(Predicate<? super T> predicate)
 	{
 		Objects.requireNonNull(predicate, "predicate must not be null");
 		return isEmpty() ? this : predicate.test(value) ? this : empty();
@@ -75,6 +75,11 @@ public final class Unfolding<T>
 		Objects.requireNonNull(consumer, "consumer must not be null");
 		if (isPresent()) consumer.accept(value);
 		return this;
+	}
+
+	public boolean isPresent()
+	{
+		return !isEmpty();
 	}
 
 	public <R> R with(Function<? super T, ? extends R> extractor)
@@ -100,20 +105,10 @@ public final class Unfolding<T>
 		return Optional.ofNullable(value);
 	}
 
-	public boolean isPresent()
-	{
-		return !isEmpty();
-	}
-
-	public boolean isEmpty()
-	{
-		return this == EMPTY;
-	}
-
 	@Override
-	public String toString()
+	public int hashCode()
 	{
-		return "Unfolding[" + value + "]";
+		return Objects.hashCode(value);
 	}
 
 	@Override
@@ -125,8 +120,13 @@ public final class Unfolding<T>
 	}
 
 	@Override
-	public int hashCode()
+	public String toString()
 	{
-		return Objects.hashCode(value);
+		return "Unfolding[" + value + "]";
+	}
+
+	private Unfolding(T value)
+	{
+		this.value = value;
 	}
 }

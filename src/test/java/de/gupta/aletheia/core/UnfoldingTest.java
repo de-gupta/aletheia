@@ -457,19 +457,19 @@ class UnfoldingTest
 	}
 
 	@Nested
-	@DisplayName("Tests for filter() method")
-	class FilterTests
+	@DisplayName("Tests for discern() method")
+	class DiscernTests
 	{
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("presentResultTestCases")
 		@DisplayName("should keep value when predicate matches")
 		<T> void shouldKeepValueWhenPredicateMatches(String description, Unfolding<T> unfolding, Predicate<T> predicate)
 		{
-			Unfolding<T> result = unfolding.filter(predicate);
+			Unfolding<T> result = unfolding.discern(predicate);
 
-			assertThat(result.isPresent()).as("filter() for %s with matching predicate should remain present",
+			assertThat(result.isPresent()).as("discern() for %s with matching predicate should remain present",
 					unfolding).isTrue();
-			assertThat(result.get()).as("filter() result value should match original").isEqualTo(unfolding.get());
+			assertThat(result.get()).as("discern() result value should match original").isEqualTo(unfolding.get());
 		}
 
 		@ParameterizedTest(name = "{0}")
@@ -478,9 +478,9 @@ class UnfoldingTest
 		<T> void shouldDiscardValueWhenPredicateDoesntMatch(String description, Unfolding<T> unfolding,
 															Predicate<T> predicate)
 		{
-			Unfolding<T> result = unfolding.filter(predicate);
+			Unfolding<T> result = unfolding.discern(predicate);
 
-			assertThat(result.isEmpty()).as("filter() for %s with non-matching predicate should become empty",
+			assertThat(result.isEmpty()).as("discern() for %s with non-matching predicate should become empty",
 					unfolding).isTrue();
 		}
 
@@ -491,8 +491,8 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.of("test");
 			Predicate<String> nullPredicate = null;
 
-			assertThatThrownBy(() -> unfolding.filter(nullPredicate))
-					.as("filter() with null predicate should throw NullPointerException")
+			assertThatThrownBy(() -> unfolding.discern(nullPredicate))
+					.as("discern() with null predicate should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
 					.hasMessageContaining("predicate must not be null");
 		}
@@ -794,7 +794,7 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.of("hello world");
 			List<String> capturedValues = new ArrayList<>();
 
-			String result = unfolding.map(String::toUpperCase).tap(capturedValues::add).filter(s -> s.length() > 5)
+			String result = unfolding.map(String::toUpperCase).tap(capturedValues::add).discern(s -> s.length() > 5)
 									 .mapIf(s -> s.contains("WORLD"), s -> s + "!").with(s -> s.substring(0, 5));
 
 			assertThat(result).as("Chained operations should produce expected result").isEqualTo("HELLO");
@@ -809,7 +809,7 @@ class UnfoldingTest
 			List<String> capturedValues = new ArrayList<>();
 
 			Unfolding<String> result =
-					unfolding.map(String::toUpperCase).tap(capturedValues::add).filter(s -> s.length() > 5)
+					unfolding.map(String::toUpperCase).tap(capturedValues::add).discern(s -> s.length() > 5)
 							 .mapIf(s -> s.contains("WORLD"), s -> s + "!");
 
 			assertThat(result.isEmpty()).as("Result of chained operations on empty unfolding should be empty").isTrue();
@@ -822,7 +822,7 @@ class UnfoldingTest
 		{
 			Unfolding<Integer> unfolding = Unfolding.of(42);
 
-			String result = unfolding.map(n -> n * 2).filter(n -> n > 50).map(Object::toString)
+			String result = unfolding.map(n -> n * 2).discern(n -> n > 50).map(Object::toString)
 									 .mapIf(s -> s.length() == 2, s -> "0" + s).alternatively("Not found");
 
 			assertThat(result).as("Complex chain should produce expected result").isEqualTo("084");
@@ -836,7 +836,7 @@ class UnfoldingTest
 			List<String> capturedValues = new ArrayList<>();
 
 			String result = unfolding.map(n -> n * 2)
-									 .filter(n -> n < 50)
+									 .discern(n -> n < 50)
 									 .map(Object::toString)
 									 .tap(capturedValues::add)
 									 .alternatively("Not found");
