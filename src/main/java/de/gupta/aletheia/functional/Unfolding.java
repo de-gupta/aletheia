@@ -14,7 +14,7 @@ public final class Unfolding<T>
 
 	private final T value;
 
-	public T reveal()
+	public T summon()
 	{
 		if (value == null)
 		{
