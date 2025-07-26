@@ -120,7 +120,8 @@ public final class Unfolding<T>
 	public boolean equals(final Object o)
 	{
 		if (!(o instanceof final Unfolding<?> unfolding)) return false;
-		return isEmpty() == unfolding.isEmpty() || Objects.equals(value, unfolding.value);
+		if (isEmpty() && unfolding.isEmpty()) return true;
+		return !isEmpty() && !unfolding.isEmpty() && Objects.equals(value, unfolding.value);
 	}
 
 	@Override

@@ -846,4 +846,264 @@ class UnfoldingTest
 			assertThat(capturedValues).as("tap() should not be called after filter made unfolding empty").isEmpty();
 		}
 	}
+
+	@Nested
+	@DisplayName("Tests for equals() and hashCode() methods")
+	class EqualsAndHashCodeTests
+	{
+		@DisplayName("should satisfy reflexivity (x.equals(x) == true)")
+		@Test
+		void shouldSatisfyReflexivity()
+		{
+			Unfolding<String> stringUnfolding = Unfolding.of("test");
+			assertThat(stringUnfolding.equals(stringUnfolding))
+					.as("An unfolding should equal itself (reflexivity)")
+					.isTrue();
+
+			Unfolding<Integer> emptyUnfolding = Unfolding.empty();
+			assertThat(emptyUnfolding.equals(emptyUnfolding))
+					.as("An empty unfolding should equal itself (reflexivity)")
+					.isTrue();
+		}
+
+		@DisplayName("should satisfy symmetry (x.equals(y) == y.equals(x))")
+		@Test
+		void shouldSatisfySymmetry()
+		{
+			Unfolding<String> unfolding1 = Unfolding.of("test");
+			Unfolding<String> unfolding2 = Unfolding.of("test");
+
+			assertThat(unfolding1.equals(unfolding2))
+					.as("First unfolding should equal second unfolding with same value")
+					.isEqualTo(unfolding2.equals(unfolding1));
+
+			Unfolding<String> presentUnfolding = Unfolding.of("test");
+			Unfolding<String> emptyUnfolding = Unfolding.empty();
+
+			assertThat(presentUnfolding.equals(emptyUnfolding))
+					.as("Present unfolding equality with empty unfolding should be symmetric")
+					.isEqualTo(emptyUnfolding.equals(presentUnfolding));
+
+			Unfolding<String> emptyUnfolding1 = Unfolding.empty();
+			Unfolding<Integer> emptyUnfolding2 = Unfolding.empty();
+
+			assertThat(emptyUnfolding1.equals(emptyUnfolding2))
+					.as("Empty unfolding equality should be symmetric")
+					.isEqualTo(emptyUnfolding2.equals(emptyUnfolding1));
+		}
+
+		@DisplayName("should satisfy transitivity (if x.equals(y) and y.equals(z), then x.equals(z))")
+		@Test
+		void shouldSatisfyTransitivity()
+		{
+			Unfolding<String> unfolding1 = Unfolding.of("test");
+			Unfolding<String> unfolding2 = Unfolding.of("test");
+			Unfolding<String> unfolding3 = Unfolding.of("test");
+
+			boolean firstEqualsSecond = unfolding1.equals(unfolding2);
+			boolean secondEqualsThird = unfolding2.equals(unfolding3);
+
+			assertThat(firstEqualsSecond && secondEqualsThird)
+					.as("Precondition: first equals second and second equals third")
+					.isTrue();
+
+			assertThat(unfolding1.equals(unfolding3))
+					.as("Transitivity: if first equals second and second equals third, then first equals third")
+					.isTrue();
+
+			Unfolding<String> emptyUnfolding1 = Unfolding.empty();
+			Unfolding<Integer> emptyUnfolding2 = Unfolding.empty();
+			Unfolding<List<String>> emptyUnfolding3 = Unfolding.empty();
+
+			boolean firstEmptyEqualsSecond = emptyUnfolding1.equals(emptyUnfolding2);
+			boolean secondEmptyEqualsThird = emptyUnfolding2.equals(emptyUnfolding3);
+
+			assertThat(firstEmptyEqualsSecond && secondEmptyEqualsThird)
+					.as("Precondition: first empty equals second empty and second empty equals third empty")
+					.isTrue();
+
+			assertThat(emptyUnfolding1.equals(emptyUnfolding3))
+					.as("Transitivity for empty: if first equals second and second equals third, then first equals third")
+					.isTrue();
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("hashCodeConsistencyTestCases")
+		@DisplayName("should have consistent hashCode with equals (if x.equals(y), then x.hashCode() == y.hashCode())")
+		<T, U> void shouldHaveConsistentHashCodeWithEquals(
+				String description,
+				Unfolding<T> first,
+				Unfolding<U> second,
+				boolean shouldBeEqual
+		)
+		{
+			assertThat(first.equals(second))
+					.as(description)
+					.isEqualTo(shouldBeEqual);
+
+			// If they should be equal, their hashCodes must be equal too
+			if (shouldBeEqual)
+			{
+				assertThat(first.hashCode())
+						.as("Equal unfoldings should have the same hashCode")
+						.isEqualTo(second.hashCode());
+			}
+
+			// Note: Different unfoldings may have the same hashCode by coincidence,
+			// so we don't assert that they must have different hashCodes when not equal
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("equalityWithDifferentValueTypesTestCases")
+		@DisplayName("should handle equality with different value types correctly")
+		<T, U> void shouldHandleEqualityWithDifferentValueTypesCorrectly(String description, Unfolding<T> first,
+																		 Unfolding<U> second, boolean shouldBeEqual)
+		{
+			assertThat(first.equals(second))
+					.as(description)
+					.isEqualTo(shouldBeEqual);
+		}
+
+		@DisplayName("should handle equality with null values and empty unfoldings correctly")
+		@Test
+		void shouldHandleEqualityWithNullValuesAndEmptyUnfoldingsCorrectly()
+		{
+			Unfolding<String> emptyStringUnfolding = Unfolding.empty();
+			Unfolding<Integer> emptyIntegerUnfolding = Unfolding.empty();
+			Unfolding<List<String>> emptyListUnfolding = Unfolding.empty();
+
+			assertThat(emptyStringUnfolding.equals(emptyIntegerUnfolding))
+					.as("Empty unfoldings of different types should be equal")
+					.isTrue();
+
+			assertThat(emptyIntegerUnfolding.equals(emptyListUnfolding))
+					.as("Empty unfoldings of different types should be equal")
+					.isTrue();
+
+			Unfolding<String> nullStringUnfolding = Unfolding.of(null);
+			Unfolding<Integer> nullIntegerUnfolding = Unfolding.of(null);
+
+			assertThat(nullStringUnfolding.equals(emptyStringUnfolding))
+					.as("Unfolding.of(null) should equal Unfolding.empty()")
+					.isTrue();
+
+			assertThat(nullIntegerUnfolding.equals(emptyIntegerUnfolding))
+					.as("Unfolding.of(null) should equal Unfolding.empty()")
+					.isTrue();
+
+			assertThat(nullStringUnfolding.equals(nullIntegerUnfolding))
+					.as("Unfolding.of(null) instances should be equal regardless of type")
+					.isTrue();
+
+			Unfolding<String> presentUnfolding = Unfolding.of("test");
+
+			assertThat(emptyStringUnfolding.equals(presentUnfolding))
+					.as("Empty unfolding should not equal present unfolding")
+					.isFalse();
+
+			assertThat(nullStringUnfolding.equals(presentUnfolding))
+					.as("Unfolding.of(null) should not equal present unfolding")
+					.isFalse();
+
+			Unfolding<String> emptyStringValueUnfolding = Unfolding.of("");
+
+			assertThat(emptyStringValueUnfolding.equals(emptyStringUnfolding))
+					.as("Unfolding with empty string should not equal empty unfolding")
+					.isFalse();
+
+			assertThat(emptyStringValueUnfolding.equals(nullStringUnfolding))
+					.as("Unfolding with empty string should not equal Unfolding.of(null)")
+					.isFalse();
+
+			assertThat(presentUnfolding.equals(null))
+					.as("Unfolding should not equal null")
+					.isFalse();
+
+			assertThat(emptyStringUnfolding.equals(null))
+					.as("Empty unfolding should not equal null")
+					.isFalse();
+
+			String stringObject = "test";
+
+			assertThat(presentUnfolding.equals(stringObject))
+					.as("Unfolding should not equal non-Unfolding object")
+					.isFalse();
+
+			assertThat(emptyStringUnfolding.equals(stringObject))
+					.as("Empty unfolding should not equal non-Unfolding object")
+					.isFalse();
+		}
+
+		private static Stream<Arguments> hashCodeConsistencyTestCases()
+		{
+			Unfolding<String> unfolding1 = Unfolding.of("test");
+			Unfolding<String> unfolding2 = Unfolding.of("test");
+
+			Unfolding<String> unfolding3 = Unfolding.of("different");
+
+			Unfolding<String> emptyUnfolding1 = Unfolding.empty();
+			Unfolding<Integer> emptyUnfolding2 = Unfolding.empty();
+
+			return Stream.of(
+					new HashCodeTestCase<>("Unfoldings with same value should be equal and have same hashCode",
+							unfolding1, unfolding2, true),
+					new HashCodeTestCase<>("Unfoldings with different values should not be equal",
+							unfolding1, unfolding3, false),
+					new HashCodeTestCase<>("Empty unfoldings should be equal and have same hashCode",
+							emptyUnfolding1, emptyUnfolding2, true)
+			).map(tc -> Arguments.of(tc.description, tc.first, tc.second, tc.shouldBeEqual));
+		}
+
+		private static Stream<Arguments> equalityWithDifferentValueTypesTestCases()
+		{
+			Unfolding<String> stringUnfolding1 = Unfolding.of("test");
+			Unfolding<String> stringUnfolding2 = Unfolding.of("test");
+			Unfolding<String> differentStringUnfolding = Unfolding.of("different");
+
+			Unfolding<Integer> intUnfolding1 = Unfolding.of(42);
+			Unfolding<Integer> intUnfolding2 = Unfolding.of(42);
+			Unfolding<Integer> differentIntUnfolding = Unfolding.of(100);
+
+			List<String> list1 = new ArrayList<>();
+			list1.add("item");
+			List<String> list2 = new ArrayList<>();
+			list2.add("item");
+			List<String> differentList = new ArrayList<>();
+			differentList.add("different");
+
+			Unfolding<List<String>> listUnfolding1 = Unfolding.of(list1);
+			Unfolding<List<String>> listUnfolding2 = Unfolding.of(list2);
+			Unfolding<List<String>> differentListUnfolding = Unfolding.of(differentList);
+
+			Unfolding<Integer> integerUnfolding = Unfolding.of(123);
+			Unfolding<String> stringNumberUnfolding = Unfolding.of("123");
+
+			return Stream.of(
+					new EqualityTestCase<>("Unfoldings with same string value should be equal",
+							stringUnfolding1, stringUnfolding2, true),
+					new EqualityTestCase<>("Unfoldings with different string values should not be equal",
+							stringUnfolding1, differentStringUnfolding, false),
+					new EqualityTestCase<>("Unfoldings with same integer value should be equal",
+							intUnfolding1, intUnfolding2, true),
+					new EqualityTestCase<>("Unfoldings with different integer values should not be equal",
+							intUnfolding1, differentIntUnfolding, false),
+					new EqualityTestCase<>("Unfoldings with equal list values should be equal",
+							listUnfolding1, listUnfolding2, true),
+					new EqualityTestCase<>("Unfoldings with different list values should not be equal",
+							listUnfolding1, differentListUnfolding, false),
+					new EqualityTestCase<>("Unfoldings with different types but similar values should not be equal",
+							integerUnfolding, stringNumberUnfolding, false)
+			).map(tc -> Arguments.of(tc.description, tc.first, tc.second, tc.shouldBeEqual));
+		}
+
+		private record HashCodeTestCase<T, U>(String description, Unfolding<T> first, Unfolding<U> second,
+											  boolean shouldBeEqual)
+		{
+		}
+
+		private record EqualityTestCase<T, U>(String description, Unfolding<T> first, Unfolding<U> second,
+											  boolean shouldBeEqual)
+		{
+		}
+	}
 }
