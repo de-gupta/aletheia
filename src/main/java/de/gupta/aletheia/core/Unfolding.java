@@ -22,7 +22,7 @@ public final class Unfolding<T>
 		return value;
 	}
 
-	public <R> Unfolding<R> map(Function<? super T, ? extends R> mapper)
+	public <R> Unfolding<R> refold(Function<? super T, ? extends R> mapper)
 	{
 		Objects.requireNonNull(mapper, "mapper must not be null");
 		return isEmpty() ? empty() : of(mapper.apply(value));
@@ -48,7 +48,7 @@ public final class Unfolding<T>
 		return new Unfolding<>(value);
 	}
 
-	public Unfolding<T> mapIf(Predicate<? super T> predicate, Function<? super T, ? extends T> mapper)
+	public Unfolding<T> develop(Predicate<? super T> predicate, Function<? super T, ? extends T> mapper)
 	{
 		Objects.requireNonNull(predicate, "predicate must not be null");
 		Objects.requireNonNull(mapper, "mapper must not be null");
@@ -56,7 +56,7 @@ public final class Unfolding<T>
 		return isEmpty() ? this : predicate.test(value) ? of(mapper.apply(value)) : this;
 	}
 
-	public <R> Unfolding<R> mapIfs(Predicate<? super T> predicate, Function<? super T, ? extends R> mapper)
+	public <R> Unfolding<R> refold(Predicate<? super T> predicate, Function<? super T, ? extends R> mapper)
 	{
 		Objects.requireNonNull(predicate, "predicate must not be null");
 		Objects.requireNonNull(mapper, "mapper must not be null");

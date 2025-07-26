@@ -204,8 +204,8 @@ class UnfoldingTest
 	}
 
 	@Nested
-	@DisplayName("Tests for map() method")
-	class MapTests
+	@DisplayName("Tests for refold() method")
+	class RefoldTests
 	{
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("presentResultTestCases")
@@ -213,10 +213,10 @@ class UnfoldingTest
 		<T, R> void shouldTransformPresentValue(String description, Unfolding<T> unfolding, Function<T, R> mapper,
 												Unfolding<R> expectedResult)
 		{
-			Unfolding<R> result = unfolding.map(mapper);
+			Unfolding<R> result = unfolding.refold(mapper);
 
-			assertThat(result.isPresent()).as("map() for %s should result in present unfolding", unfolding).isTrue();
-			assertThat(result.get()).as("map() result value should match expected").isEqualTo(expectedResult.get());
+			assertThat(result.isPresent()).as("refold() for %s should result in present unfolding", unfolding).isTrue();
+			assertThat(result.get()).as("refold() result value should match expected").isEqualTo(expectedResult.get());
 		}
 
 		@ParameterizedTest(name = "{0}")
@@ -224,9 +224,9 @@ class UnfoldingTest
 		@DisplayName("should transform to empty unfolding when appropriate")
 		<T, R> void shouldTransformToEmptyUnfolding(String description, Unfolding<T> unfolding, Function<T, R> mapper)
 		{
-			Unfolding<R> result = unfolding.map(mapper);
+			Unfolding<R> result = unfolding.refold(mapper);
 
-			assertThat(result.isEmpty()).as("map() for %s should result in empty unfolding", unfolding).isTrue();
+			assertThat(result.isEmpty()).as("refold() for %s should result in empty unfolding", unfolding).isTrue();
 		}
 
 		@DisplayName("should throw exception for null mapper")
@@ -236,8 +236,8 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.of("test");
 			Function<String, Integer> nullMapper = null;
 
-			assertThatThrownBy(() -> unfolding.map(nullMapper))
-					.as("map() with null mapper should throw NullPointerException")
+			assertThatThrownBy(() -> unfolding.refold(nullMapper))
+					.as("refold() with null mapper should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
 					.hasMessageContaining("mapper must not be null");
 		}
@@ -272,8 +272,8 @@ class UnfoldingTest
 	}
 
 	@Nested
-	@DisplayName("Tests for mapIf() method")
-	class MapIfTests
+	@DisplayName("Tests for develop() method")
+	class DevelopTests
 	{
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("presentResultTestCases")
@@ -281,11 +281,11 @@ class UnfoldingTest
 		<T> void shouldTransformToPresentValue(String description, Unfolding<T> unfolding, Predicate<T> predicate,
 											   Function<T, T> mapper, Unfolding<T> expectedResult)
 		{
-			Unfolding<T> result = unfolding.mapIf(predicate, mapper);
+			Unfolding<T> result = unfolding.develop(predicate, mapper);
 
-			assertThat(result.isPresent()).as("mapIf() for %s with predicate should result in present unfolding",
+			assertThat(result.isPresent()).as("develop() for %s with predicate should result in present unfolding",
 					unfolding).isTrue();
-			assertThat(result.get()).as("mapIf() result value should match expected").isEqualTo(expectedResult.get());
+			assertThat(result.get()).as("develop() result value should match expected").isEqualTo(expectedResult.get());
 		}
 
 		@ParameterizedTest(name = "{0}")
@@ -294,9 +294,10 @@ class UnfoldingTest
 		<T> void shouldTransformToEmptyUnfolding(String description, Unfolding<T> unfolding, Predicate<T> predicate,
 												 Function<T, T> mapper)
 		{
-			Unfolding<T> result = unfolding.mapIf(predicate, mapper);
+			Unfolding<T> result = unfolding.develop(predicate, mapper);
 
-			assertThat(result.isEmpty()).as("mapIf() for %s with predicate should result in empty unfolding", unfolding)
+			assertThat(result.isEmpty()).as("develop() for %s with predicate should result in empty unfolding",
+												unfolding)
 										.isTrue();
 		}
 
@@ -308,11 +309,10 @@ class UnfoldingTest
 			Predicate<String> nullPredicate = null;
 			Function<String, String> mapper = String::toUpperCase;
 
-			assertThatThrownBy(() -> unfolding.mapIf(nullPredicate, mapper)).as(
-																					"mapIf() with null predicate should throw NullPointerException")
-																			.isInstanceOf(NullPointerException.class)
-																			.hasMessageContaining(
-																					"predicate must not be null");
+			assertThatThrownBy(() -> unfolding.develop(nullPredicate, mapper))
+					.as("develop() with null predicate should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("predicate must not be null");
 		}
 
 		@DisplayName("should throw exception for null mapper")
@@ -323,11 +323,10 @@ class UnfoldingTest
 			Predicate<String> predicate = s -> s.length() > 3;
 			Function<String, String> nullMapper = null;
 
-			assertThatThrownBy(() -> unfolding.mapIf(predicate, nullMapper)).as(
-																					"mapIf() with null mapper should throw NullPointerException")
-																			.isInstanceOf(NullPointerException.class)
-																			.hasMessageContaining(
-																					"mapper must not be null");
+			assertThatThrownBy(() -> unfolding.develop(predicate, nullMapper))
+					.as("develop() with null mapper should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("mapper must not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
@@ -364,8 +363,8 @@ class UnfoldingTest
 	}
 
 	@Nested
-	@DisplayName("Tests for mapIfs() method")
-	class MapIfsTests
+	@DisplayName("Tests for refold() method")
+	class RefoldIfTests
 	{
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("presentResultTestCases")
@@ -373,11 +372,11 @@ class UnfoldingTest
 		<T, R> void shouldTransformToPresentValue(String description, Unfolding<T> unfolding, Predicate<T> predicate,
 												  Function<T, R> mapper, Unfolding<R> expectedResult)
 		{
-			Unfolding<R> result = unfolding.mapIfs(predicate, mapper);
+			Unfolding<R> result = unfolding.refold(predicate, mapper);
 
-			assertThat(result.isPresent()).as("mapIfs() for %s with predicate should result in present unfolding",
+			assertThat(result.isPresent()).as("refold() for %s with predicate should result in present unfolding",
 					unfolding).isTrue();
-			assertThat(result.get()).as("mapIfs() result value should match expected").isEqualTo(expectedResult.get());
+			assertThat(result.get()).as("refold() result value should match expected").isEqualTo(expectedResult.get());
 		}
 
 		@ParameterizedTest(name = "{0}")
@@ -386,9 +385,9 @@ class UnfoldingTest
 		<T, R> void shouldTransformToEmptyUnfolding(String description, Unfolding<T> unfolding, Predicate<T> predicate,
 													Function<T, R> mapper)
 		{
-			Unfolding<R> result = unfolding.mapIfs(predicate, mapper);
+			Unfolding<R> result = unfolding.refold(predicate, mapper);
 
-			assertThat(result.isEmpty()).as("mapIfs() for %s with predicate should result in empty unfolding",
+			assertThat(result.isEmpty()).as("refold() for %s with predicate should result in empty unfolding",
 					unfolding).isTrue();
 		}
 
@@ -400,8 +399,8 @@ class UnfoldingTest
 			Predicate<String> nullPredicate = null;
 			Function<String, String> mapper = String::toUpperCase;
 
-			assertThatThrownBy(() -> unfolding.mapIfs(nullPredicate, mapper))
-					.as("mapIfs() with null predicate should throw NullPointerException")
+			assertThatThrownBy(() -> unfolding.refold(nullPredicate, mapper))
+					.as("refold() with null predicate should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
 					.hasMessageContaining(
 							"predicate must not be null");
@@ -415,11 +414,10 @@ class UnfoldingTest
 			Predicate<String> predicate = s -> s.length() > 3;
 			Function<String, String> nullMapper = null;
 
-			assertThatThrownBy(() -> unfolding.mapIfs(predicate, nullMapper)).as(
-																					 "mapIfs() with null mapper should throw NullPointerException")
-																			 .isInstanceOf(NullPointerException.class)
-																			 .hasMessageContaining(
-																					 "mapper must not be null");
+			assertThatThrownBy(() -> unfolding.refold(predicate, nullMapper))
+					.as("refold() with null mapper should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("mapper must not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
@@ -794,8 +792,8 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.of("hello world");
 			List<String> capturedValues = new ArrayList<>();
 
-			String result = unfolding.map(String::toUpperCase).tap(capturedValues::add).discern(s -> s.length() > 5)
-									 .mapIf(s -> s.contains("WORLD"), s -> s + "!").with(s -> s.substring(0, 5));
+			String result = unfolding.refold(String::toUpperCase).tap(capturedValues::add).discern(s -> s.length() > 5)
+									 .develop(s -> s.contains("WORLD"), s -> s + "!").with(s -> s.substring(0, 5));
 
 			assertThat(result).as("Chained operations should produce expected result").isEqualTo("HELLO");
 			assertThat(capturedValues).as("tap() should have been applied during chain").containsExactly("HELLO WORLD");
@@ -809,8 +807,8 @@ class UnfoldingTest
 			List<String> capturedValues = new ArrayList<>();
 
 			Unfolding<String> result =
-					unfolding.map(String::toUpperCase).tap(capturedValues::add).discern(s -> s.length() > 5)
-							 .mapIf(s -> s.contains("WORLD"), s -> s + "!");
+					unfolding.refold(String::toUpperCase).tap(capturedValues::add).discern(s -> s.length() > 5)
+							 .develop(s -> s.contains("WORLD"), s -> s + "!");
 
 			assertThat(result.isEmpty()).as("Result of chained operations on empty unfolding should be empty").isTrue();
 			assertThat(capturedValues).as("tap() should not have been applied to empty unfolding").isEmpty();
@@ -822,8 +820,8 @@ class UnfoldingTest
 		{
 			Unfolding<Integer> unfolding = Unfolding.of(42);
 
-			String result = unfolding.map(n -> n * 2).discern(n -> n > 50).map(Object::toString)
-									 .mapIf(s -> s.length() == 2, s -> "0" + s).alternatively("Not found");
+			String result = unfolding.refold(n -> n * 2).discern(n -> n > 50).refold(Object::toString)
+									 .develop(s -> s.length() == 2, s -> "0" + s).alternatively("Not found");
 
 			assertThat(result).as("Complex chain should produce expected result").isEqualTo("084");
 		}
@@ -835,9 +833,9 @@ class UnfoldingTest
 			Unfolding<Integer> unfolding = Unfolding.of(42);
 			List<String> capturedValues = new ArrayList<>();
 
-			String result = unfolding.map(n -> n * 2)
+			String result = unfolding.refold(n -> n * 2)
 									 .discern(n -> n < 50)
-									 .map(Object::toString)
+									 .refold(Object::toString)
 									 .tap(capturedValues::add)
 									 .alternatively("Not found");
 
