@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public final class Unfolding<T>
 {
@@ -48,12 +49,12 @@ public final class Unfolding<T>
 		return new Unfolding<>(value);
 	}
 
-	public Unfolding<T> develop(Predicate<? super T> predicate, Function<? super T, ? extends T> mapper)
+	public Unfolding<T> develop(Predicate<? super T> judge, Function<? super T, ? extends T> then)
 	{
-		Objects.requireNonNull(predicate, "predicate must not be null");
-		Objects.requireNonNull(mapper, "mapper must not be null");
+		Objects.requireNonNull(judge, "judge must not be null");
+		Objects.requireNonNull(then, "then must not be null");
 
-		return isEmpty() ? this : predicate.test(value) ? of(mapper.apply(value)) : this;
+		return isEmpty() ? this : judge.test(value) ? of(then.apply(value)) : this;
 	}
 
 	public <R> Unfolding<R> evolve(Predicate<? super T> predicate, Function<? super T, ? extends R> mapper)
@@ -62,6 +63,22 @@ public final class Unfolding<T>
 		Objects.requireNonNull(mapper, "mapper must not be null");
 
 		return isEmpty() ? empty() : predicate.test(value) ? of(mapper.apply(value)) : empty();
+	}
+
+	public Stream<T> stream()
+	{
+		return isEmpty() ? Stream.empty() : Stream.of(value);
+	}
+
+	public <R> Unfolding<R> cleave(final Predicate<? super T> judge,
+								   final Function<? super T, ? extends R> then,
+								   final Function<? super T, ? extends R> otherwise)
+	{
+		Objects.requireNonNull(judge, "judge must not be null");
+		Objects.requireNonNull(then, "then must not be null");
+		Objects.requireNonNull(otherwise, "otherwise must not be null");
+
+		return isEmpty() ? empty() : judge.test(value) ? of(then.apply(value)) : of(otherwise.apply(value));
 	}
 
 	public Unfolding<T> discern(Predicate<? super T> predicate)

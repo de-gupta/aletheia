@@ -316,7 +316,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.develop(nullPredicate, mapper))
 					.as("develop() with null predicate should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("predicate must not be null");
+					.hasMessageContaining("judge must not be null");
 		}
 
 		@DisplayName("should throw exception for null mapper")
@@ -330,7 +330,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.develop(predicate, nullMapper))
 					.as("develop() with null mapper should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("mapper must not be null");
+					.hasMessageContaining("then must not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
@@ -455,6 +455,174 @@ class UnfoldingTest
 
 		private record EmptyResultTestCase<T, R>(String description, Unfolding<T> unfolding, Predicate<T> predicate,
 												 Function<T, R> mapper)
+		{
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for cleave() method")
+	class CleaveTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("truePredicateTestCases")
+		@DisplayName("should apply trueMapper when predicate matches")
+		<T, R> void shouldApplyTrueMapper(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+										  Function<T, R> trueMapper, Function<T, R> falseMapper,
+										  Unfolding<R> expectedResult)
+		{
+			Unfolding<R> result = unfolding.cleave(predicate, trueMapper, falseMapper);
+
+			assertThat(result.isPresent()).as(
+					"cleave() for %s with matching predicate should result in present unfolding",
+					unfolding).isTrue();
+			assertThat(result.reveal()).as("cleave() result value should match expected from trueMapper")
+									   .isEqualTo(expectedResult.reveal());
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("falsePredicateTestCases")
+		@DisplayName("should apply falseMapper when predicate doesn't match")
+		<T, R> void shouldApplyFalseMapper(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+										   Function<T, R> trueMapper, Function<T, R> falseMapper,
+										   Unfolding<R> expectedResult)
+		{
+			Unfolding<R> result = unfolding.cleave(predicate, trueMapper, falseMapper);
+
+			assertThat(result.isPresent()).as(
+					"cleave() for %s with non-matching predicate should result in present unfolding",
+					unfolding).isTrue();
+			assertThat(result.reveal()).as("cleave() result value should match expected from falseMapper")
+									   .isEqualTo(expectedResult.reveal());
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("emptyUnfoldingTestCases")
+		@DisplayName("should return empty unfolding when input is empty")
+		<T, R> void shouldReturnEmptyForEmptyInput(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+												   Function<T, R> trueMapper, Function<T, R> falseMapper)
+		{
+			Unfolding<R> result = unfolding.cleave(predicate, trueMapper, falseMapper);
+
+			assertThat(result.isEmpty()).as("cleave() for empty unfolding should result in empty unfolding").isTrue();
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("nullResultTestCases")
+		@DisplayName("should return empty unfolding when mapper returns null")
+		<T, R> void shouldReturnEmptyForNullMapperResult(String description, Unfolding<T> unfolding,
+														 Predicate<T> predicate,
+														 Function<T, R> trueMapper, Function<T, R> falseMapper)
+		{
+			Unfolding<R> result = unfolding.cleave(predicate, trueMapper, falseMapper);
+
+			assertThat(result.isEmpty()).as("cleave() with mapper returning null should result in empty unfolding")
+										.isTrue();
+		}
+
+		@DisplayName("should throw exception for null predicate")
+		@Test
+		void shouldThrowExceptionForNullPredicate()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Predicate<String> nullPredicate = null;
+			Function<String, String> trueMapper = String::toUpperCase;
+			Function<String, String> falseMapper = s -> s + "_suffix";
+
+			assertThatThrownBy(() -> unfolding.cleave(nullPredicate, trueMapper, falseMapper))
+					.as("cleave() with null predicate should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("judge must not be null");
+		}
+
+		@DisplayName("should throw exception for null trueMapper")
+		@Test
+		void shouldThrowExceptionForNullTrueMapper()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Predicate<String> predicate = s -> s.length() > 3;
+			Function<String, String> nullMapper = null;
+			Function<String, String> falseMapper = s -> s + "_suffix";
+
+			assertThatThrownBy(() -> unfolding.cleave(predicate, nullMapper, falseMapper))
+					.as("cleave() with null trueMapper should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("then must not be null");
+		}
+
+		@DisplayName("should throw exception for null falseMapper")
+		@Test
+		void shouldThrowExceptionForNullFalseMapper()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Predicate<String> predicate = s -> s.length() > 3;
+			Function<String, String> trueMapper = String::toUpperCase;
+			Function<String, String> nullMapper = null;
+
+			assertThatThrownBy(() -> unfolding.cleave(predicate, trueMapper, nullMapper))
+					.as("cleave() with null falseMapper should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("otherwise must not be null");
+		}
+
+		private static Stream<Arguments> truePredicateTestCases()
+		{
+			return Stream.of(
+					new TestCase<>("String length predicate matches, apply uppercase transformation",
+							Unfolding.of("hello"), s -> s.length() > 3, String::toUpperCase, s -> s + "_suffix",
+							Unfolding.of("HELLO")),
+					new TestCase<>("Integer value predicate matches, apply string conversion",
+							Unfolding.of(42), n -> n > 10, n -> "Number: " + n, n -> "Small: " + n,
+							Unfolding.of("Number: 42")),
+					new TestCase<>("Boolean value predicate matches, apply conditional text",
+							Unfolding.of(true), b -> b, b -> "It's true", b -> "It's false", Unfolding.of("It's true"))
+			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.trueMapper, tc.falseMapper,
+					tc.expectedResult));
+		}
+
+		private static Stream<Arguments> falsePredicateTestCases()
+		{
+			return Stream.of(
+					new TestCase<>("String length predicate doesn't match, apply suffix transformation",
+							Unfolding.of("hi"), s -> s.length() > 3, String::toUpperCase, s -> s + "_suffix",
+							Unfolding.of("hi_suffix")),
+					new TestCase<>("Integer value predicate doesn't match, apply small number conversion",
+							Unfolding.of(5), n -> n > 10, n -> "Number: " + n, n -> "Small: " + n,
+							Unfolding.of("Small: 5")),
+					new TestCase<>("Boolean value predicate doesn't match, apply conditional text",
+							Unfolding.of(false), b -> b, b -> "It's true", b -> "It's false",
+							Unfolding.of("It's false"))
+			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.trueMapper, tc.falseMapper,
+					tc.expectedResult));
+		}
+
+		private static Stream<Arguments> emptyUnfoldingTestCases()
+		{
+			return Stream.of(
+					new EmptyTestCase<>("Empty unfolding with true predicate should remain empty",
+							Unfolding.<String>empty(), s -> true, String::toUpperCase, s -> s + "_suffix"),
+					new EmptyTestCase<>("Empty unfolding with false predicate should remain empty",
+							Unfolding.<Integer>empty(), n -> n > 10, n -> n * 2, n -> n / 2)
+			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.trueMapper, tc.falseMapper));
+		}
+
+		private static Stream<Arguments> nullResultTestCases()
+		{
+			return Stream.of(
+					new EmptyTestCase<>("TrueMapper returning null should result in empty unfolding",
+							Unfolding.of("test"), s -> s.length() > 3, s -> null, s -> s + "_suffix"),
+					new EmptyTestCase<>("FalseMapper returning null should result in empty unfolding",
+							Unfolding.of("hi"), s -> s.length() > 3, String::toUpperCase, s -> null)
+			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.trueMapper, tc.falseMapper));
+		}
+
+		private record TestCase<T, R>(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+									  Function<T, R> trueMapper, Function<T, R> falseMapper,
+									  Unfolding<R> expectedResult)
+		{
+		}
+
+		private record EmptyTestCase<T, R>(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+										   Function<T, R> trueMapper, Function<T, R> falseMapper)
 		{
 		}
 	}
