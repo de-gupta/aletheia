@@ -1,0 +1,849 @@
+package de.gupta.aletheia.core;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+class UnfoldingTest
+{
+	@Nested
+	@DisplayName("Tests for with() method")
+	class WithTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("successTestCases")
+		@DisplayName("should transform present values")
+		<T, R> void shouldTransformValue(String description, Unfolding<T> unfolding, Function<T, R> extractor,
+										 R expectedResult)
+		{
+			R result = unfolding.with(extractor);
+			assertThat(result).as("with() for %s should give %s", unfolding, expectedResult).isEqualTo(expectedResult);
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("exceptionTestCases")
+		@DisplayName("should throw exception for empty unfolding")
+		<T, R> void shouldThrowExceptionForEmptyUnfolding(String description, Unfolding<T> unfolding,
+														  Function<T, R> extractor)
+		{
+			assertThatThrownBy(() -> unfolding.with(extractor)).as("with() for %s should throw IllegalStateException",
+					unfolding).isInstanceOf(IllegalStateException.class).hasMessageContaining("Unfolding is empty");
+		}
+
+		@DisplayName("should throw exception for null extractor")
+		@Test
+		void shouldThrowExceptionForNullExtractor()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Function<String, Integer> nullExtractor = null;
+
+			assertThatThrownBy(() -> unfolding.with(nullExtractor))
+					.as("with() with null extractor should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("extractor must not be null");
+		}
+
+		private static Stream<Arguments> successTestCases()
+		{
+			return Stream.of(
+								 new SuccessTestCase<>("Present value should be transformed by extractor", Unfolding.of("hello"),
+										 String::length, 5),
+								 new SuccessTestCase<>("Complex transformation should work on present value", Unfolding.of(42),
+										 num -> "Number: " + num, "Number: 42"),
+								 new SuccessTestCase<>("Identity function should return the same value", Unfolding.of("test"),
+										 Function.identity(), "test"),
+								 new SuccessTestCase<>("Extractor returning null should work", Unfolding.of("hello"), _ -> null,
+										 null))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.extractor, tc.expectedResult));
+		}
+
+		private static Stream<Arguments> exceptionTestCases()
+		{
+			return Stream.of(new ExceptionTestCase<>("Empty unfolding should throw exception", Unfolding.empty(),
+							_ -> "unused"),
+					new ExceptionTestCase<>("Unfolding created with null should throw exception", Unfolding.of(null),
+							_ -> "unused")).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.extractor));
+		}
+
+		private record SuccessTestCase<T, R>(String description, Unfolding<T> unfolding, Function<T, R> extractor,
+											 R expectedResult)
+		{
+		}
+
+		private record ExceptionTestCase<T, R>(String description, Unfolding<T> unfolding, Function<T, R> extractor)
+		{
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for alternatively() method")
+	class AlternativelyTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("testCases")
+		@DisplayName("should return value if present or fallback if empty")
+		<T> void shouldReturnValueOrFallback(String description, Unfolding<T> unfolding, T fallbackValue,
+											 Supplier<T> fallbackSupplier, T expectedResult, boolean useSupplier)
+		{
+			T result = useSupplier ? unfolding.alternatively(fallbackSupplier) : unfolding.alternatively(fallbackValue);
+
+			String fallbackDescription =
+					useSupplier ? "supplier returning " + expectedResult : String.valueOf(fallbackValue);
+
+			assertThat(result).as("alternatively() for %s with fallback %s should give %s", unfolding,
+					fallbackDescription, expectedResult).isEqualTo(expectedResult);
+		}
+
+		@DisplayName("should throw exception for null supplier")
+		@Test
+		void shouldThrowExceptionForNullSupplier()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Supplier<String> nullSupplier = null;
+
+			assertThatThrownBy(() -> unfolding.alternatively(nullSupplier))
+					.as("alternatively() with null supplier should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("fallback supplier must not be null");
+		}
+
+		private static Stream<Arguments> testCases()
+		{
+			return Stream.of(
+								 new TestCase<>("Present value should be returned ignoring fallback value", Unfolding.of("primary"),
+										 "fallback", null, "primary", false),
+								 new TestCase<>("Empty unfolding should return fallback value", Unfolding.empty(), "fallback", null,
+										 "fallback", false),
+								 new TestCase<>("Present value should be returned ignoring fallback supplier", Unfolding.of(100),
+										 null, () -> 200, 100, true),
+								 new TestCase<>("Present value should be returned ignoring fallback and fallback supplier",
+										 Unfolding.of(100), 300, () -> 200, 100, true),
+								 new TestCase<>("Empty unfolding should use fallback supplier", Unfolding.empty(), null, () -> 200,
+										 200, true),
+								 new TestCase<>("Null fallback value should be returned for empty unfolding", Unfolding.empty(),
+										 null, null, null, false),
+								 new TestCase<>("Null value from fallback supplier should be returned for empty unfolding",
+										 Unfolding.empty(), null, () -> null, null, true),
+								 new TestCase<>("Unfolding created with null should return fallback value", Unfolding.of(null),
+										 "fallback", null, "fallback", false),
+								 new TestCase<>("Unfolding created with null should use fallback supplier", Unfolding.of(null), null,
+										 () -> "fallback", "fallback", true))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.fallbackValue, tc.fallbackSupplier,
+								 tc.expectedResult, tc.useSupplier));
+		}
+
+		record TestCase<T>(String description, Unfolding<T> unfolding, T fallbackValue, Supplier<T> fallbackSupplier,
+						   T expectedResult, boolean useSupplier)
+		{
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for isPresent() method")
+	class IsPresentTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("testCases")
+		@DisplayName("should correctly identify if value exists")
+		<T> void shouldIdentifyValueExistence(String description, Unfolding<T> unfolding, boolean expectedResult)
+		{
+			boolean result = unfolding.isPresent();
+
+			assertThat(result).as("isPresent() for %s should give %s", unfolding, expectedResult)
+							  .isEqualTo(expectedResult);
+		}
+
+		@DisplayName("should be consistent with isEmpty()")
+		@Test
+		void shouldBeConsistentWithIsEmpty()
+		{
+			Unfolding<String> presentUnfolding = Unfolding.of("test");
+			Unfolding<Integer> emptyUnfolding = Unfolding.empty();
+			Unfolding<String> nullUnfolding = Unfolding.of(null);
+
+			assertThat(presentUnfolding.isPresent()).as("isPresent() should be opposite of isEmpty()")
+													.isEqualTo(!presentUnfolding.isEmpty());
+			assertThat(emptyUnfolding.isPresent()).as("isPresent() should be opposite of isEmpty()")
+												  .isEqualTo(!emptyUnfolding.isEmpty());
+			assertThat(nullUnfolding.isPresent()).as("isPresent() should be opposite of isEmpty()")
+												 .isEqualTo(!nullUnfolding.isEmpty());
+		}
+
+		private static Stream<Arguments> testCases()
+		{
+			return Stream.of(
+					new TestCase<>("Unfolding with non-null value should be present", Unfolding.of("value"), true),
+					new TestCase<>("Empty unfolding should not be present", Unfolding.empty(), false),
+					new TestCase<>("Unfolding created with null should be empty and not present", Unfolding.of(null),
+							false),
+					new TestCase<>("Unfolding with empty string should be present", Unfolding.of(""), true),
+					new TestCase<>("Unfolding with zero should be present", Unfolding.of(0), true),
+					new TestCase<>("Unfolding with false should be present", Unfolding.of(false), true),
+					new TestCase<>("Unfolding with empty list should be present", Unfolding.of(new ArrayList<>()),
+							true)).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedResult));
+		}
+
+		private record TestCase<T>(String description, Unfolding<T> unfolding, boolean expectedResult)
+		{
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for map() method")
+	class MapTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("presentResultTestCases")
+		@DisplayName("should transform present value to new present value")
+		<T, R> void shouldTransformPresentValue(String description, Unfolding<T> unfolding, Function<T, R> mapper,
+												Unfolding<R> expectedResult)
+		{
+			Unfolding<R> result = unfolding.map(mapper);
+
+			assertThat(result.isPresent()).as("map() for %s should result in present unfolding", unfolding).isTrue();
+			assertThat(result.get()).as("map() result value should match expected").isEqualTo(expectedResult.get());
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("emptyResultTestCases")
+		@DisplayName("should transform to empty unfolding when appropriate")
+		<T, R> void shouldTransformToEmptyUnfolding(String description, Unfolding<T> unfolding, Function<T, R> mapper)
+		{
+			Unfolding<R> result = unfolding.map(mapper);
+
+			assertThat(result.isEmpty()).as("map() for %s should result in empty unfolding", unfolding).isTrue();
+		}
+
+		@DisplayName("should throw exception for null mapper")
+		@Test
+		void shouldThrowExceptionForNullMapper()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Function<String, Integer> nullMapper = null;
+
+			assertThatThrownBy(() -> unfolding.map(nullMapper))
+					.as("map() with null mapper should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("mapper must not be null");
+		}
+
+		private static Stream<Arguments> presentResultTestCases()
+		{
+			return Stream.of(
+								 new PresentResultTestCase<>("Present value should be transformed by mapper", Unfolding.of("hello"),
+										 String::length, Unfolding.of(5)),
+								 new PresentResultTestCase<>("Complex transformation should work on present value", Unfolding.of(42),
+										 num -> "Number: " + num, Unfolding.of("Number: 42")))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.mapper, tc.expectedResult));
+		}
+
+		private static Stream<Arguments> emptyResultTestCases()
+		{
+			return Stream.of(new EmptyResultTestCase<>("Empty unfolding should remain empty after mapping",
+										 Unfolding.empty(), String::length),
+								 new EmptyResultTestCase<>("Mapper returning null should result in empty unfolding",
+										 Unfolding.of("test"), _ -> null))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.mapper));
+		}
+
+		private record PresentResultTestCase<T, R>(String description, Unfolding<T> unfolding, Function<T, R> mapper,
+												   Unfolding<R> expectedResult)
+		{
+		}
+
+		private record EmptyResultTestCase<T, R>(String description, Unfolding<T> unfolding, Function<T, R> mapper)
+		{
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for mapIf() method")
+	class MapIfTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("presentResultTestCases")
+		@DisplayName("should conditionally transform present value to new present value")
+		<T> void shouldTransformToPresentValue(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+											   Function<T, T> mapper, Unfolding<T> expectedResult)
+		{
+			Unfolding<T> result = unfolding.mapIf(predicate, mapper);
+
+			assertThat(result.isPresent()).as("mapIf() for %s with predicate should result in present unfolding",
+					unfolding).isTrue();
+			assertThat(result.get()).as("mapIf() result value should match expected").isEqualTo(expectedResult.get());
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("emptyResultTestCases")
+		@DisplayName("should transform to empty unfolding when appropriate")
+		<T> void shouldTransformToEmptyUnfolding(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+												 Function<T, T> mapper)
+		{
+			Unfolding<T> result = unfolding.mapIf(predicate, mapper);
+
+			assertThat(result.isEmpty()).as("mapIf() for %s with predicate should result in empty unfolding", unfolding)
+										.isTrue();
+		}
+
+		@DisplayName("should throw exception for null predicate")
+		@Test
+		void shouldThrowExceptionForNullPredicate()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Predicate<String> nullPredicate = null;
+			Function<String, String> mapper = String::toUpperCase;
+
+			assertThatThrownBy(() -> unfolding.mapIf(nullPredicate, mapper)).as(
+																					"mapIf() with null predicate should throw NullPointerException")
+																			.isInstanceOf(NullPointerException.class)
+																			.hasMessageContaining(
+																					"predicate must not be null");
+		}
+
+		@DisplayName("should throw exception for null mapper")
+		@Test
+		void shouldThrowExceptionForNullMapper()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Predicate<String> predicate = s -> s.length() > 3;
+			Function<String, String> nullMapper = null;
+
+			assertThatThrownBy(() -> unfolding.mapIf(predicate, nullMapper)).as(
+																					"mapIf() with null mapper should throw NullPointerException")
+																			.isInstanceOf(NullPointerException.class)
+																			.hasMessageContaining(
+																					"mapper must not be null");
+		}
+
+		private static Stream<Arguments> presentResultTestCases()
+		{
+			return Stream.of(new PresentResultTestCase<>("Present value matching predicate should be transformed",
+										 Unfolding.of("hello"), s -> s.length() > 3, String::toUpperCase, Unfolding.of("HELLO")),
+								 new PresentResultTestCase<>("Present value not matching predicate should remain unchanged",
+										 Unfolding.of("hi"), s -> s.length() > 3, String::toUpperCase, Unfolding.of("hi")),
+								 new PresentResultTestCase<>("Mapper should not be applied when predicate doesn't match",
+										 Unfolding.of(5), n -> n > 10, _ -> null, Unfolding.of(5)))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.mapper,
+								 tc.expectedResult));
+		}
+
+		private static Stream<Arguments> emptyResultTestCases()
+		{
+			return Stream.of(
+								 new EmptyResultTestCase<>("Empty unfolding should remain empty regardless of predicate and mapper",
+										 Unfolding.<String>empty(), _ -> true, String::toUpperCase), new EmptyResultTestCase<>(
+										 "Mapper returning null should result in empty unfolding when predicate matches",
+										 Unfolding.of(42), n -> n > 10, _ -> null))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.mapper));
+		}
+
+		private record PresentResultTestCase<T>(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+												Function<T, T> mapper, Unfolding<T> expectedResult)
+		{
+		}
+
+		private record EmptyResultTestCase<T>(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+											  Function<T, T> mapper)
+		{
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for mapIfs() method")
+	class MapIfsTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("presentResultTestCases")
+		@DisplayName("should conditionally transform present value to new present value")
+		<T, R> void shouldTransformToPresentValue(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+												  Function<T, R> mapper, Unfolding<R> expectedResult)
+		{
+			Unfolding<R> result = unfolding.mapIfs(predicate, mapper);
+
+			assertThat(result.isPresent()).as("mapIfs() for %s with predicate should result in present unfolding",
+					unfolding).isTrue();
+			assertThat(result.get()).as("mapIfs() result value should match expected").isEqualTo(expectedResult.get());
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("emptyResultTestCases")
+		@DisplayName("should transform to empty unfolding when appropriate")
+		<T, R> void shouldTransformToEmptyUnfolding(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+													Function<T, R> mapper)
+		{
+			Unfolding<R> result = unfolding.mapIfs(predicate, mapper);
+
+			assertThat(result.isEmpty()).as("mapIfs() for %s with predicate should result in empty unfolding",
+					unfolding).isTrue();
+		}
+
+		@DisplayName("should throw exception for null predicate")
+		@Test
+		void shouldThrowExceptionForNullPredicate()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Predicate<String> nullPredicate = null;
+			Function<String, String> mapper = String::toUpperCase;
+
+			assertThatThrownBy(() -> unfolding.mapIfs(nullPredicate, mapper))
+					.as("mapIfs() with null predicate should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining(
+							"predicate must not be null");
+		}
+
+		@DisplayName("should throw exception for null mapper")
+		@Test
+		void shouldThrowExceptionForNullMapper()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Predicate<String> predicate = s -> s.length() > 3;
+			Function<String, String> nullMapper = null;
+
+			assertThatThrownBy(() -> unfolding.mapIfs(predicate, nullMapper)).as(
+																					 "mapIfs() with null mapper should throw NullPointerException")
+																			 .isInstanceOf(NullPointerException.class)
+																			 .hasMessageContaining(
+																					 "mapper must not be null");
+		}
+
+		private static Stream<Arguments> presentResultTestCases()
+		{
+			return Stream.of(new PresentResultTestCase<>("Present value matching predicate should be transformed",
+										 Unfolding.of("hello"), s -> s.length() > 3, String::toUpperCase, Unfolding.of("HELLO")),
+								 new PresentResultTestCase<>("Type transformation should work when predicate matches",
+										 Unfolding.of(42), n -> n > 10, n -> "Number: " + n, Unfolding.of("Number: 42")))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.mapper,
+								 tc.expectedResult));
+		}
+
+		private static Stream<Arguments> emptyResultTestCases()
+		{
+			return Stream.of(new EmptyResultTestCase<>("Present value not matching predicate should become empty",
+										 Unfolding.of("hi"), s -> s.length() > 3, String::toUpperCase),
+								 new EmptyResultTestCase<>("Empty unfolding should remain empty regardless of predicate and mapper",
+										 Unfolding.<String>empty(), _ -> true, String::toUpperCase), new EmptyResultTestCase<>(
+										 "Mapper returning null should result in empty unfolding when predicate matches",
+										 Unfolding.of(42), n -> n > 10, _ -> null),
+								 new EmptyResultTestCase<>("Mapper should not be applied when predicate doesn't match",
+										 Unfolding.of(5), n -> n > 10, _ -> "transformed"))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.mapper));
+		}
+
+		private record PresentResultTestCase<T, R>(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+												   Function<T, R> mapper, Unfolding<R> expectedResult)
+		{
+		}
+
+		private record EmptyResultTestCase<T, R>(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+												 Function<T, R> mapper)
+		{
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for filter() method")
+	class FilterTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("presentResultTestCases")
+		@DisplayName("should keep value when predicate matches")
+		<T> void shouldKeepValueWhenPredicateMatches(String description, Unfolding<T> unfolding, Predicate<T> predicate)
+		{
+			Unfolding<T> result = unfolding.filter(predicate);
+
+			assertThat(result.isPresent()).as("filter() for %s with matching predicate should remain present",
+					unfolding).isTrue();
+			assertThat(result.get()).as("filter() result value should match original").isEqualTo(unfolding.get());
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("emptyResultTestCases")
+		@DisplayName("should discard value when predicate doesn't match")
+		<T> void shouldDiscardValueWhenPredicateDoesntMatch(String description, Unfolding<T> unfolding,
+															Predicate<T> predicate)
+		{
+			Unfolding<T> result = unfolding.filter(predicate);
+
+			assertThat(result.isEmpty()).as("filter() for %s with non-matching predicate should become empty",
+					unfolding).isTrue();
+		}
+
+		@DisplayName("should throw exception for null predicate")
+		@Test
+		void shouldThrowExceptionForNullPredicate()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Predicate<String> nullPredicate = null;
+
+			assertThatThrownBy(() -> unfolding.filter(nullPredicate))
+					.as("filter() with null predicate should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("predicate must not be null");
+		}
+
+		private static Stream<Arguments> presentResultTestCases()
+		{
+			return Stream.of(new PresentResultTestCase<>("Present value matching predicate should remain unchanged",
+										 Unfolding.of("hello"), s -> s.length() > 3),
+								 new PresentResultTestCase<>("Predicate with complex logic should work correctly (even numbers)",
+										 Unfolding.of(42), n -> n % 2 == 0))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate));
+		}
+
+		private static Stream<Arguments> emptyResultTestCases()
+		{
+			return Stream.of(new EmptyResultTestCase<>("Present value not matching predicate should become empty",
+										 Unfolding.of("hi"), s -> s.length() > 3),
+								 new EmptyResultTestCase<>("Empty unfolding should remain empty regardless of predicate",
+										 Unfolding.<String>empty(), _ -> true),
+								 new EmptyResultTestCase<>("Predicate with complex logic should work correctly (odd numbers)",
+										 Unfolding.of(43), n -> n % 2 == 0))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate));
+		}
+
+		private record PresentResultTestCase<T>(String description, Unfolding<T> unfolding, Predicate<T> predicate)
+		{
+		}
+
+		private record EmptyResultTestCase<T>(String description, Unfolding<T> unfolding, Predicate<T> predicate)
+		{
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for tap() method")
+	class TapTests
+	{
+		@DisplayName("should apply consumer to present value and return the same unfolding")
+		@Test
+		void shouldApplyConsumerToPresentValue()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			List<String> capturedValues = new ArrayList<>();
+			Consumer<String> consumer = capturedValues::add;
+
+			Unfolding<String> result = unfolding.tap(consumer);
+
+			assertThat(result).as("tap() should return the same unfolding").isSameAs(unfolding);
+			assertThat(capturedValues).as("Consumer should be applied to the value").containsExactly("test");
+		}
+
+		@DisplayName("should not apply consumer to empty unfolding and return the same unfolding")
+		@Test
+		void shouldNotApplyConsumerToEmptyUnfolding()
+		{
+			Unfolding<String> unfolding = Unfolding.empty();
+			List<String> capturedValues = new ArrayList<>();
+			Consumer<String> consumer = capturedValues::add;
+
+			Unfolding<String> result = unfolding.tap(consumer);
+
+			assertThat(result).as("tap() should return the same unfolding").isSameAs(unfolding);
+			assertThat(capturedValues).as("Consumer should not be applied to empty unfolding").isEmpty();
+		}
+
+		@DisplayName("should throw exception for null consumer")
+		@Test
+		void shouldThrowExceptionForNullConsumer()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Consumer<String> nullConsumer = null;
+
+			assertThatThrownBy(() -> unfolding.tap(nullConsumer)).as(
+																		 "tap() with null consumer should throw NullPointerException")
+																 .isInstanceOf(NullPointerException.class)
+																 .hasMessageContaining("consumer must not be null");
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for get() method")
+	class GetTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("successTestCases")
+		@DisplayName("should return value for present unfolding")
+		<T> void shouldReturnValue(String description, Unfolding<T> unfolding, T expectedValue)
+		{
+			T result = unfolding.get();
+			assertThat(result).as("get() for %s should return %s", unfolding, expectedValue).isEqualTo(expectedValue);
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("exceptionTestCases")
+		@DisplayName("should throw exception for empty unfolding")
+		<T> void shouldThrowException(String description, Unfolding<T> unfolding)
+		{
+			assertThatThrownBy(unfolding::get).as("get() for %s should throw IllegalStateException", unfolding)
+											  .isInstanceOf(IllegalStateException.class)
+											  .hasMessageContaining("Unfolding is empty");
+		}
+
+		private static Stream<Arguments> successTestCases()
+		{
+			return Stream.of(new SuccessTestCase<>("Present value should be returned", Unfolding.of("hello"), "hello"))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedValue));
+		}
+
+		private static Stream<Arguments> exceptionTestCases()
+		{
+			return Stream.of(new ExceptionTestCase<>("Empty unfolding should throw exception", Unfolding.empty()),
+								 new ExceptionTestCase<>("Unfolding with null value should throw exception", Unfolding.of(null)))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding));
+		}
+
+		private record SuccessTestCase<T>(String description, Unfolding<T> unfolding, T expectedValue)
+		{
+		}
+
+		private record ExceptionTestCase<T>(String description, Unfolding<T> unfolding)
+		{
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for optional() method")
+	class OptionalTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("presentTestCases")
+		@DisplayName("should convert present unfolding to present Optional")
+		<T> void shouldConvertPresentUnfoldingToPresentOptional(String description, Unfolding<T> unfolding,
+																T expectedValue)
+		{
+			Optional<T> result = unfolding.optional();
+
+			assertThat(result.isPresent()).as("optional() for %s should result in present Optional", unfolding)
+										  .isTrue();
+			assertThat(result.get()).as("optional() result value should match expected").isEqualTo(expectedValue);
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("emptyTestCases")
+		@DisplayName("should convert empty unfolding to empty Optional")
+		<T> void shouldConvertEmptyUnfoldingToEmptyOptional(String description, Unfolding<T> unfolding)
+		{
+			Optional<T> result = unfolding.optional();
+
+			assertThat(result.isPresent()).as("optional() for %s should result in empty Optional", unfolding).isFalse();
+		}
+
+		private static Stream<Arguments> presentTestCases()
+		{
+			return Stream.of(new PresentTestCase<>("Present value should be converted to present Optional",
+								 Unfolding.of("hello"), "hello"))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedValue));
+		}
+
+		private static Stream<Arguments> emptyTestCases()
+		{
+			return Stream.of(
+					new EmptyTestCase<>("Empty unfolding should be converted to empty Optional", Unfolding.empty()),
+					new EmptyTestCase<>("Unfolding created with null should be converted to empty Optional",
+							Unfolding.of(null))).map(tc -> Arguments.of(tc.description, tc.unfolding));
+		}
+
+		private record PresentTestCase<T>(String description, Unfolding<T> unfolding, T expectedValue)
+		{
+		}
+
+		private record EmptyTestCase<T>(String description, Unfolding<T> unfolding)
+		{
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for isEmpty() method")
+	class IsEmptyTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("testCases")
+		@DisplayName("should correctly identify if unfolding is empty")
+		<T> void shouldIdentifyIfEmpty(String description, Unfolding<T> unfolding, boolean expectedResult)
+		{
+			boolean result = unfolding.isEmpty();
+			assertThat(result).as("isEmpty() for %s should give %s", unfolding, expectedResult)
+							  .isEqualTo(expectedResult);
+		}
+
+		private static Stream<Arguments> testCases()
+		{
+			return Stream.of(
+								 new TestCase<>("Unfolding with non-null value should not be empty", Unfolding.of("value"), false),
+								 new TestCase<>("Empty unfolding should be empty", Unfolding.empty(), true),
+								 new TestCase<>("Unfolding created with null should be empty", Unfolding.of(null), true))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedResult));
+		}
+
+		private record TestCase<T>(String description, Unfolding<T> unfolding, boolean expectedResult)
+		{
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for factory methods")
+	class FactoryMethodTests
+	{
+		@Nested
+		@DisplayName("Tests for of() method")
+		class OfMethodTests
+		{
+			@DisplayName("should create non-empty unfolding for non-null value")
+			@Test
+			void shouldCreateNonEmptyUnfoldingForNonNullValue()
+			{
+				String value = "test";
+				Unfolding<String> unfolding = Unfolding.of(value);
+
+				assertThat(unfolding.isPresent()).as("of() with non-null value should create present unfolding")
+												 .isTrue();
+				assertThat(unfolding.get()).as("of() should store the provided value").isEqualTo(value);
+			}
+
+			@DisplayName("should create empty unfolding for null value")
+			@Test
+			void shouldCreateEmptyUnfoldingForNullValue()
+			{
+				Unfolding<String> unfolding = Unfolding.of(null);
+
+				assertThat(unfolding.isEmpty()).as("of() with null value should create empty unfolding").isTrue();
+				assertThatThrownBy(unfolding::get).as("get() on empty unfolding should throw exception")
+												  .isInstanceOf(IllegalStateException.class);
+			}
+
+			@DisplayName("should create unfolding with primitive value")
+			@Test
+			void shouldCreateUnfoldingWithPrimitiveValue()
+			{
+				int value = 42;
+				Unfolding<Integer> unfolding = Unfolding.of(value);
+
+				assertThat(unfolding.isPresent()).as("of() with primitive value should create present unfolding")
+												 .isTrue();
+				assertThat(unfolding.get()).as("of() should store the provided primitive value").isEqualTo(value);
+			}
+		}
+
+		@Nested
+		@DisplayName("Tests for empty() method")
+		class EmptyMethodTests
+		{
+			@DisplayName("should create empty unfolding")
+			@Test
+			void shouldCreateEmptyUnfolding()
+			{
+				Unfolding<String> unfolding = Unfolding.empty();
+
+				assertThat(unfolding.isEmpty()).as("empty() should create empty unfolding").isTrue();
+				assertThat(unfolding.isPresent()).as("empty() should create unfolding that is not present").isFalse();
+				assertThatThrownBy(unfolding::get).as("get() on empty unfolding should throw exception")
+												  .isInstanceOf(IllegalStateException.class);
+			}
+
+			@DisplayName("should return same instance for multiple calls")
+			@Test
+			void shouldReturnSameInstanceForMultipleCalls()
+			{
+				Unfolding<String> unfolding1 = Unfolding.empty();
+				Unfolding<Integer> unfolding2 = Unfolding.empty();
+
+				assertThat(unfolding1).as("empty() should return same instance for different calls")
+									  .isSameAs(unfolding2);
+			}
+
+			@DisplayName("should return same instance for different generic types")
+			@Test
+			void shouldReturnSameInstanceForDifferentGenericTypes()
+			{
+				Unfolding<String> stringUnfolding = Unfolding.empty();
+				Unfolding<Integer> intUnfolding = Unfolding.empty();
+				Unfolding<List<String>> listUnfolding = Unfolding.empty();
+
+				assertThat(stringUnfolding).as("empty() should return same instance for String type")
+										   .isSameAs(intUnfolding);
+				assertThat(intUnfolding).as("empty() should return same instance for Integer type")
+										.isSameAs(listUnfolding);
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for method chaining")
+	class MethodChainingTests
+	{
+		@DisplayName("should support chaining multiple operations on present value")
+		@Test
+		void shouldSupportChainingMultipleOperationsOnPresentValue()
+		{
+			Unfolding<String> unfolding = Unfolding.of("hello world");
+			List<String> capturedValues = new ArrayList<>();
+
+			String result = unfolding.map(String::toUpperCase).tap(capturedValues::add).filter(s -> s.length() > 5)
+									 .mapIf(s -> s.contains("WORLD"), s -> s + "!").with(s -> s.substring(0, 5));
+
+			assertThat(result).as("Chained operations should produce expected result").isEqualTo("HELLO");
+			assertThat(capturedValues).as("tap() should have been applied during chain").containsExactly("HELLO WORLD");
+		}
+
+		@DisplayName("should short-circuit on empty unfolding")
+		@Test
+		void shouldShortCircuitOnEmptyUnfolding()
+		{
+			Unfolding<String> unfolding = Unfolding.empty();
+			List<String> capturedValues = new ArrayList<>();
+
+			Unfolding<String> result =
+					unfolding.map(String::toUpperCase).tap(capturedValues::add).filter(s -> s.length() > 5)
+							 .mapIf(s -> s.contains("WORLD"), s -> s + "!");
+
+			assertThat(result.isEmpty()).as("Result of chained operations on empty unfolding should be empty").isTrue();
+			assertThat(capturedValues).as("tap() should not have been applied to empty unfolding").isEmpty();
+		}
+
+		@DisplayName("should handle complex transformations in chain")
+		@Test
+		void shouldHandleComplexTransformationsInChain()
+		{
+			Unfolding<Integer> unfolding = Unfolding.of(42);
+
+			String result = unfolding.map(n -> n * 2).filter(n -> n > 50).map(Object::toString)
+									 .mapIf(s -> s.length() == 2, s -> "0" + s).alternatively("Not found");
+
+			assertThat(result).as("Complex chain should produce expected result").isEqualTo("084");
+		}
+
+		@DisplayName("should handle filter making unfolding empty in middle of chain")
+		@Test
+		void shouldHandleFilterMakingUnfoldingEmptyInMiddleOfChain()
+		{
+			Unfolding<Integer> unfolding = Unfolding.of(42);
+			List<String> capturedValues = new ArrayList<>();
+
+			String result = unfolding.map(n -> n * 2)
+									 .filter(n -> n < 50)
+									 .map(Object::toString)
+									 .tap(capturedValues::add)
+									 .alternatively("Not found");
+
+			assertThat(result).as("Chain with filter making unfolding empty should use fallback")
+							  .isEqualTo("Not found");
+			assertThat(capturedValues).as("tap() should not be called after filter made unfolding empty").isEmpty();
+		}
+	}
+}
