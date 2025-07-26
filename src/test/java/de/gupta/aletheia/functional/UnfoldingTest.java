@@ -1,4 +1,4 @@
-package de.gupta.aletheia.core;
+package de.gupta.aletheia.functional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

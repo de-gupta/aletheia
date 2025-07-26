@@ -1,4 +1,4 @@
-package de.gupta.aletheia.core;
+package de.gupta.aletheia.functional;
 
 import java.util.Objects;
 import java.util.Optional;

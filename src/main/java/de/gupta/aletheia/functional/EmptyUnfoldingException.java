@@ -1,4 +1,4 @@
-package de.gupta.aletheia.core;
+package de.gupta.aletheia.functional;
 
 public class EmptyUnfoldingException extends RuntimeException
 {
