@@ -106,10 +106,10 @@ public final class Unfolding<T>
 		return conclusion.apply(value);
 	}
 
-	public T alternatively(Supplier<? extends T> alternate)
+	public T alternatively(Supplier<? extends T> revelation)
 	{
-		Objects.requireNonNull(alternate, "alternate supplier must not be null");
-		return isPresent() ? value : alternate.get();
+		Objects.requireNonNull(revelation, "revelation must not be null");
+		return isPresent() ? value : revelation.get();
 	}
 
 	public T alternatively(T alternate)
