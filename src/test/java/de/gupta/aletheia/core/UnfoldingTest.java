@@ -43,8 +43,8 @@ class UnfoldingTest
 														  Function<T, R> extractor)
 		{
 			assertThatThrownBy(() -> unfolding.concludeWith(extractor)).as(
-					"concludeWith() for %s should throw IllegalStateException",
-					unfolding).isInstanceOf(IllegalStateException.class).hasMessageContaining("Unfolding is empty");
+					"concludeWith() for %s should throw EmptyUnfoldingException",
+					unfolding).isInstanceOf(EmptyUnfoldingException.class).hasMessageContaining("empty");
 		}
 
 		@DisplayName("should throw exception for null conclusion")
@@ -52,12 +52,12 @@ class UnfoldingTest
 		void shouldThrowExceptionForNullExtractor()
 		{
 			Unfolding<String> unfolding = Unfolding.of("test");
-			Function<String, Integer> nullExtractor = null;
+			Function<String, Integer> nullConclusion = null;
 
-			assertThatThrownBy(() -> unfolding.concludeWith(nullExtractor))
+			assertThatThrownBy(() -> unfolding.concludeWith(nullConclusion))
 					.as("concludeWith() with null conclusion should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("conclusion must not be null");
+					.hasMessageContaining("conclusion may not be null");
 		}
 
 		private static Stream<Arguments> successTestCases()
@@ -121,7 +121,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.alternatively(nullSupplier))
 					.as("alternatively() with null revelation should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("revelation must not be null");
+					.hasMessageContaining("revelation may not be null");
 		}
 
 		private static Stream<Arguments> testCases()
@@ -242,7 +242,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.refold(nullMapper))
 					.as("refold() with null mapper should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("Folding must not be null");
+					.hasMessageContaining("folding may not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
@@ -316,7 +316,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.develop(nullPredicate, mapper))
 					.as("develop() with null predicate should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("judgement must not be null");
+					.hasMessageContaining("judgement may not be null");
 		}
 
 		@DisplayName("should throw exception for null mapper")
@@ -330,7 +330,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.develop(predicate, nullMapper))
 					.as("develop() with null mapper should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("development must not be null");
+					.hasMessageContaining("development may not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
@@ -407,7 +407,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.evolve(nullPredicate, mapper))
 					.as("evolve() with null predicate should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("judgement must not be null");
+					.hasMessageContaining("judgement may not be null");
 		}
 
 		@DisplayName("should throw exception for null mapper")
@@ -421,7 +421,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.evolve(predicate, nullMapper))
 					.as("evolve() with null mapper should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("evolution must not be null");
+					.hasMessageContaining("evolution may not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
@@ -530,7 +530,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.cleave(nullPredicate, trueMapper, falseMapper))
 					.as("cleave() with null predicate should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("judgement must not be null");
+					.hasMessageContaining("judgement may not be null");
 		}
 
 		@DisplayName("should throw exception for null reward")
@@ -545,7 +545,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.cleave(predicate, nullMapper, falseMapper))
 					.as("cleave() with null reward should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("reward must not be null");
+					.hasMessageContaining("reward may not be null");
 		}
 
 		@DisplayName("should throw exception for null punishment")
@@ -560,7 +560,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.cleave(predicate, trueMapper, nullMapper))
 					.as("cleave() with null punishment should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("punishment must not be null");
+					.hasMessageContaining("punishment may not be null");
 		}
 
 		private static Stream<Arguments> truePredicateTestCases()
@@ -665,7 +665,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.discern(nullPredicate))
 					.as("discern() with null predicate should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("judgement must not be null");
+					.hasMessageContaining("judgement may not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
@@ -739,7 +739,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.unlace(nullConsumer))
 					.as("unlace() with null consumer should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("impregnator must not be null");
+					.hasMessageContaining("impregnator may not be null");
 		}
 	}
 
@@ -762,9 +762,9 @@ class UnfoldingTest
 		@DisplayName("should throw exception for empty unfolding")
 		<T> void shouldThrowException(String description, Unfolding<T> unfolding)
 		{
-			assertThatThrownBy(unfolding::reveal).as("reveal() for %s should throw IllegalStateException", unfolding)
-												 .isInstanceOf(IllegalStateException.class)
-												 .hasMessageContaining("Unfolding is empty");
+			assertThatThrownBy(unfolding::reveal).as("reveal() for %s should throw EmptyUnfoldingException", unfolding)
+												 .isInstanceOf(EmptyUnfoldingException.class)
+												 .hasMessageContaining("empty");
 		}
 
 		private static Stream<Arguments> successTestCases()
@@ -896,7 +896,7 @@ class UnfoldingTest
 
 				assertThat(unfolding.isEmpty()).as("of() with null value should create empty unfolding").isTrue();
 				assertThatThrownBy(unfolding::reveal).as("reveal() on empty unfolding should throw exception")
-													 .isInstanceOf(IllegalStateException.class);
+													 .isInstanceOf(EmptyUnfoldingException.class);
 			}
 
 			@DisplayName("should create unfolding with primitive value")
@@ -925,7 +925,7 @@ class UnfoldingTest
 				assertThat(unfolding.isEmpty()).as("empty() should create empty unfolding").isTrue();
 				assertThat(unfolding.isPresent()).as("empty() should create unfolding that is not present").isFalse();
 				assertThatThrownBy(unfolding::reveal).as("reveal() on empty unfolding should throw exception")
-													 .isInstanceOf(IllegalStateException.class);
+													 .isInstanceOf(EmptyUnfoldingException.class);
 			}
 
 			@DisplayName("should return same instance for multiple calls")
