@@ -22,7 +22,7 @@ public final class Unfolding<T>
 		return value;
 	}
 
-	public <R> Unfolding<R> evolve(Function<? super T, ? extends R> mapper)
+	public <R> Unfolding<R> refold(Function<? super T, ? extends R> mapper)
 	{
 		Objects.requireNonNull(mapper, "mapper must not be null");
 		return isEmpty() ? empty() : of(mapper.apply(value));
@@ -70,7 +70,7 @@ public final class Unfolding<T>
 		return isEmpty() ? this : predicate.test(value) ? this : empty();
 	}
 
-	public Unfolding<T> tap(Consumer<? super T> consumer)
+	public Unfolding<T> unlace(Consumer<? super T> consumer)
 	{
 		Objects.requireNonNull(consumer, "consumer must not be null");
 		if (isPresent()) consumer.accept(value);

@@ -215,7 +215,7 @@ class UnfoldingTest
 		<T, R> void shouldTransformPresentValue(String description, Unfolding<T> unfolding, Function<T, R> mapper,
 												Unfolding<R> expectedResult)
 		{
-			Unfolding<R> result = unfolding.evolve(mapper);
+			Unfolding<R> result = unfolding.refold(mapper);
 
 			assertThat(result.isPresent()).as("refold() for %s should result in present unfolding", unfolding).isTrue();
 			assertThat(result.reveal()).as("refold() result value should match expected")
@@ -227,7 +227,7 @@ class UnfoldingTest
 		@DisplayName("should transform to empty unfolding when appropriate")
 		<T, R> void shouldTransformToEmptyUnfolding(String description, Unfolding<T> unfolding, Function<T, R> mapper)
 		{
-			Unfolding<R> result = unfolding.evolve(mapper);
+			Unfolding<R> result = unfolding.refold(mapper);
 
 			assertThat(result.isEmpty()).as("refold() for %s should result in empty unfolding", unfolding).isTrue();
 		}
@@ -239,7 +239,7 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.of("test");
 			Function<String, Integer> nullMapper = null;
 
-			assertThatThrownBy(() -> unfolding.evolve(nullMapper))
+			assertThatThrownBy(() -> unfolding.refold(nullMapper))
 					.as("refold() with null mapper should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
 					.hasMessageContaining("mapper must not be null");
@@ -531,8 +531,8 @@ class UnfoldingTest
 	}
 
 	@Nested
-	@DisplayName("Tests for tap() method")
-	class TapTests
+	@DisplayName("Tests for unlace() method")
+	class UnlaceTests
 	{
 		@DisplayName("should apply consumer to present value and return the same unfolding")
 		@Test
@@ -542,9 +542,9 @@ class UnfoldingTest
 			List<String> capturedValues = new ArrayList<>();
 			Consumer<String> consumer = capturedValues::add;
 
-			Unfolding<String> result = unfolding.tap(consumer);
+			Unfolding<String> result = unfolding.unlace(consumer);
 
-			assertThat(result).as("tap() should return the same unfolding").isSameAs(unfolding);
+			assertThat(result).as("unlace() should return the same unfolding").isSameAs(unfolding);
 			assertThat(capturedValues).as("Consumer should be applied to the value").containsExactly("test");
 		}
 
@@ -556,9 +556,9 @@ class UnfoldingTest
 			List<String> capturedValues = new ArrayList<>();
 			Consumer<String> consumer = capturedValues::add;
 
-			Unfolding<String> result = unfolding.tap(consumer);
+			Unfolding<String> result = unfolding.unlace(consumer);
 
-			assertThat(result).as("tap() should return the same unfolding").isSameAs(unfolding);
+			assertThat(result).as("unlace() should return the same unfolding").isSameAs(unfolding);
 			assertThat(capturedValues).as("Consumer should not be applied to empty unfolding").isEmpty();
 		}
 
@@ -569,10 +569,10 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.of("test");
 			Consumer<String> nullConsumer = null;
 
-			assertThatThrownBy(() -> unfolding.tap(nullConsumer)).as(
-																		 "tap() with null consumer should throw NullPointerException")
-																 .isInstanceOf(NullPointerException.class)
-																 .hasMessageContaining("consumer must not be null");
+			assertThatThrownBy(() -> unfolding.unlace(nullConsumer))
+					.as("unlace() with null consumer should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("consumer must not be null");
 		}
 	}
 
@@ -799,12 +799,14 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.of("hello world");
 			List<String> capturedValues = new ArrayList<>();
 
-			String result = unfolding.evolve(String::toUpperCase).tap(capturedValues::add).discern(s -> s.length() > 5)
-									 .develop(s -> s.contains("WORLD"), s -> s + "!")
-									 .concludeWith(s -> s.substring(0, 5));
+			String result =
+					unfolding.refold(String::toUpperCase).unlace(capturedValues::add).discern(s -> s.length() > 5)
+							 .develop(s -> s.contains("WORLD"), s -> s + "!")
+							 .concludeWith(s -> s.substring(0, 5));
 
 			assertThat(result).as("Chained operations should produce expected result").isEqualTo("HELLO");
-			assertThat(capturedValues).as("tap() should have been applied during chain").containsExactly("HELLO WORLD");
+			assertThat(capturedValues).as("unlace() should have been applied during chain")
+									  .containsExactly("HELLO WORLD");
 		}
 
 		@DisplayName("should short-circuit on empty unfolding")
@@ -815,11 +817,11 @@ class UnfoldingTest
 			List<String> capturedValues = new ArrayList<>();
 
 			Unfolding<String> result =
-					unfolding.evolve(String::toUpperCase).tap(capturedValues::add).discern(s -> s.length() > 5)
+					unfolding.refold(String::toUpperCase).unlace(capturedValues::add).discern(s -> s.length() > 5)
 							 .develop(s -> s.contains("WORLD"), s -> s + "!");
 
 			assertThat(result.isEmpty()).as("Result of chained operations on empty unfolding should be empty").isTrue();
-			assertThat(capturedValues).as("tap() should not have been applied to empty unfolding").isEmpty();
+			assertThat(capturedValues).as("unlace() should not have been applied to empty unfolding").isEmpty();
 		}
 
 		@DisplayName("should handle complex transformations in chain")
@@ -828,7 +830,7 @@ class UnfoldingTest
 		{
 			Unfolding<Integer> unfolding = Unfolding.of(42);
 
-			String result = unfolding.evolve(n -> n * 2).discern(n -> n > 50).evolve(Object::toString)
+			String result = unfolding.refold(n -> n * 2).discern(n -> n > 50).refold(Object::toString)
 									 .develop(s -> s.length() == 2, s -> "0" + s).alternatively("Not found");
 
 			assertThat(result).as("Complex chain should produce expected result").isEqualTo("084");
@@ -841,15 +843,15 @@ class UnfoldingTest
 			Unfolding<Integer> unfolding = Unfolding.of(42);
 			List<String> capturedValues = new ArrayList<>();
 
-			String result = unfolding.evolve(n -> n * 2)
+			String result = unfolding.refold(n -> n * 2)
 									 .discern(n -> n < 50)
-									 .evolve(Object::toString)
-									 .tap(capturedValues::add)
+									 .refold(Object::toString)
+									 .unlace(capturedValues::add)
 									 .alternatively("Not found");
 
 			assertThat(result).as("Chain with filter making unfolding empty should use fallback")
 							  .isEqualTo("Not found");
-			assertThat(capturedValues).as("tap() should not be called after filter made unfolding empty").isEmpty();
+			assertThat(capturedValues).as("unlace() should not be called after filter made unfolding empty").isEmpty();
 		}
 	}
 
