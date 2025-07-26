@@ -22,7 +22,7 @@ public final class Unfolding<T>
 		return value;
 	}
 
-	public <R> Unfolding<R> refold(Function<? super T, ? extends R> mapper)
+	public <R> Unfolding<R> evolve(Function<? super T, ? extends R> mapper)
 	{
 		Objects.requireNonNull(mapper, "mapper must not be null");
 		return isEmpty() ? empty() : of(mapper.apply(value));
@@ -56,7 +56,7 @@ public final class Unfolding<T>
 		return isEmpty() ? this : predicate.test(value) ? of(mapper.apply(value)) : this;
 	}
 
-	public <R> Unfolding<R> refold(Predicate<? super T> predicate, Function<? super T, ? extends R> mapper)
+	public <R> Unfolding<R> evolve(Predicate<? super T> predicate, Function<? super T, ? extends R> mapper)
 	{
 		Objects.requireNonNull(predicate, "predicate must not be null");
 		Objects.requireNonNull(mapper, "mapper must not be null");
@@ -82,7 +82,7 @@ public final class Unfolding<T>
 		return !isEmpty();
 	}
 
-	public <R> R with(Function<? super T, ? extends R> extractor)
+	public <R> R concludeWith(Function<? super T, ? extends R> extractor)
 	{
 		Objects.requireNonNull(extractor, "extractor must not be null");
 		if (isEmpty()) throw new IllegalStateException("Unfolding is empty");
@@ -114,9 +114,13 @@ public final class Unfolding<T>
 	@Override
 	public boolean equals(final Object o)
 	{
-		if (!(o instanceof final Unfolding<?> unfolding)) return false;
-		if (isEmpty() && unfolding.isEmpty()) return true;
-		return !isEmpty() && !unfolding.isEmpty() && Objects.equals(value, unfolding.value);
+		return this == o ||
+				(o instanceof Unfolding<?> other &&
+						(
+								isEmpty() && other.isEmpty() ||
+										(isPresent() && other.isPresent() && Objects.equals(value, other.value))
+						)
+				);
 	}
 
 	@Override
