@@ -1,5 +1,7 @@
 package de.gupta.aletheia.functional;
 
+import de.gupta.aletheia.collection.Pair;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -31,16 +33,18 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public int hashCode()
+	{
+		return Objects.hashCode(value);
+	}
+
+	@Override
 	public boolean equals(final Object o)
 	{
-		return this == o ||
-				(o instanceof Myth<?> other &&
-						(
-								(sterile() && other.sterile()) ||
-										(supple() && other.supple() && Objects.equals(value, other.value))
-						)
-				);
-	}	@Override
+		return this == o || (o instanceof Myth<?> other && Objects.equals(value, other.value));
+	}
+
+	@Override
 	public boolean sterile()
 	{
 		return false;
@@ -65,9 +69,17 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> Unfolding<Pair<T, R>> interlace(final Function<? super T, ? extends R> interlacing)
+	{
+		Objects.requireNonNull(interlacing, "interlacing may not be null");
+
+		return Unfolding.of(Pair.of(value, interlacing.apply(value)));
+	}
+
+	@Override
 	public Stream<T> stream()
 	{
-		return sterile() ? Stream.empty() : Stream.of(value);
+		return Stream.of(value);
 	}
 
 	@Override
@@ -107,7 +119,6 @@ final class Myth<T> implements Unfolding<T>
 	public <R> R concludeWith(Function<? super T, ? extends R> conclusion)
 	{
 		Objects.requireNonNull(conclusion, "conclusion may not be null");
-		if (sterile()) throw EmptyUnfoldingException.instance();
 		return conclusion.apply(value);
 	}
 
@@ -128,12 +139,6 @@ final class Myth<T> implements Unfolding<T>
 	public Optional<T> optional()
 	{
 		return Optional.ofNullable(value);
-	}
-
-	@Override
-	public int hashCode()
-	{
-		return Objects.hashCode(value);
 	}
 
 	@Override

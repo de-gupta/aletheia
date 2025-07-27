@@ -1,5 +1,7 @@
 package de.gupta.aletheia.functional;
 
+import de.gupta.aletheia.collection.Pair;
+
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -30,6 +32,8 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development);
 
 	<R> Unfolding<R> evolve(Predicate<? super T> judgement, Function<? super T, ? extends R> evolution);
+
+	<R> Unfolding<Pair<T, R>> interlace(Function<? super T, ? extends R> interlacing);
 
 	Stream<T> stream();
 

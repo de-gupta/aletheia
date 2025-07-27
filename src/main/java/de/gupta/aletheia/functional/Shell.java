@@ -1,5 +1,7 @@
 package de.gupta.aletheia.functional;
 
+import de.gupta.aletheia.collection.Pair;
+
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -44,6 +46,12 @@ final class Shell<T> implements Unfolding<T>
 	@Override
 	public <R> Unfolding<R> evolve(final Predicate<? super T> judgement,
 								   final Function<? super T, ? extends R> evolution)
+	{
+		return instance();
+	}
+
+	@Override
+	public <R> Unfolding<Pair<T, R>> interlace(final Function<? super T, ? extends R> interlacing)
 	{
 		return instance();
 	}
