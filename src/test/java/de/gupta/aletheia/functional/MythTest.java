@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class ScrollTest
+class MythTest
 {
 	@Nested
 	@DisplayName("Tests for concludeWith() method")
@@ -141,9 +141,9 @@ class ScrollTest
 										 null, null, null, false),
 								 new TestCase<>("Null value from fallback supplier should be returned for empty unfolding",
 										 Unfolding.empty(), null, () -> null, null, true),
-								 new TestCase<>("Scroll created with null should return fallback value", Unfolding.of(null),
+								 new TestCase<>("Myth created with null should return fallback value", Unfolding.of(null),
 										 "fallback", null, "fallback", false),
-								 new TestCase<>("Scroll created with null should use fallback supplier", Unfolding.of(null),
+								 new TestCase<>("Myth created with null should use fallback supplier", Unfolding.of(null),
 										 null,
 										 () -> "fallback", "fallback", true))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.fallbackValue, tc.fallbackSupplier,
@@ -190,14 +190,14 @@ class ScrollTest
 		private static Stream<Arguments> testCases()
 		{
 			return Stream.of(
-					new TestCase<>("Scroll with non-null value should be present", Unfolding.of("value"), true),
+					new TestCase<>("Myth with non-null value should be present", Unfolding.of("value"), true),
 					new TestCase<>("Empty unfolding should not be present", Unfolding.empty(), false),
-					new TestCase<>("Scroll created with null should be empty and not present", Unfolding.of(null),
+					new TestCase<>("Myth created with null should be empty and not present", Unfolding.of(null),
 							false),
-					new TestCase<>("Scroll with empty string should be present", Unfolding.of(""), true),
-					new TestCase<>("Scroll with zero should be present", Unfolding.of(0), true),
-					new TestCase<>("Scroll with false should be present", Unfolding.of(false), true),
-					new TestCase<>("Scroll with empty list should be present", Unfolding.of(new ArrayList<>()),
+					new TestCase<>("Myth with empty string should be present", Unfolding.of(""), true),
+					new TestCase<>("Myth with zero should be present", Unfolding.of(0), true),
+					new TestCase<>("Myth with false should be present", Unfolding.of(false), true),
+					new TestCase<>("Myth with empty list should be present", Unfolding.of(new ArrayList<>()),
 							true)).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedResult));
 		}
 
@@ -784,7 +784,7 @@ class ScrollTest
 		private static Stream<Arguments> exceptionTestCases()
 		{
 			return Stream.of(new ExceptionTestCase<>("Empty unfolding should throw exception", Unfolding.empty()),
-								 new ExceptionTestCase<>("Scroll with null value should throw exception", Unfolding.of(null)))
+								 new ExceptionTestCase<>("Myth with null value should throw exception", Unfolding.of(null)))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding));
 		}
 
@@ -835,7 +835,7 @@ class ScrollTest
 		{
 			return Stream.of(
 					new EmptyTestCase<>("Empty unfolding should be converted to empty Optional", Unfolding.empty()),
-					new EmptyTestCase<>("Scroll created with null should be converted to empty Optional",
+					new EmptyTestCase<>("Myth created with null should be converted to empty Optional",
 							Unfolding.of(null))).map(tc -> Arguments.of(tc.description, tc.unfolding));
 		}
 
@@ -865,9 +865,9 @@ class ScrollTest
 		private static Stream<Arguments> testCases()
 		{
 			return Stream.of(
-								 new TestCase<>("Scroll with non-null value should not be empty", Unfolding.of("value"), false),
+								 new TestCase<>("Myth with non-null value should not be empty", Unfolding.of("value"), false),
 								 new TestCase<>("Empty unfolding should be empty", Unfolding.empty(), true),
-								 new TestCase<>("Scroll created with null should be empty", Unfolding.of(null), true))
+								 new TestCase<>("Myth created with null should be empty", Unfolding.of(null), true))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedResult));
 		}
 
@@ -1113,18 +1113,18 @@ class ScrollTest
 			String result = unfolding.toString();
 
 			assertThat(result).as("toString() for empty unfolding should return expected formatted string")
-							  .isEqualTo(EmptyUnfolding.instance().toString());
+							  .isEqualTo(Shell.instance().toString());
 		}
 
 		private static Stream<Arguments> presentValueTestCases()
 		{
 			return Stream.of(
 					new PresentTestCase<>("String value should be formatted correctly",
-							Unfolding.of("test"), "Scroll[test]"),
+							Unfolding.of("test"), "Myth[test]"),
 					new PresentTestCase<>("Integer value should be formatted correctly",
-							Unfolding.of(42), "Scroll[42]"),
+							Unfolding.of(42), "Myth[42]"),
 					new PresentTestCase<>("Boolean value should be formatted correctly",
-							Unfolding.of(true), "Scroll[true]")
+							Unfolding.of(true), "Myth[true]")
 			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedResult));
 		}
 
@@ -1310,15 +1310,15 @@ class ScrollTest
 			Unfolding<String> emptyStringValueUnfolding = Unfolding.of("");
 
 			assertThat(emptyStringValueUnfolding.equals(emptyStringUnfolding))
-					.as("Scroll with empty string should not equal empty unfolding")
+					.as("Myth with empty string should not equal empty unfolding")
 					.isFalse();
 
 			assertThat(emptyStringValueUnfolding.equals(nullStringUnfolding))
-					.as("Scroll with empty string should not equal Unfolding.of(null)")
+					.as("Myth with empty string should not equal Unfolding.of(null)")
 					.isFalse();
 
 			assertThat(presentUnfolding.equals(null))
-					.as("Scroll should not equal null")
+					.as("Myth should not equal null")
 					.isFalse();
 
 			assertThat(emptyStringUnfolding.equals(null))
@@ -1328,11 +1328,11 @@ class ScrollTest
 			String stringObject = "test";
 
 			assertThat(presentUnfolding.equals(stringObject))
-					.as("Scroll should not equal non-Scroll object")
+					.as("Myth should not equal non-Myth object")
 					.isFalse();
 
 			assertThat(emptyStringUnfolding.equals(stringObject))
-					.as("Empty unfolding should not equal non-Scroll object")
+					.as("Empty unfolding should not equal non-Myth object")
 					.isFalse();
 		}
 
@@ -1436,7 +1436,7 @@ class ScrollTest
 							emptyStringUnfolding, presentStringUnfolding, false),
 					new EqualityTestCase<>("Empty unfolding should not equal present unfolding (integer)",
 							emptyIntegerUnfolding, presentIntegerUnfolding, false),
-					new EqualityTestCase<>("Scroll with empty string value should not equal empty unfolding",
+					new EqualityTestCase<>("Myth with empty string value should not equal empty unfolding",
 							emptyStringValueUnfolding, emptyStringUnfolding, false),
 					new EqualityTestCase<>("Empty unfolding should not equal unfolding with empty string value",
 							emptyStringUnfolding, emptyStringValueUnfolding, false)

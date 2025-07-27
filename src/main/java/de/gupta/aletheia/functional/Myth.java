@@ -8,15 +8,15 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-final class Scroll<T> implements Unfolding<T>
+final class Myth<T> implements Unfolding<T>
 {
-	private static final Scroll<?> EMPTY = new Scroll<>(null);
+	private static final Myth<?> EMPTY = new Myth<>(null);
 
 	private final T value;
 
 	public static <T> Unfolding<T> from(final T value)
 	{
-		return new Scroll<>(value);
+		return new Myth<>(value);
 	}
 
 	@Override
@@ -42,16 +42,16 @@ final class Scroll<T> implements Unfolding<T>
 		return this == EMPTY;
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <T> Scroll<T> empty()
-	{
-		return (Scroll<T>) EMPTY;
-	}
-
-	public static <T> Scroll<T> of(final T value)
+	public static <T> Myth<T> of(final T value)
 	{
 		if (value == null) return empty();
-		return new Scroll<>(value);
+		return new Myth<>(value);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> Myth<T> empty()
+	{
+		return (Myth<T>) EMPTY;
 	}
 
 	@Override
@@ -148,7 +148,7 @@ final class Scroll<T> implements Unfolding<T>
 	public boolean equals(final Object o)
 	{
 		return this == o ||
-				(o instanceof Scroll<?> other &&
+				(o instanceof Myth<?> other &&
 						(
 								(isEmpty() && other.isEmpty()) ||
 										(isPresent() && other.isPresent() && Objects.equals(value, other.value))
@@ -159,10 +159,10 @@ final class Scroll<T> implements Unfolding<T>
 	@Override
 	public String toString()
 	{
-		return "Scroll[" + value + "]";
+		return "Myth[" + value + "]";
 	}
 
-	private Scroll(T value)
+	private Myth(T value)
 	{
 		this.value = value;
 	}

@@ -7,9 +7,9 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-final class EmptyUnfolding<T> implements Unfolding<T>
+final class Shell<T> implements Unfolding<T>
 {
-	private static final EmptyUnfolding<?> INSTANCE = new EmptyUnfolding<>();
+	private static final Shell<?> INSTANCE = new Shell<>();
 
 	@Override
 	public <R> Unfolding<R> refold(final Function<? super T, ? extends R> folding)
@@ -106,10 +106,10 @@ final class EmptyUnfolding<T> implements Unfolding<T>
 	@Override
 	public String toString()
 	{
-		return "EmptyUnfolding{}";
+		return "Shell{}";
 	}
 
-	private EmptyUnfolding()
+	private Shell()
 	{
 	}
 }

@@ -7,18 +7,18 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public sealed interface Unfolding<T> permits EmptyUnfolding, Scroll
+public sealed interface Unfolding<T> permits Shell, Myth
 {
 	static <T> Unfolding<T> empty()
 	{
-		return EmptyUnfolding.instance();
+		return Shell.instance();
 	}
 
 	static <T> Unfolding<T> of(T value)
 	{
 		return Optional.ofNullable(value)
-					   .map(Scroll::from)
-					   .orElseGet(EmptyUnfolding::instance);
+					   .map(Myth::from)
+					   .orElseGet(Shell::instance);
 	}
 
 	T summon();
