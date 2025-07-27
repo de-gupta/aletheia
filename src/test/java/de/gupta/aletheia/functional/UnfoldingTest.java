@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class MythTest
+class UnfoldingTest
 {
 	@Nested
 	@DisplayName("Tests for concludeWith() method")
@@ -141,9 +141,9 @@ class MythTest
 										 null, null, null, false),
 								 new TestCase<>("Null value from fallback supplier should be returned for empty unfolding",
 										 Unfolding.empty(), null, () -> null, null, true),
-								 new TestCase<>("Myth created with null should return fallback value", Unfolding.of(null),
+								 new TestCase<>("Unfolding created with null should return fallback value", Unfolding.of(null),
 										 "fallback", null, "fallback", false),
-								 new TestCase<>("Myth created with null should use fallback supplier", Unfolding.of(null),
+								 new TestCase<>("Unfolding created with null should use fallback supplier", Unfolding.of(null),
 										 null,
 										 () -> "fallback", "fallback", true))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.fallbackValue, tc.fallbackSupplier,
@@ -190,14 +190,14 @@ class MythTest
 		private static Stream<Arguments> testCases()
 		{
 			return Stream.of(
-					new TestCase<>("Myth with non-null value should be present", Unfolding.of("value"), true),
+					new TestCase<>("Unfolding with non-null value should be present", Unfolding.of("value"), true),
 					new TestCase<>("Empty unfolding should not be present", Unfolding.empty(), false),
-					new TestCase<>("Myth created with null should be empty and not present", Unfolding.of(null),
+					new TestCase<>("Unfolding created with null should be empty and not present", Unfolding.of(null),
 							false),
-					new TestCase<>("Myth with empty string should be present", Unfolding.of(""), true),
-					new TestCase<>("Myth with zero should be present", Unfolding.of(0), true),
-					new TestCase<>("Myth with false should be present", Unfolding.of(false), true),
-					new TestCase<>("Myth with empty list should be present", Unfolding.of(new ArrayList<>()),
+					new TestCase<>("Unfolding with empty string should be present", Unfolding.of(""), true),
+					new TestCase<>("Unfolding with zero should be present", Unfolding.of(0), true),
+					new TestCase<>("Unfolding with false should be present", Unfolding.of(false), true),
+					new TestCase<>("Unfolding with empty list should be present", Unfolding.of(new ArrayList<>()),
 							true)).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedResult));
 		}
 
@@ -784,7 +784,7 @@ class MythTest
 		private static Stream<Arguments> exceptionTestCases()
 		{
 			return Stream.of(new ExceptionTestCase<>("Empty unfolding should throw exception", Unfolding.empty()),
-								 new ExceptionTestCase<>("Myth with null value should throw exception", Unfolding.of(null)))
+								 new ExceptionTestCase<>("Unfolding with null value should throw exception", Unfolding.of(null)))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding));
 		}
 
@@ -835,7 +835,7 @@ class MythTest
 		{
 			return Stream.of(
 					new EmptyTestCase<>("Empty unfolding should be converted to empty Optional", Unfolding.empty()),
-					new EmptyTestCase<>("Myth created with null should be converted to empty Optional",
+					new EmptyTestCase<>("Unfolding created with null should be converted to empty Optional",
 							Unfolding.of(null))).map(tc -> Arguments.of(tc.description, tc.unfolding));
 		}
 
@@ -865,9 +865,9 @@ class MythTest
 		private static Stream<Arguments> testCases()
 		{
 			return Stream.of(
-								 new TestCase<>("Myth with non-null value should not be empty", Unfolding.of("value"), false),
+								 new TestCase<>("Unfolding with non-null value should not be empty", Unfolding.of("value"), false),
 								 new TestCase<>("Empty unfolding should be empty", Unfolding.empty(), true),
-								 new TestCase<>("Myth created with null should be empty", Unfolding.of(null), true))
+								 new TestCase<>("Unfolding created with null should be empty", Unfolding.of(null), true))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedResult));
 		}
 
@@ -1120,11 +1120,11 @@ class MythTest
 		{
 			return Stream.of(
 					new PresentTestCase<>("String value should be formatted correctly",
-							Unfolding.of("test"), "Myth[test]"),
+							Unfolding.of("test"), "Unfolding[test]"),
 					new PresentTestCase<>("Integer value should be formatted correctly",
-							Unfolding.of(42), "Myth[42]"),
+							Unfolding.of(42), "Unfolding[42]"),
 					new PresentTestCase<>("Boolean value should be formatted correctly",
-							Unfolding.of(true), "Myth[true]")
+							Unfolding.of(true), "Unfolding[true]")
 			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedResult));
 		}
 
@@ -1310,15 +1310,15 @@ class MythTest
 			Unfolding<String> emptyStringValueUnfolding = Unfolding.of("");
 
 			assertThat(emptyStringValueUnfolding.equals(emptyStringUnfolding))
-					.as("Myth with empty string should not equal empty unfolding")
+					.as("Unfolding with empty string should not equal empty unfolding")
 					.isFalse();
 
 			assertThat(emptyStringValueUnfolding.equals(nullStringUnfolding))
-					.as("Myth with empty string should not equal Unfolding.of(null)")
+					.as("Unfolding with empty string should not equal Unfolding.of(null)")
 					.isFalse();
 
 			assertThat(presentUnfolding.equals(null))
-					.as("Myth should not equal null")
+					.as("Unfolding should not equal null")
 					.isFalse();
 
 			assertThat(emptyStringUnfolding.equals(null))
@@ -1328,11 +1328,11 @@ class MythTest
 			String stringObject = "test";
 
 			assertThat(presentUnfolding.equals(stringObject))
-					.as("Myth should not equal non-Myth object")
+					.as("Unfolding should not equal non-Unfolding object")
 					.isFalse();
 
 			assertThat(emptyStringUnfolding.equals(stringObject))
-					.as("Empty unfolding should not equal non-Myth object")
+					.as("Empty unfolding should not equal non-Unfolding object")
 					.isFalse();
 		}
 
@@ -1436,7 +1436,7 @@ class MythTest
 							emptyStringUnfolding, presentStringUnfolding, false),
 					new EqualityTestCase<>("Empty unfolding should not equal present unfolding (integer)",
 							emptyIntegerUnfolding, presentIntegerUnfolding, false),
-					new EqualityTestCase<>("Myth with empty string value should not equal empty unfolding",
+					new EqualityTestCase<>("Unfolding with empty string value should not equal empty unfolding",
 							emptyStringValueUnfolding, emptyStringUnfolding, false),
 					new EqualityTestCase<>("Empty unfolding should not equal unfolding with empty string value",
 							emptyStringUnfolding, emptyStringValueUnfolding, false)

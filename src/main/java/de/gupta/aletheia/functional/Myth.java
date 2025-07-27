@@ -10,11 +10,9 @@ import java.util.stream.Stream;
 
 final class Myth<T> implements Unfolding<T>
 {
-	private static final Myth<?> EMPTY = new Myth<>(null);
-
 	private final T value;
 
-	public static <T> Unfolding<T> from(final T value)
+	static <T> Unfolding<T> with(final T value)
 	{
 		return new Myth<>(value);
 	}
@@ -22,10 +20,6 @@ final class Myth<T> implements Unfolding<T>
 	@Override
 	public T summon()
 	{
-		if (value == null)
-		{
-			throw EmptyUnfoldingException.instance();
-		}
 		return value;
 	}
 
@@ -33,25 +27,13 @@ final class Myth<T> implements Unfolding<T>
 	public <R> Unfolding<R> refold(Function<? super T, ? extends R> folding)
 	{
 		Objects.requireNonNull(folding, "folding may not be null");
-		return isEmpty() ? empty() : of(folding.apply(value));
+		return Unfolding.of(folding.apply(value));
 	}
 
 	@Override
 	public boolean isEmpty()
 	{
-		return this == EMPTY;
-	}
-
-	public static <T> Myth<T> of(final T value)
-	{
-		if (value == null) return empty();
-		return new Myth<>(value);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T> Myth<T> empty()
-	{
-		return (Myth<T>) EMPTY;
+		return false;
 	}
 
 	@Override
@@ -60,7 +42,7 @@ final class Myth<T> implements Unfolding<T>
 		Objects.requireNonNull(judgement, "judgement may not be null");
 		Objects.requireNonNull(development, "development may not be null");
 
-		return isEmpty() ? this : judgement.test(value) ? of(development.apply(value)) : this;
+		return judgement.test(value) ? Unfolding.of(development.apply(value)) : this;
 	}
 
 	@Override
@@ -69,7 +51,7 @@ final class Myth<T> implements Unfolding<T>
 		Objects.requireNonNull(judgement, "judgement may not be null");
 		Objects.requireNonNull(evolution, "evolution may not be null");
 
-		return isEmpty() ? empty() : judgement.test(value) ? of(evolution.apply(value)) : empty();
+		return judgement.test(value) ? Unfolding.of(evolution.apply(value)) : Unfolding.empty();
 	}
 
 	@Override
@@ -87,14 +69,14 @@ final class Myth<T> implements Unfolding<T>
 		Objects.requireNonNull(reward, "reward may not be null");
 		Objects.requireNonNull(punishment, "punishment may not be null");
 
-		return isEmpty() ? empty() : judgement.test(value) ? of(reward.apply(value)) : of(punishment.apply(value));
+		return judgement.test(value) ? Unfolding.of(reward.apply(value)) : Unfolding.of(punishment.apply(value));
 	}
 
 	@Override
 	public Unfolding<T> discern(Predicate<? super T> judgement)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
-		return isEmpty() ? this : judgement.test(value) ? this : empty();
+		return judgement.test(value) ? this : Unfolding.empty();
 	}
 
 	@Override
@@ -159,7 +141,7 @@ final class Myth<T> implements Unfolding<T>
 	@Override
 	public String toString()
 	{
-		return "Myth[" + value + "]";
+		return "Unfolding[" + value + "]";
 	}
 
 	private Myth(T value)
