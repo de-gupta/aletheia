@@ -8,12 +8,24 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public final class Unfolding<T>
+public final class Unfolding<T> implements IUnfolding<T>
 {
 	private static final Unfolding<?> EMPTY = new Unfolding<>(null);
 
 	private final T value;
 
+	public static <T> IUnfolding<T> from(final T value)
+	{
+		return new Unfolding<>(value);
+	}
+
+	public static <T> Unfolding<T> of(final T value)
+	{
+		if (value == null) return empty();
+		return new Unfolding<>(value);
+	}
+
+	@Override
 	public T summon()
 	{
 		if (value == null)
@@ -23,12 +35,14 @@ public final class Unfolding<T>
 		return value;
 	}
 
+	@Override
 	public <R> Unfolding<R> refold(Function<? super T, ? extends R> folding)
 	{
 		Objects.requireNonNull(folding, "folding may not be null");
 		return isEmpty() ? empty() : of(folding.apply(value));
 	}
 
+	@Override
 	public boolean isEmpty()
 	{
 		return this == EMPTY;
@@ -40,15 +54,7 @@ public final class Unfolding<T>
 		return (Unfolding<T>) EMPTY;
 	}
 
-	public static <T> Unfolding<T> of(T value)
-	{
-		if (value == null)
-		{
-			return empty();
-		}
-		return new Unfolding<>(value);
-	}
-
+	@Override
 	public Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
@@ -57,6 +63,7 @@ public final class Unfolding<T>
 		return isEmpty() ? this : judgement.test(value) ? of(development.apply(value)) : this;
 	}
 
+	@Override
 	public <R> Unfolding<R> evolve(Predicate<? super T> judgement, Function<? super T, ? extends R> evolution)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
@@ -65,11 +72,13 @@ public final class Unfolding<T>
 		return isEmpty() ? empty() : judgement.test(value) ? of(evolution.apply(value)) : empty();
 	}
 
+	@Override
 	public Stream<T> stream()
 	{
 		return isEmpty() ? Stream.empty() : Stream.of(value);
 	}
 
+	@Override
 	public <R> Unfolding<R> cleave(final Predicate<? super T> judgement,
 								   final Function<? super T, ? extends R> reward,
 								   final Function<? super T, ? extends R> punishment)
@@ -81,12 +90,14 @@ public final class Unfolding<T>
 		return isEmpty() ? empty() : judgement.test(value) ? of(reward.apply(value)) : of(punishment.apply(value));
 	}
 
+	@Override
 	public Unfolding<T> discern(Predicate<? super T> judgement)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
 		return isEmpty() ? this : judgement.test(value) ? this : empty();
 	}
 
+	@Override
 	public Unfolding<T> unlace(Consumer<? super T> impregnator)
 	{
 		Objects.requireNonNull(impregnator, "impregnator may not be null");
@@ -94,11 +105,13 @@ public final class Unfolding<T>
 		return this;
 	}
 
+	@Override
 	public boolean isPresent()
 	{
 		return !isEmpty();
 	}
 
+	@Override
 	public <R> R concludeWith(Function<? super T, ? extends R> conclusion)
 	{
 		Objects.requireNonNull(conclusion, "conclusion may not be null");
@@ -106,17 +119,20 @@ public final class Unfolding<T>
 		return conclusion.apply(value);
 	}
 
+	@Override
 	public T alternatively(Supplier<? extends T> revelation)
 	{
 		Objects.requireNonNull(revelation, "revelation may not be null");
 		return isPresent() ? value : revelation.get();
 	}
 
+	@Override
 	public T alternatively(T alternative)
 	{
 		return isPresent() ? value : alternative;
 	}
 
+	@Override
 	public Optional<T> optional()
 	{
 		return Optional.ofNullable(value);
