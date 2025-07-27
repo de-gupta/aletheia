@@ -29,7 +29,7 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public boolean isEmpty()
+	public boolean sterile()
 	{
 		return true;
 	}
@@ -74,7 +74,7 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public boolean isPresent()
+	public boolean supple()
 	{
 		return false;
 	}

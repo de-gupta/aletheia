@@ -31,7 +31,17 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public boolean isEmpty()
+	public boolean equals(final Object o)
+	{
+		return this == o ||
+				(o instanceof Myth<?> other &&
+						(
+								(sterile() && other.sterile()) ||
+										(supple() && other.supple() && Objects.equals(value, other.value))
+						)
+				);
+	}	@Override
+	public boolean sterile()
 	{
 		return false;
 	}
@@ -57,7 +67,7 @@ final class Myth<T> implements Unfolding<T>
 	@Override
 	public Stream<T> stream()
 	{
-		return isEmpty() ? Stream.empty() : Stream.of(value);
+		return sterile() ? Stream.empty() : Stream.of(value);
 	}
 
 	@Override
@@ -83,21 +93,21 @@ final class Myth<T> implements Unfolding<T>
 	public Unfolding<T> unlace(Consumer<? super T> impregnator)
 	{
 		Objects.requireNonNull(impregnator, "impregnator may not be null");
-		if (isPresent()) impregnator.accept(value);
+		if (supple()) impregnator.accept(value);
 		return this;
 	}
 
 	@Override
-	public boolean isPresent()
+	public boolean supple()
 	{
-		return !isEmpty();
+		return !sterile();
 	}
 
 	@Override
 	public <R> R concludeWith(Function<? super T, ? extends R> conclusion)
 	{
 		Objects.requireNonNull(conclusion, "conclusion may not be null");
-		if (isEmpty()) throw EmptyUnfoldingException.instance();
+		if (sterile()) throw EmptyUnfoldingException.instance();
 		return conclusion.apply(value);
 	}
 
@@ -105,13 +115,13 @@ final class Myth<T> implements Unfolding<T>
 	public T alternatively(Supplier<? extends T> revelation)
 	{
 		Objects.requireNonNull(revelation, "revelation may not be null");
-		return isPresent() ? value : revelation.get();
+		return supple() ? value : revelation.get();
 	}
 
 	@Override
 	public T alternatively(T alternative)
 	{
-		return isPresent() ? value : alternative;
+		return supple() ? value : alternative;
 	}
 
 	@Override
@@ -126,17 +136,7 @@ final class Myth<T> implements Unfolding<T>
 		return Objects.hashCode(value);
 	}
 
-	@Override
-	public boolean equals(final Object o)
-	{
-		return this == o ||
-				(o instanceof Myth<?> other &&
-						(
-								(isEmpty() && other.isEmpty()) ||
-										(isPresent() && other.isPresent() && Objects.equals(value, other.value))
-						)
-				);
-	}
+
 
 	@Override
 	public String toString()

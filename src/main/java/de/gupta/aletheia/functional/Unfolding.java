@@ -25,7 +25,7 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R> Unfolding<R> refold(Function<? super T, ? extends R> folding);
 
-	boolean isEmpty();
+	boolean sterile();
 
 	Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development);
 
@@ -41,7 +41,7 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	Unfolding<T> unlace(Consumer<? super T> impregnator);
 
-	boolean isPresent();
+	boolean supple();
 
 	<R> R concludeWith(Function<? super T, ? extends R> conclusion);
 
