@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public interface IUnfolding<T>
+public sealed interface IUnfolding<T> permits EmptyUnfolding, Unfolding
 {
 	static <T> IUnfolding<T> of(T value)
 	{

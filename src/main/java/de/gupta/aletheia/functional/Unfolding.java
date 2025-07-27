@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public final class Unfolding<T> implements IUnfolding<T>
+final class Unfolding<T> implements IUnfolding<T>
 {
 	private static final Unfolding<?> EMPTY = new Unfolding<>(null);
 
