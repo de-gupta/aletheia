@@ -136,8 +136,6 @@ final class Myth<T> implements Unfolding<T>
 		return Objects.hashCode(value);
 	}
 
-
-
 	@Override
 	public String toString()
 	{
