@@ -17,7 +17,7 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	static <T> Unfolding<T> of(T value)
 	{
 		return Optional.ofNullable(value)
-					   .map(Myth::with)
+					   .map(Myth::of)
 					   .orElseGet(Shell::instance);
 	}
 

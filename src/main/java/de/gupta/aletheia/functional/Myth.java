@@ -12,7 +12,7 @@ final class Myth<T> implements Unfolding<T>
 {
 	private final T value;
 
-	static <T> Unfolding<T> with(final T value)
+	static <T> Unfolding<T> of(final T value)
 	{
 		return new Myth<>(value);
 	}
