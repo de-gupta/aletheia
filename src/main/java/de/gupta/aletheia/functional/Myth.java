@@ -124,20 +124,20 @@ final class Myth<T> implements Unfolding<T>
 	public T alternatively(final Supplier<? extends T> revelation)
 	{
 		Objects.requireNonNull(revelation, "revelation may not be null");
-		return supple() ? value : revelation.get();
+		return value;
 	}
 
 	@Override
 	public T alternatively(final T manifestation)
 	{
-		return supple() ? value : manifestation;
+		return value;
 	}
 
 	@Override
 	public Unfolding<T> unlace(final Consumer<? super T> impregnator)
 	{
 		Objects.requireNonNull(impregnator, "impregnator may not be null");
-		if (supple()) impregnator.accept(value);
+		impregnator.accept(value);
 		return this;
 	}
 
