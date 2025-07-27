@@ -7,13 +7,14 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-final class EmptyUnfolding<T> implements IUnfolding<T>
+final class EmptyUnfolding<T> implements Unfolding<T>
 {
 	private static final EmptyUnfolding<?> INSTANCE = new EmptyUnfolding<>();
 
-	public static <T> IUnfolding<T> instance()
+	@Override
+	public <R> Unfolding<R> refold(final Function<? super T, ? extends R> folding)
 	{
-		return (IUnfolding<T>) INSTANCE;
+		return instance();
 	}
 
 	@Override
@@ -22,10 +23,9 @@ final class EmptyUnfolding<T> implements IUnfolding<T>
 		throw EmptyUnfoldingException.instance();
 	}
 
-	@Override
-	public <R> IUnfolding<R> refold(final Function<? super T, ? extends R> folding)
+	public static <T> Unfolding<T> instance()
 	{
-		return instance();
+		return (Unfolding<T>) INSTANCE;
 	}
 
 	@Override
@@ -35,14 +35,14 @@ final class EmptyUnfolding<T> implements IUnfolding<T>
 	}
 
 	@Override
-	public IUnfolding<T> develop(final Predicate<? super T> judgement,
+	public Unfolding<T> develop(final Predicate<? super T> judgement,
 								final Function<? super T, ? extends T> development)
 	{
 		return instance();
 	}
 
 	@Override
-	public <R> IUnfolding<R> evolve(final Predicate<? super T> judgement,
+	public <R> Unfolding<R> evolve(final Predicate<? super T> judgement,
 								   final Function<? super T, ? extends R> evolution)
 	{
 		return instance();
@@ -55,20 +55,20 @@ final class EmptyUnfolding<T> implements IUnfolding<T>
 	}
 
 	@Override
-	public <R> IUnfolding<R> cleave(final Predicate<? super T> judgement, final Function<? super T, ? extends R> reward,
+	public <R> Unfolding<R> cleave(final Predicate<? super T> judgement, final Function<? super T, ? extends R> reward,
 								   final Function<? super T, ? extends R> punishment)
 	{
 		return instance();
 	}
 
 	@Override
-	public IUnfolding<T> discern(final Predicate<? super T> judgement)
+	public Unfolding<T> discern(final Predicate<? super T> judgement)
 	{
 		return instance();
 	}
 
 	@Override
-	public IUnfolding<T> unlace(final Consumer<? super T> impregnator)
+	public Unfolding<T> unlace(final Consumer<? super T> impregnator)
 	{
 		return instance();
 	}
