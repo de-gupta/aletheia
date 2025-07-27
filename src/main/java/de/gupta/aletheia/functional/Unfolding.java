@@ -36,7 +36,7 @@ final class Unfolding<T> implements IUnfolding<T>
 	}
 
 	@Override
-	public <R> Unfolding<R> refold(Function<? super T, ? extends R> folding)
+	public <R> IUnfolding<R> refold(Function<? super T, ? extends R> folding)
 	{
 		Objects.requireNonNull(folding, "folding may not be null");
 		return isEmpty() ? empty() : of(folding.apply(value));
@@ -55,7 +55,7 @@ final class Unfolding<T> implements IUnfolding<T>
 	}
 
 	@Override
-	public Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development)
+	public IUnfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
 		Objects.requireNonNull(development, "development may not be null");
@@ -64,7 +64,7 @@ final class Unfolding<T> implements IUnfolding<T>
 	}
 
 	@Override
-	public <R> Unfolding<R> evolve(Predicate<? super T> judgement, Function<? super T, ? extends R> evolution)
+	public <R> IUnfolding<R> evolve(Predicate<? super T> judgement, Function<? super T, ? extends R> evolution)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
 		Objects.requireNonNull(evolution, "evolution may not be null");
@@ -79,7 +79,7 @@ final class Unfolding<T> implements IUnfolding<T>
 	}
 
 	@Override
-	public <R> Unfolding<R> cleave(final Predicate<? super T> judgement,
+	public <R> IUnfolding<R> cleave(final Predicate<? super T> judgement,
 								   final Function<? super T, ? extends R> reward,
 								   final Function<? super T, ? extends R> punishment)
 	{
@@ -91,14 +91,14 @@ final class Unfolding<T> implements IUnfolding<T>
 	}
 
 	@Override
-	public Unfolding<T> discern(Predicate<? super T> judgement)
+	public IUnfolding<T> discern(Predicate<? super T> judgement)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
 		return isEmpty() ? this : judgement.test(value) ? this : empty();
 	}
 
 	@Override
-	public Unfolding<T> unlace(Consumer<? super T> impregnator)
+	public IUnfolding<T> unlace(Consumer<? super T> impregnator)
 	{
 		Objects.requireNonNull(impregnator, "impregnator may not be null");
 		if (isPresent()) impregnator.accept(value);

@@ -103,6 +103,12 @@ final class EmptyUnfolding<T> implements IUnfolding<T>
 		return Optional.empty();
 	}
 
+	@Override
+	public String toString()
+	{
+		return "EmptyUnfolding{}";
+	}
+
 	private EmptyUnfolding()
 	{
 	}

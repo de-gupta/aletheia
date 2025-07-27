@@ -9,6 +9,11 @@ import java.util.stream.Stream;
 
 public sealed interface IUnfolding<T> permits EmptyUnfolding, Unfolding
 {
+	static <T> IUnfolding<T> empty()
+	{
+		return EmptyUnfolding.instance();
+	}
+
 	static <T> IUnfolding<T> of(T value)
 	{
 		return Optional.ofNullable(value)
