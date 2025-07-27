@@ -8,6 +8,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -1762,6 +1765,90 @@ class UnfoldingTest
 			assertThatThrownBy(() -> Unfolding.empty().summon())
 					.isInstanceOf(EmptyUnfoldingException.class)
 					.hasMessageContaining("empty");
+		}
+	}
+
+	@Nested
+	class StoryOfJesus
+	{
+		@Test
+		@DisplayName("Chronicle of Christ: An Unfolding Gospel")
+		void chronicleOfChrist()
+		{
+			LocalDate christmas = LocalDate.of(0, Month.DECEMBER, 25);
+			Unfolding<LocalDate> gospel = Unfolding.of(christmas);
+
+			String poeticSummary = gospel
+					// Develop into Epiphany (Baptism) // Jan 6
+					.develop(_ -> true, d -> d.plusYears(30).withMonth(1).withDayOfMonth(6))
+
+					// Cleave into Crucifixion (if Epiphany accepted)
+					.cleave(_ -> true, _ -> LocalDate.of(33, 4, 3), d -> d)
+
+					// Evolve into Resurrection
+					.evolve(d -> d.equals(LocalDate.of(33, 4, 3)), crucifixion -> crucifixion.plusDays(3))
+
+					// Develop into Ascension
+					.develop(d -> d.equals(LocalDate.of(33, 4, 6)), resurrection -> resurrection.plusDays(40))
+
+					// Interlace with corresponding Feast
+					.interlace(this::mapToFeast)
+
+					// Refold into SacredEvent
+					.refold(pair -> SacredEvent.of(pair.second(), christmas, pair.first()))
+
+					// Interlace again with duration from Christmas
+					.interlace(SacredEvent::daysSinceChristmas)
+
+					// Refold into poetic summary
+					.refold(pair -> formatSummary(pair.first(), pair.second()))
+
+					// Conclude
+					.concludeWith(Function.identity());
+
+			assertThat(poeticSummary).contains("Ascension").contains("11830 days").contains("He ascended to Heaven");
+		}
+
+		private FeastDay mapToFeast(LocalDate date)
+		{
+			if (date.equals(LocalDate.of(0, 12, 25))) return FeastDay.CHRISTMAS;
+			if (date.equals(LocalDate.of(30, 1, 6))) return FeastDay.EPIPHANY;
+			if (date.equals(LocalDate.of(33, 4, 3))) return FeastDay.GOOD_FRIDAY;
+			if (date.equals(LocalDate.of(33, 4, 6))) return FeastDay.EASTER;
+			if (date.equals(LocalDate.of(33, 5, 16))) return FeastDay.ASCENSION;
+			throw new IllegalArgumentException("Unknown date: " + date);
+		}
+
+		private String formatSummary(SacredEvent event, long daysSinceBirth)
+		{
+			return switch (event.feast())
+			{
+				case CHRISTMAS -> "The Light entered the world";
+				case EPIPHANY -> "He was revealed to the nations after " + daysSinceBirth + " days";
+				case GOOD_FRIDAY -> "He suffered and died after " + daysSinceBirth + " days";
+				case EASTER -> "He rose again in glory after " + daysSinceBirth + " days";
+				case ASCENSION -> "Ascension: He ascended to Heaven after " + daysSinceBirth + " days — and the myth " +
+						"continues.";
+			};
+		}
+
+
+		private enum FeastDay
+		{
+			CHRISTMAS,
+			EPIPHANY,
+			GOOD_FRIDAY,
+			EASTER,
+			ASCENSION
+		}
+
+		private record SacredEvent(FeastDay feast, LocalDate date, long daysSinceChristmas)
+		{
+			private static SacredEvent of(FeastDay feast, LocalDate base, LocalDate eventDate)
+			{
+				return new SacredEvent(feast, eventDate,
+						Duration.between(base.atStartOfDay(), eventDate.atStartOfDay()).toDays());
+			}
 		}
 	}
 }
