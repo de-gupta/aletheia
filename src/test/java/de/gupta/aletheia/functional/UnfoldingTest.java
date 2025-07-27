@@ -1832,7 +1832,6 @@ class UnfoldingTest
 			};
 		}
 
-
 		private enum FeastDay
 		{
 			CHRISTMAS,
