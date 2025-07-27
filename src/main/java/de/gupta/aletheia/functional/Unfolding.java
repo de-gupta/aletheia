@@ -25,33 +25,35 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	T summon();
 
-	<R> Unfolding<R> refold(Function<? super T, ? extends R> folding);
-
 	boolean sterile();
+
+	boolean supple();
+
+	Unfolding<T> discern(Predicate<? super T> judgement);
 
 	Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development);
 
+	<R> Unfolding<R> refold(Function<? super T, ? extends R> folding);
+
 	<R> Unfolding<R> evolve(Predicate<? super T> judgement, Function<? super T, ? extends R> evolution);
-
-	<R> Unfolding<Pair<T, R>> interlace(Function<? super T, ? extends R> interlacing);
-
-	Stream<T> stream();
 
 	<R> Unfolding<R> cleave(Predicate<? super T> judgement,
 							Function<? super T, ? extends R> reward,
 							Function<? super T, ? extends R> punishment);
 
-	Unfolding<T> discern(Predicate<? super T> judgement);
+	<R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot);
 
-	Unfolding<T> unlace(Consumer<? super T> impregnator);
-
-	boolean supple();
+	<R> Unfolding<Pair<T, R>> interlace(Function<? super T, ? extends R> interlacing);
 
 	<R> R concludeWith(Function<? super T, ? extends R> conclusion);
 
 	T alternatively(Supplier<? extends T> revelation);
 
-	T alternatively(T alternative);
+	T alternatively(T manifestation);
+
+	Stream<T> stream();
+
+	Unfolding<T> unlace(Consumer<? super T> impregnator);
 
 	Optional<T> optional();
 }

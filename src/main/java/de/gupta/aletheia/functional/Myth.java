@@ -95,18 +95,23 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public Unfolding<T> discern(Predicate<? super T> judgement)
+	public Unfolding<T> discern(final Predicate<? super T> judgement)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
 		return judgement.test(value) ? this : Unfolding.empty();
 	}
 
 	@Override
-	public Unfolding<T> unlace(Consumer<? super T> impregnator)
+	public <R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot)
 	{
-		Objects.requireNonNull(impregnator, "impregnator may not be null");
-		if (supple()) impregnator.accept(value);
-		return this;
+		return plot.apply(value);
+	}
+
+	@Override
+	public <R> R concludeWith(final Function<? super T, ? extends R> conclusion)
+	{
+		Objects.requireNonNull(conclusion, "conclusion may not be null");
+		return conclusion.apply(value);
 	}
 
 	@Override
@@ -116,23 +121,24 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R> R concludeWith(Function<? super T, ? extends R> conclusion)
-	{
-		Objects.requireNonNull(conclusion, "conclusion may not be null");
-		return conclusion.apply(value);
-	}
-
-	@Override
-	public T alternatively(Supplier<? extends T> revelation)
+	public T alternatively(final Supplier<? extends T> revelation)
 	{
 		Objects.requireNonNull(revelation, "revelation may not be null");
 		return supple() ? value : revelation.get();
 	}
 
 	@Override
-	public T alternatively(T alternative)
+	public T alternatively(final T manifestation)
 	{
-		return supple() ? value : alternative;
+		return supple() ? value : manifestation;
+	}
+
+	@Override
+	public Unfolding<T> unlace(final Consumer<? super T> impregnator)
+	{
+		Objects.requireNonNull(impregnator, "impregnator may not be null");
+		if (supple()) impregnator.accept(value);
+		return this;
 	}
 
 	@Override
@@ -147,7 +153,7 @@ final class Myth<T> implements Unfolding<T>
 		return "Unfolding[" + value + "]";
 	}
 
-	private Myth(T value)
+	private Myth(final T value)
 	{
 		this.value = value;
 	}

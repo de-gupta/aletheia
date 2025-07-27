@@ -70,6 +70,12 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot)
+	{
+		return instance();
+	}
+
+	@Override
 	public Unfolding<T> discern(final Predicate<? super T> judgement)
 	{
 		return instance();
@@ -100,9 +106,9 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public T alternatively(final T alternative)
+	public T alternatively(final T manifestation)
 	{
-		return alternative;
+		return manifestation;
 	}
 
 	@Override
