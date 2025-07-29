@@ -16,11 +16,18 @@ final class Myth<T> implements Unfolding<T>
 
 	static <T> Unfolding<T> of(final T value)
 	{
+		Objects.requireNonNull(value, "value may not be null");
 		return new Myth<>(value);
 	}
 
 	@Override
 	public T summon()
+	{
+		return value;
+	}
+
+	@Override
+	public T decree(final Supplier<? extends RuntimeException> exceptionSupplier)
 	{
 		return value;
 	}

@@ -25,6 +25,8 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	T summon();
 
+	T decree(Supplier<? extends RuntimeException> exceptionSupplier);
+
 	boolean sterile();
 
 	boolean supple();

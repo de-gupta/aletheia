@@ -25,6 +25,12 @@ final class Shell<T> implements Unfolding<T>
 		throw EmptyUnfoldingException.instance();
 	}
 
+	@Override
+	public T decree(final Supplier<? extends RuntimeException> exceptionSupplier)
+	{
+		throw exceptionSupplier.get();
+	}
+
 	public static <T> Unfolding<T> instance()
 	{
 		return (Unfolding<T>) INSTANCE;
