@@ -1850,4 +1850,38 @@ class UnfoldingTest
 			}
 		}
 	}
+
+	@Nested
+	@DisplayName("Tests for the decree")
+	class DecreeTests
+	{
+		@Test
+		@DisplayName("Decree: The decree that is true")
+		void decree()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+
+			assertThat(unfolding.decree(RuntimeException::new))
+					.as("A supple unfolding should return the hero when decreed")
+					.isEqualTo("test");
+
+			assertThatCode(() -> unfolding.decree(RuntimeException::new))
+					.as("A supple unfolding should not throw when decreed")
+					.doesNotThrowAnyException();
+		}
+
+		@Test
+		@DisplayName("Decree: The decree that is false")
+		void decreeFalse()
+		{
+			Unfolding<String> unfolding = Unfolding.empty();
+
+			Supplier<RuntimeException> exceptionSupplier = () -> new IllegalStateException("test");
+
+			assertThatThrownBy(() -> unfolding.decree(exceptionSupplier))
+					.as("An empty unfolding should throw when decreed")
+					.isInstanceOf(exceptionSupplier.get().getClass())
+					.hasMessageContaining("test");
+		}
+	}
 }
