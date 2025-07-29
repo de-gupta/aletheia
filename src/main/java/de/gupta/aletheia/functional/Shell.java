@@ -14,12 +14,6 @@ final class Shell<T> implements Unfolding<T>
 	private static final Shell<?> INSTANCE = new Shell<>();
 
 	@Override
-	public <R> Unfolding<R> refold(final Function<? super T, ? extends R> folding)
-	{
-		return instance();
-	}
-
-	@Override
 	public T summon()
 	{
 		throw EmptyUnfoldingException.instance();
@@ -31,15 +25,22 @@ final class Shell<T> implements Unfolding<T>
 		throw exceptionSupplier.get();
 	}
 
-	public static <T> Unfolding<T> instance()
-	{
-		return (Unfolding<T>) INSTANCE;
-	}
-
 	@Override
 	public boolean sterile()
 	{
 		return true;
+	}
+
+	@Override
+	public boolean supple()
+	{
+		return false;
+	}
+
+	@Override
+	public Unfolding<T> discern(final Predicate<? super T> judgement)
+	{
+		return instance();
 	}
 
 	@Override
@@ -50,22 +51,16 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis)
+	{
+		return instance();
+	}
+
+	@Override
 	public <R> Unfolding<R> evolve(final Predicate<? super T> judgement,
 								   final Function<? super T, ? extends R> evolution)
 	{
 		return instance();
-	}
-
-	@Override
-	public <R> Unfolding<Pair<T, R>> interlace(final Function<? super T, ? extends R> interlacing)
-	{
-		return instance();
-	}
-
-	@Override
-	public Stream<T> stream()
-	{
-		return Stream.empty();
 	}
 
 	@Override
@@ -82,21 +77,9 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public Unfolding<T> discern(final Predicate<? super T> judgement)
+	public <R> Unfolding<Pair<T, R>> interlace(final Function<? super T, ? extends R> interlacing)
 	{
 		return instance();
-	}
-
-	@Override
-	public Unfolding<T> unlace(final Consumer<? super T> impregnator)
-	{
-		return instance();
-	}
-
-	@Override
-	public boolean supple()
-	{
-		return false;
 	}
 
 	@Override
@@ -118,9 +101,26 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public Stream<T> stream()
+	{
+		return Stream.empty();
+	}
+
+	@Override
+	public Unfolding<T> unlace(final Consumer<? super T> impregnator)
+	{
+		return instance();
+	}
+
+	@Override
 	public Optional<T> optional()
 	{
 		return Optional.empty();
+	}
+
+	public static <T> Unfolding<T> instance()
+	{
+		return (Unfolding<T>) INSTANCE;
 	}
 
 	@Override

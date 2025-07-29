@@ -33,13 +33,6 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R> Unfolding<R> refold(Function<? super T, ? extends R> folding)
-	{
-		Objects.requireNonNull(folding, "folding may not be null");
-		return Unfolding.of(folding.apply(value));
-	}
-
-	@Override
 	public int hashCode()
 	{
 		return Objects.hashCode(value);
@@ -49,6 +42,33 @@ final class Myth<T> implements Unfolding<T>
 	public boolean equals(final Object o)
 	{
 		return this == o || (o instanceof Myth<?> other && Objects.equals(value, other.value));
+	}
+
+	@Override
+	public String toString()
+	{
+		return "Unfolding[" + value + "]";
+	}
+
+	private Myth(final T value)
+	{
+		this.value = value;
+	}	@Override
+	public <R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis)
+	{
+		Objects.requireNonNull(metamorphosis, "folding may not be null");
+		return Unfolding.of(metamorphosis.apply(value));
+	}
+
+	@Override
+	public <R> Unfolding<R> cleave(final Predicate<? super T> judgement, final Function<? super T, ? extends R> reward,
+								   final Function<? super T, ? extends R> punishment)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		Objects.requireNonNull(reward, "reward may not be null");
+		Objects.requireNonNull(punishment, "punishment may not be null");
+
+		return judgement.test(value) ? Unfolding.of(reward.apply(value)) : Unfolding.of(punishment.apply(value));
 	}
 
 	@Override
@@ -89,17 +109,7 @@ final class Myth<T> implements Unfolding<T>
 		return Stream.of(value);
 	}
 
-	@Override
-	public <R> Unfolding<R> cleave(final Predicate<? super T> judgement,
-								   final Function<? super T, ? extends R> reward,
-								   final Function<? super T, ? extends R> punishment)
-	{
-		Objects.requireNonNull(judgement, "judgement may not be null");
-		Objects.requireNonNull(reward, "reward may not be null");
-		Objects.requireNonNull(punishment, "punishment may not be null");
 
-		return judgement.test(value) ? Unfolding.of(reward.apply(value)) : Unfolding.of(punishment.apply(value));
-	}
 
 	@Override
 	public Unfolding<T> discern(final Predicate<? super T> judgement)
@@ -152,16 +162,5 @@ final class Myth<T> implements Unfolding<T>
 	public Optional<T> optional()
 	{
 		return Optional.ofNullable(value);
-	}
-
-	@Override
-	public String toString()
-	{
-		return "Unfolding[" + value + "]";
-	}
-
-	private Myth(final T value)
-	{
-		this.value = value;
 	}
 }

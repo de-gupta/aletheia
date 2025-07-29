@@ -35,7 +35,13 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development);
 
-	<R> Unfolding<R> refold(Function<? super T, ? extends R> folding);
+	@Deprecated(since = "0.0.3", forRemoval = true)
+	default <R> Unfolding<R> refold(Function<? super T, ? extends R> folding)
+	{
+		return metamorphose(folding);
+	}
+
+	<R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis);
 
 	<R> Unfolding<R> evolve(Predicate<? super T> judgement, Function<? super T, ? extends R> evolution);
 

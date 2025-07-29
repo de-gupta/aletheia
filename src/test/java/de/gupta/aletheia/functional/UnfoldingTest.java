@@ -212,8 +212,8 @@ class UnfoldingTest
 	}
 
 	@Nested
-	@DisplayName("Tests for refold() method")
-	class RefoldTests
+	@DisplayName("Tests for metamorphose() method")
+	class MetamorphosesTests
 	{
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("presentResultTestCases")
@@ -221,10 +221,11 @@ class UnfoldingTest
 		<T, R> void shouldTransformPresentValue(String description, Unfolding<T> unfolding, Function<T, R> mapper,
 												Unfolding<R> expectedResult)
 		{
-			Unfolding<R> result = unfolding.refold(mapper);
+			Unfolding<R> result = unfolding.metamorphose(mapper);
 
-			assertThat(result.supple()).as("refold() for %s should result in present unfolding", unfolding).isTrue();
-			assertThat(result.summon()).as("refold() result value should match expected")
+			assertThat(result.supple()).as("metamorphose() for %s should result in present unfolding", unfolding)
+									   .isTrue();
+			assertThat(result.summon()).as("metamorphose() result value should match expected")
 									   .isEqualTo(expectedResult.summon());
 		}
 
@@ -233,9 +234,10 @@ class UnfoldingTest
 		@DisplayName("should transform to empty unfolding when appropriate")
 		<T, R> void shouldTransformToEmptyUnfolding(String description, Unfolding<T> unfolding, Function<T, R> mapper)
 		{
-			Unfolding<R> result = unfolding.refold(mapper);
+			Unfolding<R> result = unfolding.metamorphose(mapper);
 
-			assertThat(result.sterile()).as("refold() for %s should result in empty unfolding", unfolding).isTrue();
+			assertThat(result.sterile()).as("metamorphose() for %s should result in empty unfolding", unfolding)
+										.isTrue();
 		}
 
 		@DisplayName("should throw exception for null mapper")
@@ -245,8 +247,8 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.of("test");
 			Function<String, Integer> nullMapper = null;
 
-			assertThatThrownBy(() -> unfolding.refold(nullMapper))
-					.as("refold() with null mapper should throw NullPointerException")
+			assertThatThrownBy(() -> unfolding.metamorphose(nullMapper))
+					.as("metamorphose() with null mapper should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
 					.hasMessageContaining("folding may not be null");
 		}
@@ -1168,7 +1170,7 @@ class UnfoldingTest
 			List<String> capturedValues = new ArrayList<>();
 
 			String result =
-					unfolding.refold(String::toUpperCase).unlace(capturedValues::add).discern(s -> s.length() > 5)
+					unfolding.metamorphose(String::toUpperCase).unlace(capturedValues::add).discern(s -> s.length() > 5)
 							 .develop(s -> s.contains("WORLD"), s -> s + "!")
 							 .concludeWith(s -> s.substring(0, 5));
 
@@ -1185,7 +1187,7 @@ class UnfoldingTest
 			List<String> capturedValues = new ArrayList<>();
 
 			Unfolding<String> result =
-					unfolding.refold(String::toUpperCase).unlace(capturedValues::add).discern(s -> s.length() > 5)
+					unfolding.metamorphose(String::toUpperCase).unlace(capturedValues::add).discern(s -> s.length() > 5)
 							 .develop(s -> s.contains("WORLD"), s -> s + "!");
 
 			assertThat(result.sterile()).as("Result of chained operations on empty unfolding should be empty").isTrue();
@@ -1198,7 +1200,7 @@ class UnfoldingTest
 		{
 			Unfolding<Integer> unfolding = Unfolding.of(42);
 
-			String result = unfolding.refold(n -> n * 2).discern(n -> n > 50).refold(Object::toString)
+			String result = unfolding.metamorphose(n -> n * 2).discern(n -> n > 50).metamorphose(Object::toString)
 									 .develop(s -> s.length() == 2, s -> "0" + s).alternatively("Not found");
 
 			assertThat(result).as("Complex chain should produce expected result").isEqualTo("084");
@@ -1211,9 +1213,9 @@ class UnfoldingTest
 			Unfolding<Integer> unfolding = Unfolding.of(42);
 			List<String> capturedValues = new ArrayList<>();
 
-			String result = unfolding.refold(n -> n * 2)
+			String result = unfolding.metamorphose(n -> n * 2)
 									 .discern(n -> n < 50)
-									 .refold(Object::toString)
+									 .metamorphose(Object::toString)
 									 .unlace(capturedValues::add)
 									 .alternatively("Not found");
 
@@ -1681,7 +1683,7 @@ class UnfoldingTest
 		{
 			String result = Unfolding.of("Eurydice")
 									 .interlace(String::length)
-									 .refold(pair -> pair.first() + " (" + pair.second() + ")")
+									 .metamorphose(pair -> pair.first() + " (" + pair.second() + ")")
 									 .concludeWith(Function.identity());
 
 			assertThat(result).isEqualTo("Eurydice (8)");
@@ -1729,12 +1731,12 @@ class UnfoldingTest
 
 		@Test
 		@DisplayName("Refolding identity should yield the same value")
-		void refoldWithIdentityPreservesValue()
+		void metamorphoseWithIdentityPreservesValue()
 		{
 			Unfolding<String> myth = Unfolding.of("echo");
-			Unfolding<String> refolded = myth.refold(Function.identity());
+			Unfolding<String> metamorphosed = myth.metamorphose(Function.identity());
 
-			assertThat(refolded.optional()).isEqualTo(myth.optional());
+			assertThat(metamorphosed.optional()).isEqualTo(myth.optional());
 		}
 
 		@Test
@@ -1743,7 +1745,7 @@ class UnfoldingTest
 		{
 			Unfolding<String> shell = Unfolding.empty();
 
-			assertThat(shell.refold(_ -> "new")).isSameAs(shell);
+			assertThat(shell.metamorphose(_ -> "new")).isSameAs(shell);
 			assertThat(shell.evolve(_ -> true, _ -> "anything")).isEqualTo(Unfolding.empty());
 			assertThat(shell.discern(_ -> false)).isEqualTo(Unfolding.empty());
 		}
@@ -1795,13 +1797,13 @@ class UnfoldingTest
 					.interlace(this::mapToFeast)
 
 					// Refold into SacredEvent
-					.refold(pair -> SacredEvent.of(pair.second(), christmas, pair.first()))
+					.metamorphose(pair -> SacredEvent.of(pair.second(), christmas, pair.first()))
 
 					// Interlace again with duration from Christmas
 					.interlace(SacredEvent::daysSinceChristmas)
 
 					// Refold into poetic summary
-					.refold(pair -> formatSummary(pair.first(), pair.second()))
+					.metamorphose(pair -> formatSummary(pair.first(), pair.second()))
 
 					// Conclude
 					.concludeWith(Function.identity());
