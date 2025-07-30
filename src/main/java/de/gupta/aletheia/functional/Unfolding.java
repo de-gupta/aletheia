@@ -24,11 +24,16 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	T decree(Supplier<? extends RuntimeException> exceptionSupplier);
 
+	void interdict(Supplier<? extends RuntimeException> exceptionSupplier);
+
 	boolean sterile();
 
 	boolean supple();
 
 	Unfolding<T> discern(Predicate<? super T> judgement);
+
+	Unfolding<T> discern(final Predicate<? super T> judgement,
+						 final Supplier<? extends RuntimeException> exceptionSupplier);
 
 	Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development);
 

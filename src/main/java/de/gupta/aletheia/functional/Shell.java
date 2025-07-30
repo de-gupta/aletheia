@@ -23,6 +23,12 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public void interdict(final Supplier<? extends RuntimeException> exceptionSupplier)
+	{
+		// do nothing
+	}
+
+	@Override
 	public boolean sterile()
 	{
 		return true;
@@ -38,6 +44,13 @@ final class Shell<T> implements Unfolding<T>
 	public Unfolding<T> discern(final Predicate<? super T> judgement)
 	{
 		return instance();
+	}
+
+	@Override
+	public Unfolding<T> discern(final Predicate<? super T> judgement,
+								final Supplier<? extends RuntimeException> exceptionSupplier)
+	{
+		throw exceptionSupplier.get();
 	}
 
 	@Override

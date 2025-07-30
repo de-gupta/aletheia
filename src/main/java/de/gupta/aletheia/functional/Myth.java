@@ -30,6 +30,12 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public void interdict(final Supplier<? extends RuntimeException> exceptionSupplier)
+	{
+		throw exceptionSupplier.get();
+	}
+
+	@Override
 	public int hashCode()
 	{
 		return Objects.hashCode(hero);
@@ -44,7 +50,34 @@ final class Myth<T> implements Unfolding<T>
 	public boolean equals(final Object o)
 	{
 		return this == o || (o instanceof Myth<?> other && Objects.equals(hero, other.hero));
+	}
+
+	@Override
+	public String toString()
+	{
+		return "Unfolding[" + hero + "]";
 	}	@Override
+	public Unfolding<T> discern(final Predicate<? super T> judgement,
+								final Supplier<? extends RuntimeException> exceptionSupplier)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		Objects.requireNonNull(exceptionSupplier, "exceptionSupplier may not be null");
+
+		if (!judgement.test(hero))
+		{
+			throw exceptionSupplier.get();
+		}
+		return this;
+	}
+
+	private Myth(final T hero)
+	{
+		this.hero = hero;
+	}
+
+
+
+	@Override
 	public Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
@@ -54,20 +87,13 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public String toString()
-	{
-		return "Unfolding[" + hero + "]";
-	}	@Override
 	public <R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis)
 	{
 		Objects.requireNonNull(metamorphosis, "folding may not be null");
 		return Unfolding.of(metamorphosis.apply(hero));
 	}
 
-	private Myth(final T hero)
-	{
-		this.hero = hero;
-	}	@Override
+	@Override
 	public <R> Unfolding<R> evolve(Predicate<? super T> judgement, Function<? super T, ? extends R> evolution)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
@@ -75,6 +101,17 @@ final class Myth<T> implements Unfolding<T>
 
 		return judgement.test(hero) ? Unfolding.of(evolution.apply(hero)) : Unfolding.empty();
 	}
+
+	@Override
+	public <U, R> Unfolding<R> conjoin(final U consort, final BiFunction<? super T, ? super U, ? extends R> conjugation)
+	{
+		Objects.requireNonNull(consort, "consort may not be null");
+		Objects.requireNonNull(conjugation, "conjugation may not be null");
+		return Unfolding.of(conjugation.apply(hero, consort));
+	}
+
+
+
 
 	@Override
 	public <R> Unfolding<R> cleave(final Predicate<? super T> judgement, final Function<? super T, ? extends R> reward,
@@ -107,12 +144,6 @@ final class Myth<T> implements Unfolding<T>
 		return Unfolding.of(Pair.of(hero, interlacing.apply(hero)));
 	}
 
-	@Override
-	public <U, R> Unfolding<R> conjoin(final U consort, final BiFunction<? super T, ? super U, ? extends R> conjugation)
-	{
-		Objects.requireNonNull(consort, "consort may not be null");
-		return Unfolding.of(conjugation.apply(hero, consort));
-	}
 
 	@Override
 	public <R> R concludeWith(final Function<? super T, ? extends R> conclusion)
@@ -159,12 +190,6 @@ final class Myth<T> implements Unfolding<T>
 	{
 		return !sterile();
 	}
-
-
-
-
-
-
 
 
 }

@@ -14,10 +14,7 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -1154,6 +1151,292 @@ class UnfoldingTest
 
 		private record EmptyResultTestCase<T, R>(String description, Unfolding<T> unfolding,
 												 Function<T, R> transformer)
+		{
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for conjoin() method")
+	class ConjoinTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("presentResultTestCases")
+		@DisplayName("should transform present value with consort to new value")
+		<T, U, R> void shouldTransformToPresentValue(String description, Unfolding<T> unfolding,
+													 U consort, BiFunction<T, U, R> conjugation,
+													 Unfolding<R> expectedResult)
+		{
+			Unfolding<R> result = unfolding.conjoin(consort, conjugation);
+
+			assertThat(result.supple()).as("conjoin() for %s should result in present unfolding",
+					unfolding).isTrue();
+			assertThat(result.summon()).as("conjoin() result should match expected value")
+									   .isEqualTo(expectedResult.summon());
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("emptyResultTestCases")
+		@DisplayName("should transform to empty unfolding when appropriate")
+		<T, U, R> void shouldTransformToEmptyUnfolding(String description, Unfolding<T> unfolding,
+													   U consort, BiFunction<T, U, R> conjugation)
+		{
+			Unfolding<R> result = unfolding.conjoin(consort, conjugation);
+
+			assertThat(result.sterile()).as("conjoin() for %s should result in empty unfolding",
+					unfolding).isTrue();
+		}
+
+		@DisplayName("should throw exception for null consort")
+		@Test
+		void shouldThrowExceptionForNullConsort()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			String nullConsort = null;
+			BiFunction<String, String, String> conjugation = String::concat;
+
+			assertThatThrownBy(() -> unfolding.conjoin(nullConsort, conjugation))
+					.as("conjoin() with null consort should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("consort may not be null");
+		}
+
+		@DisplayName("should throw exception for null conjugation function")
+		@Test
+		void shouldThrowExceptionForNullConjugation()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			String consort = "partner";
+			BiFunction<String, String, String> nullConjugation = null;
+
+			assertThatThrownBy(() -> unfolding.conjoin(consort, nullConjugation))
+					.as("conjoin() with null conjugation should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("conjugation may not be null");
+		}
+
+		private static Stream<Arguments> presentResultTestCases()
+		{
+			return Stream.of(
+								 new PresentResultTestCase<>(
+										 "Present string value should be combined with another string",
+										 Unfolding.of("hello"),
+										 " world",
+										 String::concat,
+										 Unfolding.of("hello world")),
+								 new PresentResultTestCase<>(
+										 "Present string value should be combined with an integer",
+										 Unfolding.of("Count: "),
+										 42,
+										 (s, i) -> s + i,
+										 Unfolding.of("Count: 42")),
+								 new PresentResultTestCase<>(
+										 "Present integer value should be combined with another integer",
+										 Unfolding.of(10),
+										 5,
+										 Integer::sum,
+										 Unfolding.of(15)),
+								 new PresentResultTestCase<>(
+										 "Present value should be combined with consort to create a pair",
+										 Unfolding.of("key"),
+										 "value",
+										 Pair::of,
+										 Unfolding.of(Pair.of("key", "value"))),
+								 new PresentResultTestCase<>(
+										 "Present empty string should be combined correctly",
+										 Unfolding.of(""),
+										 "suffix",
+										 String::concat,
+										 Unfolding.of("suffix"))
+						 )
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.consort, tc.conjugation,
+								 tc.expectedResult));
+		}
+
+		private static Stream<Arguments> emptyResultTestCases()
+		{
+			return Stream.of(
+								 new EmptyResultTestCase<>(
+										 "Empty unfolding should remain empty regardless of consort and conjugation",
+										 Unfolding.empty(),
+										 "partner",
+										 String::concat)
+						 )
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.consort, tc.conjugation));
+		}
+
+		private record PresentResultTestCase<T, U, R>(String description, Unfolding<T> unfolding,
+													  U consort, BiFunction<T, U, R> conjugation,
+													  Unfolding<R> expectedResult)
+		{
+		}
+
+		private record EmptyResultTestCase<T, U, R>(String description, Unfolding<T> unfolding,
+													U consort, BiFunction<T, U, R> conjugation)
+		{
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for interdict() method")
+	class InterdictTests
+	{
+		@DisplayName("should throw exception for present value")
+		@Test
+		void shouldThrowExceptionForPresentValue()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			RuntimeException testException = new RuntimeException("Test exception");
+
+			assertThatThrownBy(() -> unfolding.interdict(() -> testException))
+					.as("interdict() for present value should throw the supplied exception")
+					.isSameAs(testException);
+		}
+
+		@DisplayName("should not throw exception for empty unfolding")
+		@Test
+		void shouldNotThrowExceptionForEmptyUnfolding()
+		{
+			Unfolding<String> unfolding = Unfolding.empty();
+			RuntimeException testException = new RuntimeException("Test exception");
+
+			assertThatCode(() -> unfolding.interdict(() -> testException))
+					.as("interdict() for empty unfolding should not throw exception")
+					.doesNotThrowAnyException();
+		}
+
+		@DisplayName("should throw exception for null supplier")
+		@Test
+		void shouldThrowExceptionForNullSupplier()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Supplier<RuntimeException> nullSupplier = null;
+
+			assertThatThrownBy(() -> unfolding.interdict(nullSupplier))
+					.as("interdict() with null supplier should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class);
+		}
+
+		@DisplayName("should throw exception when supplier returns null")
+		@Test
+		void shouldThrowExceptionWhenSupplierReturnsNull()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+
+			assertThatThrownBy(() -> unfolding.interdict(() -> null))
+					.as("interdict() with supplier returning null should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class);
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for discern() method with exception supplier")
+	class DiscernWithExceptionTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("successTestCases")
+		@DisplayName("should keep value when predicate matches")
+		<T> void shouldKeepValueWhenPredicateMatches(String description, Unfolding<T> unfolding,
+													 Predicate<T> predicate)
+		{
+			RuntimeException testException = new RuntimeException("Test exception");
+			Unfolding<T> result = unfolding.discern(predicate, () -> testException);
+
+			assertThat(result.supple()).as(
+					"discern() with exception supplier for %s with matching predicate should remain present",
+					unfolding).isTrue();
+			assertThat(result.summon()).as("discern() with exception supplier result value should match original")
+									   .isEqualTo(unfolding.summon());
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("exceptionTestCases")
+		@DisplayName("should throw exception when predicate doesn't match")
+		<T> void shouldThrowExceptionWhenPredicateDoesntMatch(String description, Unfolding<T> unfolding,
+															  Predicate<T> predicate)
+		{
+			RuntimeException testException = new RuntimeException("Test exception");
+
+			assertThatThrownBy(() -> unfolding.discern(predicate, () -> testException))
+					.as("discern() with exception supplier for %s with non-matching predicate should throw exception",
+							unfolding)
+					.isSameAs(testException);
+		}
+
+		@DisplayName("should throw exception for null predicate")
+		@Test
+		void shouldThrowExceptionForNullPredicate()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Predicate<String> nullPredicate = null;
+			RuntimeException testException = new RuntimeException("Test exception");
+
+			assertThatThrownBy(() -> unfolding.discern(nullPredicate, () -> testException))
+					.as("discern() with exception supplier with null predicate should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("judgement may not be null");
+		}
+
+		@DisplayName("should throw exception for null exception supplier")
+		@Test
+		void shouldThrowExceptionForNullExceptionSupplier()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+			Supplier<RuntimeException> nullSupplier = null;
+
+			assertThatThrownBy(() -> unfolding.discern(s -> true, nullSupplier))
+					.as("discern() with null exception supplier should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("exceptionSupplier may not be null");
+		}
+
+		@DisplayName("should throw exception when supplier returns null")
+		@Test
+		void shouldThrowExceptionWhenSupplierReturnsNull()
+		{
+			Unfolding<String> unfolding = Unfolding.of("test");
+
+			assertThatThrownBy(() -> unfolding.discern(s -> false, () -> null))
+					.as("discern() with supplier returning null should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class);
+		}
+
+		@DisplayName("should always throw exception for empty unfolding")
+		@Test
+		void shouldAlwaysThrowExceptionForEmptyUnfolding()
+		{
+			Unfolding<String> unfolding = Unfolding.empty();
+			RuntimeException testException = new RuntimeException("Test exception");
+
+			assertThatThrownBy(() -> unfolding.discern(s -> true, () -> testException))
+					.as("discern() with exception supplier for empty unfolding should throw exception")
+					.isSameAs(testException);
+		}
+
+		private static Stream<Arguments> successTestCases()
+		{
+			return Stream.of(
+								 new SuccessTestCase<>("Present value matching predicate should remain unchanged",
+										 Unfolding.of("hello"), s -> s.length() > 3),
+								 new SuccessTestCase<>("Predicate with complex logic should work correctly (even numbers)",
+										 Unfolding.of(42), n -> n % 2 == 0))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate));
+		}
+
+		private static Stream<Arguments> exceptionTestCases()
+		{
+			return Stream.of(
+								 new ExceptionTestCase<>("Present value not matching predicate should throw exception",
+										 Unfolding.of("hi"), s -> s.length() > 3),
+								 new ExceptionTestCase<>("Predicate with complex logic should work correctly (odd numbers)",
+										 Unfolding.of(43), n -> n % 2 == 0))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate));
+		}
+
+		private record SuccessTestCase<T>(String description, Unfolding<T> unfolding, Predicate<T> predicate)
+		{
+		}
+
+		private record ExceptionTestCase<T>(String description, Unfolding<T> unfolding, Predicate<T> predicate)
 		{
 		}
 	}
