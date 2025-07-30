@@ -3,10 +3,7 @@ package de.gupta.aletheia.functional;
 import de.gupta.aletheia.collection.Pair;
 
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 final class Shell<T> implements Unfolding<T>
@@ -78,6 +75,12 @@ final class Shell<T> implements Unfolding<T>
 
 	@Override
 	public <R> Unfolding<Pair<T, R>> interlace(final Function<? super T, ? extends R> interlacing)
+	{
+		return instance();
+	}
+
+	@Override
+	public <U, R> Unfolding<R> conjoin(final U consort, final BiFunction<? super T, ? super U, ? extends R> conjugation)
 	{
 		return instance();
 	}

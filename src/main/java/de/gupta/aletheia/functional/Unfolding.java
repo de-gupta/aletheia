@@ -3,10 +3,7 @@ package de.gupta.aletheia.functional;
 import de.gupta.aletheia.collection.Pair;
 
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 public sealed interface Unfolding<T> permits Shell, Myth
@@ -52,6 +49,8 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	<R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot);
 
 	<R> Unfolding<Pair<T, R>> interlace(Function<? super T, ? extends R> interlacing);
+
+	<U, R> Unfolding<R> conjoin(U consort, BiFunction<? super T, ? super U, ? extends R> conjugation);
 
 	<R> R concludeWith(Function<? super T, ? extends R> conclusion);
 
