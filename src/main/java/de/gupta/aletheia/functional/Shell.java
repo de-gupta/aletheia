@@ -142,7 +142,7 @@ final class Shell<T> implements Unfolding<T>
 	@Override
 	public String toString()
 	{
-		return "Shell{}";
+		return "Unfolding{}";
 	}
 
 	private Shell()

@@ -247,7 +247,7 @@ class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.metamorphose(nullMapper))
 					.as("metamorphose() with null mapper should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("folding may not be null");
+					.hasMessageContaining("metamorphosis may not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()

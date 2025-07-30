@@ -39,11 +39,6 @@ final class Myth<T> implements Unfolding<T>
 	public int hashCode()
 	{
 		return Objects.hashCode(hero);
-	}	@Override
-	public Unfolding<T> discern(final Predicate<? super T> judgement)
-	{
-		Objects.requireNonNull(judgement, "judgement may not be null");
-		return judgement.test(hero) ? this : Unfolding.empty();
 	}
 
 	@Override
@@ -56,7 +51,16 @@ final class Myth<T> implements Unfolding<T>
 	public String toString()
 	{
 		return "Unfolding[" + hero + "]";
-	}	@Override
+	}
+
+	@Override
+	public Unfolding<T> discern(final Predicate<? super T> judgement)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		return judgement.test(hero) ? this : Unfolding.empty();
+	}
+
+	@Override
 	public Unfolding<T> discern(final Predicate<? super T> judgement,
 								final Supplier<? extends RuntimeException> exceptionSupplier)
 	{
@@ -70,13 +74,6 @@ final class Myth<T> implements Unfolding<T>
 		return this;
 	}
 
-	private Myth(final T hero)
-	{
-		this.hero = hero;
-	}
-
-
-
 	@Override
 	public Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development)
 	{
@@ -89,7 +86,7 @@ final class Myth<T> implements Unfolding<T>
 	@Override
 	public <R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis)
 	{
-		Objects.requireNonNull(metamorphosis, "folding may not be null");
+		Objects.requireNonNull(metamorphosis, "metamorphosis may not be null");
 		return Unfolding.of(metamorphosis.apply(hero));
 	}
 
@@ -109,9 +106,6 @@ final class Myth<T> implements Unfolding<T>
 		Objects.requireNonNull(conjugation, "conjugation may not be null");
 		return Unfolding.of(conjugation.apply(hero, consort));
 	}
-
-
-
 
 	@Override
 	public <R> Unfolding<R> cleave(final Predicate<? super T> judgement, final Function<? super T, ? extends R> reward,
@@ -143,7 +137,6 @@ final class Myth<T> implements Unfolding<T>
 
 		return Unfolding.of(Pair.of(hero, interlacing.apply(hero)));
 	}
-
 
 	@Override
 	public <R> R concludeWith(final Function<? super T, ? extends R> conclusion)
@@ -191,5 +184,8 @@ final class Myth<T> implements Unfolding<T>
 		return !sterile();
 	}
 
-
+	private Myth(final T hero)
+	{
+		this.hero = hero;
+	}
 }
