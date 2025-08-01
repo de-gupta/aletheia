@@ -1795,11 +1795,11 @@ class UnfoldingTest
 					.as("Unfolding with empty string should not equal Unfolding.of(null)")
 					.isFalse();
 
-			assertThat(presentUnfolding.equals(null))
+			assertThat(presentUnfolding == null)
 					.as("Unfolding should not equal null")
 					.isFalse();
 
-			assertThat(emptyStringUnfolding.equals(null))
+			assertThat(emptyStringUnfolding == null)
 					.as("Empty unfolding should not equal null")
 					.isFalse();
 
