@@ -8,16 +8,32 @@ import java.util.stream.Stream;
 
 public sealed interface Unfolding<T> permits Shell, Myth
 {
-	static <T> Unfolding<T> empty()
+	static <T> Unfolding<T> distill(final Stream<T> brook)
+	{
+		return augur(brook.findFirst());
+	}
+
+	static <T> Unfolding<T> augur(final Optional<T> omen)
+	{
+		return omen.map(Unfolding::beckon).orElseGet(Unfolding::chaos);
+	}
+
+	static <T> Unfolding<T> beckon(T apparition)
+	{
+		return Optional.ofNullable(apparition)
+					   .map(Myth::beckon)
+					   .orElseGet(Unfolding::chaos);
+	}
+
+	static <T> Unfolding<T> chaos()
 	{
 		return Shell.instance();
 	}
 
-	static <T> Unfolding<T> of(T value)
+	@Deprecated(since = "0.0.6", forRemoval = true)
+	static <T> Unfolding<T> of(T apparition)
 	{
-		return Optional.ofNullable(value)
-					   .map(Myth::of)
-					   .orElseGet(Shell::instance);
+		return beckon(apparition);
 	}
 
 	T summon();
@@ -56,6 +72,8 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	<R> Unfolding<Pair<T, R>> interlace(Function<? super T, ? extends R> interlacing);
 
 	<U, R> Unfolding<R> conjoin(U consort, BiFunction<? super T, ? super U, ? extends R> conjugation);
+
+	<R, U> Unfolding<U> braid(Unfolding<R> consort, BiFunction<? super T, ? super R, ? extends U> weaver);
 
 	<R> R concludeWith(Function<? super T, ? extends R> conclusion);
 

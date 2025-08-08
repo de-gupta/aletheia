@@ -99,6 +99,13 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R, U> Unfolding<U> braid(final Unfolding<R> consort,
+									 final BiFunction<? super T, ? super R, ? extends U> weaver)
+	{
+		return instance();
+	}
+
+	@Override
 	public <R> R concludeWith(final Function<? super T, ? extends R> conclusion)
 	{
 		throw EmptyUnfoldingException.instance();
