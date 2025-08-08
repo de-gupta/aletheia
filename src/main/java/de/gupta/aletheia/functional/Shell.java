@@ -2,6 +2,7 @@ package de.gupta.aletheia.functional;
 
 import de.gupta.aletheia.collection.Pair;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.*;
 import java.util.stream.Stream;
@@ -112,15 +113,23 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public T alternatively(final Supplier<? extends T> revelation)
+	public T rescue(final Supplier<? extends T> revelation)
 	{
 		return revelation.get();
 	}
 
 	@Override
-	public T alternatively(final T manifestation)
+	public T rescue(final T manifestation)
 	{
 		return manifestation;
+	}
+
+	@Override
+	public Unfolding<T> resurrect(final Supplier<Unfolding<T>> grace)
+	{
+		Objects.requireNonNull(grace, "grace may not be null");
+
+		return Optional.ofNullable(grace.get()).orElseGet(Shell::instance);
 	}
 
 	@Override

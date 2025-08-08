@@ -77,9 +77,11 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R> R concludeWith(Function<? super T, ? extends R> conclusion);
 
-	T alternatively(Supplier<? extends T> revelation);
+	T rescue(Supplier<? extends T> revelation);
 
-	T alternatively(T manifestation);
+	T rescue(T manifestation);
+
+	Unfolding<T> resurrect(Supplier<Unfolding<T>> grace);
 
 	Stream<T> stream();
 

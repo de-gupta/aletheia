@@ -64,6 +64,13 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public T rescue(final Supplier<? extends T> revelation)
+	{
+		Objects.requireNonNull(revelation, "revelation may not be null");
+		return hero;
+	}
+
+	@Override
 	public Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
@@ -155,7 +162,6 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 
-
 	@Override
 	public boolean sterile()
 	{
@@ -171,17 +177,18 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public T alternatively(final Supplier<? extends T> revelation)
+	public T rescue(final T manifestation)
 	{
-		Objects.requireNonNull(revelation, "revelation may not be null");
 		return hero;
 	}
 
 	@Override
-	public T alternatively(final T manifestation)
+	public Unfolding<T> resurrect(final Supplier<Unfolding<T>> grace)
 	{
-		return hero;
+		return Unfolding.beckon(hero);
 	}
+
+
 
 	@Override
 	public Stream<T> stream()
