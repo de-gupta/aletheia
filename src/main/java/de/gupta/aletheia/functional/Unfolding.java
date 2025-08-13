@@ -67,6 +67,8 @@ public sealed interface Unfolding<T> permits Shell, Myth
 							Function<? super T, ? extends R> reward,
 							Function<? super T, ? extends R> punishment);
 
+	<R> R cleave(Predicate<? super T> judgement, R reward, R punishment);
+
 	<R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot);
 
 	<R> Unfolding<Pair<T, R>> interlace(Function<? super T, ? extends R> interlacing);

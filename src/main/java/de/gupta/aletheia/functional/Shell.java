@@ -82,6 +82,12 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> R cleave(final Predicate<? super T> judgement, final R reward, final R punishment)
+	{
+		throw EmptyUnfoldingException.instance();
+	}
+
+	@Override
 	public <R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot)
 	{
 		return instance();

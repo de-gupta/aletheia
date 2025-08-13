@@ -64,6 +64,16 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> R cleave(final Predicate<? super T> judgement, final R reward, final R punishment)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		Objects.requireNonNull(reward, "reward may not be null");
+		Objects.requireNonNull(punishment, "punishment may not be null");
+
+		return judgement.test(hero) ? reward : punishment;
+	}
+
+	@Override
 	public T rescue(final Supplier<? extends T> revelation)
 	{
 		Objects.requireNonNull(revelation, "revelation may not be null");
@@ -119,6 +129,8 @@ final class Myth<T> implements Unfolding<T>
 
 		return judgement.test(hero) ? Unfolding.beckon(reward.apply(hero)) : Unfolding.beckon(punishment.apply(hero));
 	}
+
+
 
 	@Override
 	public <R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot)
@@ -187,7 +199,6 @@ final class Myth<T> implements Unfolding<T>
 	{
 		return Unfolding.beckon(hero);
 	}
-
 
 
 	@Override

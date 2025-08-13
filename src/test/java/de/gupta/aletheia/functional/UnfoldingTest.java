@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
-class UnfoldingTest
+final class UnfoldingTest
 {
 	@Nested
 	@DisplayName("Tests for concludeWith() method")
@@ -43,8 +43,9 @@ class UnfoldingTest
 														  Function<T, R> extractor)
 		{
 			assertThatThrownBy(() -> unfolding.concludeWith(extractor)).as(
-					"concludeWith() for %s should throw EmptyUnfoldingException",
-					unfolding).isInstanceOf(EmptyUnfoldingException.class).hasMessageContaining("empty");
+																			   "concludeWith() for %s should throw EmptyUnfoldingException", unfolding)
+																	   .isInstanceOf(EmptyUnfoldingException.class)
+																	   .hasMessageContaining("empty");
 		}
 
 		@DisplayName("should throw exception for null conclusion")
@@ -54,10 +55,11 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 			Function<String, Integer> nullConclusion = null;
 
-			assertThatThrownBy(() -> unfolding.concludeWith(nullConclusion))
-					.as("concludeWith() with null conclusion should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("conclusion may not be null");
+			assertThatThrownBy(() -> unfolding.concludeWith(nullConclusion)).as(
+																					"concludeWith() with null conclusion should throw NullPointerException")
+																			.isInstanceOf(NullPointerException.class)
+																			.hasMessageContaining(
+																					"conclusion may not be null");
 		}
 
 		private static Stream<Arguments> successTestCases()
@@ -76,11 +78,11 @@ class UnfoldingTest
 
 		private static Stream<Arguments> exceptionTestCases()
 		{
-			return Stream.of(new ExceptionTestCase<>("Empty unfolding should throw exception", Unfolding.chaos(),
-							_ -> "unused"),
-					new ExceptionTestCase<>("Unfolding created with null should throw exception",
-							Unfolding.beckon(null),
-							_ -> "unused")).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.extractor));
+			return Stream.of(
+								 new ExceptionTestCase<>("Empty unfolding should throw exception", Unfolding.chaos(), _ -> "unused"),
+								 new ExceptionTestCase<>("Unfolding created with null should throw exception",
+										 Unfolding.beckon(null), _ -> "unused"))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.extractor));
 		}
 
 		private record SuccessTestCase<T, R>(String description, Unfolding<T> unfolding, Function<T, R> extractor,
@@ -119,18 +121,16 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 			Supplier<String> nullSupplier = null;
 
-			assertThatThrownBy(() -> unfolding.rescue(nullSupplier))
-					.as("alternatively() with null revelation should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("revelation may not be null");
+			assertThatThrownBy(() -> unfolding.rescue(nullSupplier)).as(
+																			"alternatively() with null revelation should throw NullPointerException")
+																	.isInstanceOf(NullPointerException.class)
+																	.hasMessageContaining("revelation may not be null");
 		}
 
 		private static Stream<Arguments> testCases()
 		{
-			return Stream.of(
-								 new TestCase<>("Present value should be returned ignoring fallback value",
-										 Unfolding.beckon("primary"),
-										 "fallback", null, "primary", false),
+			return Stream.of(new TestCase<>("Present value should be returned ignoring fallback value",
+										 Unfolding.beckon("primary"), "fallback", null, "primary", false),
 								 new TestCase<>("Empty unfolding should return fallback value", Unfolding.chaos(), "fallback", null,
 										 "fallback", false),
 								 new TestCase<>("Present value should be returned ignoring fallback supplier", Unfolding.beckon(100),
@@ -146,8 +146,7 @@ class UnfoldingTest
 								 new TestCase<>("Unfolding created with null should return fallback value", Unfolding.beckon(null),
 										 "fallback", null, "fallback", false),
 								 new TestCase<>("Unfolding created with null should use fallback supplier", Unfolding.beckon(null),
-										 null,
-										 () -> "fallback", "fallback", true))
+										 null, () -> "fallback", "fallback", true))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.fallbackValue, tc.fallbackSupplier,
 								 tc.expectedResult, tc.useSupplier));
 		}
@@ -195,8 +194,7 @@ class UnfoldingTest
 					new TestCase<>("Unfolding with non-null value should be present", Unfolding.beckon("value"), true),
 					new TestCase<>("Empty unfolding should not be present", Unfolding.chaos(), false),
 					new TestCase<>("Unfolding created with null should be empty and not present",
-							Unfolding.beckon(null),
-							false),
+							Unfolding.beckon(null), false),
 					new TestCase<>("Unfolding with empty string should be present", Unfolding.beckon(""), true),
 					new TestCase<>("Unfolding with zero should be present", Unfolding.beckon(0), true),
 					new TestCase<>("Unfolding with false should be present", Unfolding.beckon(false), true),
@@ -245,28 +243,27 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 			Function<String, Integer> nullMapper = null;
 
-			assertThatThrownBy(() -> unfolding.metamorphose(nullMapper))
-					.as("metamorphose() with null mapper should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("metamorphosis may not be null");
+			assertThatThrownBy(() -> unfolding.metamorphose(nullMapper)).as(
+																				"metamorphose() with null mapper should throw NullPointerException")
+																		.isInstanceOf(NullPointerException.class)
+																		.hasMessageContaining(
+																				"metamorphosis may not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
 		{
-			return Stream.of(
-								 new PresentResultTestCase<>("Present value should be transformed by mapper",
-										 Unfolding.beckon("hello"),
-										 String::length, Unfolding.beckon(5)),
+			return Stream.of(new PresentResultTestCase<>("Present value should be transformed by mapper",
+										 Unfolding.beckon("hello"), String::length, Unfolding.beckon(5)),
 								 new PresentResultTestCase<>("Complex transformation should work on present value",
-										 Unfolding.beckon(42),
-										 num -> "Number: " + num, Unfolding.beckon("Number: 42")))
+										 Unfolding.beckon(42), num -> "Number: " + num, Unfolding.beckon("Number: 42")))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.mapper, tc.expectedResult));
 		}
 
 		private static Stream<Arguments> emptyResultTestCases()
 		{
-			return Stream.of(new EmptyResultTestCase<>("Empty unfolding should remain empty after mapping",
-										 Unfolding.chaos(), String::length),
+			return Stream.of(
+								 new EmptyResultTestCase<>("Empty unfolding should remain empty after mapping", Unfolding.chaos(),
+										 String::length),
 								 new EmptyResultTestCase<>("Mapper returning null should result in empty unfolding",
 										 Unfolding.beckon("test"), _ -> null))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.mapper));
@@ -309,8 +306,7 @@ class UnfoldingTest
 			Unfolding<T> result = unfolding.develop(predicate, mapper);
 
 			assertThat(result.sterile()).as("develop() for %s with predicate should result in empty unfolding",
-												unfolding)
-										.isTrue();
+					unfolding).isTrue();
 		}
 
 		@DisplayName("should throw exception for null predicate")
@@ -321,10 +317,11 @@ class UnfoldingTest
 			Predicate<String> nullPredicate = null;
 			Function<String, String> mapper = String::toUpperCase;
 
-			assertThatThrownBy(() -> unfolding.develop(nullPredicate, mapper))
-					.as("develop() with null predicate should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("judgement may not be null");
+			assertThatThrownBy(() -> unfolding.develop(nullPredicate, mapper)).as(
+																					  "develop() with null predicate should throw NullPointerException")
+																			  .isInstanceOf(NullPointerException.class)
+																			  .hasMessageContaining(
+																					  "judgement may not be null");
 		}
 
 		@DisplayName("should throw exception for null mapper")
@@ -335,10 +332,11 @@ class UnfoldingTest
 			Predicate<String> predicate = s -> s.length() > 3;
 			Function<String, String> nullMapper = null;
 
-			assertThatThrownBy(() -> unfolding.develop(predicate, nullMapper))
-					.as("develop() with null mapper should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("development may not be null");
+			assertThatThrownBy(() -> unfolding.develop(predicate, nullMapper)).as(
+																					  "develop() with null mapper should throw NullPointerException")
+																			  .isInstanceOf(NullPointerException.class)
+																			  .hasMessageContaining(
+																					  "development may not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
@@ -414,10 +412,11 @@ class UnfoldingTest
 			Predicate<String> nullPredicate = null;
 			Function<String, String> mapper = String::toUpperCase;
 
-			assertThatThrownBy(() -> unfolding.evolve(nullPredicate, mapper))
-					.as("evolve() with null predicate should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("judgement may not be null");
+			assertThatThrownBy(() -> unfolding.evolve(nullPredicate, mapper)).as(
+																					 "evolve() with null predicate should throw NullPointerException")
+																			 .isInstanceOf(NullPointerException.class)
+																			 .hasMessageContaining(
+																					 "judgement may not be null");
 		}
 
 		@DisplayName("should throw exception for null mapper")
@@ -428,10 +427,11 @@ class UnfoldingTest
 			Predicate<String> predicate = s -> s.length() > 3;
 			Function<String, String> nullMapper = null;
 
-			assertThatThrownBy(() -> unfolding.evolve(predicate, nullMapper))
-					.as("evolve() with null mapper should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("evolution may not be null");
+			assertThatThrownBy(() -> unfolding.evolve(predicate, nullMapper)).as(
+																					 "evolve() with null mapper should throw NullPointerException")
+																			 .isInstanceOf(NullPointerException.class)
+																			 .hasMessageContaining(
+																					 "evolution may not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
@@ -483,8 +483,7 @@ class UnfoldingTest
 		{
 			Unfolding<R> result = unfolding.cleave(predicate, trueMapper, falseMapper);
 
-			assertThat(result.supple()).as(
-					"cleave() for %s with matching predicate should result in present unfolding",
+			assertThat(result.supple()).as("cleave() for %s with matching predicate should result in present unfolding",
 					unfolding).isTrue();
 			assertThat(result.summon()).as("cleave() result value should match expected from trueMapper")
 									   .isEqualTo(expectedResult.summon());
@@ -500,8 +499,8 @@ class UnfoldingTest
 			Unfolding<R> result = unfolding.cleave(predicate, trueMapper, falseMapper);
 
 			assertThat(result.supple()).as(
-					"cleave() for %s with non-matching predicate should result in present unfolding",
-					unfolding).isTrue();
+											   "cleave() for %s with non-matching predicate should result in present unfolding", unfolding)
+									   .isTrue();
 			assertThat(result.summon()).as("cleave() result value should match expected from falseMapper")
 									   .isEqualTo(expectedResult.summon());
 		}
@@ -521,8 +520,8 @@ class UnfoldingTest
 		@MethodSource("nullResultTestCases")
 		@DisplayName("should return empty unfolding when mapper returns null")
 		<T, R> void shouldReturnEmptyForNullMapperResult(String description, Unfolding<T> unfolding,
-														 Predicate<T> predicate,
-														 Function<T, R> trueMapper, Function<T, R> falseMapper)
+														 Predicate<T> predicate, Function<T, R> trueMapper,
+														 Function<T, R> falseMapper)
 		{
 			Unfolding<R> result = unfolding.cleave(predicate, trueMapper, falseMapper);
 
@@ -539,10 +538,9 @@ class UnfoldingTest
 			Function<String, String> trueMapper = String::toUpperCase;
 			Function<String, String> falseMapper = s -> s + "_suffix";
 
-			assertThatThrownBy(() -> unfolding.cleave(nullPredicate, trueMapper, falseMapper))
-					.as("cleave() with null predicate should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("judgement may not be null");
+			assertThatThrownBy(() -> unfolding.cleave(nullPredicate, trueMapper, falseMapper)).as(
+					"cleave() with null predicate should throw NullPointerException").isInstanceOf(
+					NullPointerException.class).hasMessageContaining("judgement may not be null");
 		}
 
 		@DisplayName("should throw exception for null reward")
@@ -554,10 +552,9 @@ class UnfoldingTest
 			Function<String, String> nullMapper = null;
 			Function<String, String> falseMapper = s -> s + "_suffix";
 
-			assertThatThrownBy(() -> unfolding.cleave(predicate, nullMapper, falseMapper))
-					.as("cleave() with null reward should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("reward may not be null");
+			assertThatThrownBy(() -> unfolding.cleave(predicate, nullMapper, falseMapper)).as(
+					"cleave() with null reward should throw NullPointerException").isInstanceOf(
+					NullPointerException.class).hasMessageContaining("reward may not be null");
 		}
 
 		@DisplayName("should throw exception for null punishment")
@@ -569,62 +566,57 @@ class UnfoldingTest
 			Function<String, String> trueMapper = String::toUpperCase;
 			Function<String, String> nullMapper = null;
 
-			assertThatThrownBy(() -> unfolding.cleave(predicate, trueMapper, nullMapper))
-					.as("cleave() with null punishment should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("punishment may not be null");
+			assertThatThrownBy(() -> unfolding.cleave(predicate, trueMapper, nullMapper)).as(
+					"cleave() with null punishment should throw NullPointerException").isInstanceOf(
+					NullPointerException.class).hasMessageContaining("punishment may not be null");
 		}
 
 		private static Stream<Arguments> truePredicateTestCases()
 		{
-			return Stream.of(
-					new TestCase<>("String length predicate matches, apply uppercase transformation",
-							Unfolding.beckon("hello"), s -> s.length() > 3, String::toUpperCase, s -> s + "_suffix",
-							Unfolding.beckon("HELLO")),
-					new TestCase<>("Integer value predicate matches, apply string conversion",
-							Unfolding.beckon(42), n -> n > 10, n -> "Number: " + n, n -> "Small: " + n,
-							Unfolding.beckon("Number: 42")),
-					new TestCase<>("Boolean value predicate matches, apply conditional text",
-							Unfolding.beckon(true), b -> b, _ -> "It's true", _ -> "It's false",
-							Unfolding.beckon("It's true"))
-			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.trueMapper, tc.falseMapper,
-					tc.expectedResult));
+			return Stream.of(new TestCase<>("String length predicate matches, apply uppercase transformation",
+										 Unfolding.beckon("hello"), s -> s.length() > 3, String::toUpperCase, s -> s + "_suffix",
+										 Unfolding.beckon("HELLO")),
+								 new TestCase<>("Integer value predicate matches, apply string conversion", Unfolding.beckon(42),
+										 n -> n > 10, n -> "Number: " + n, n -> "Small: " + n, Unfolding.beckon("Number: 42")),
+								 new TestCase<>("Boolean value predicate matches, apply conditional text", Unfolding.beckon(true),
+										 b -> b, _ -> "It's true", _ -> "It's false", Unfolding.beckon("It's true")))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.trueMapper,
+								 tc.falseMapper, tc.expectedResult));
 		}
 
 		private static Stream<Arguments> falsePredicateTestCases()
 		{
-			return Stream.of(
-					new TestCase<>("String length predicate doesn't match, apply suffix transformation",
-							Unfolding.beckon("hi"), s -> s.length() > 3, String::toUpperCase, s -> s + "_suffix",
-							Unfolding.beckon("hi_suffix")),
-					new TestCase<>("Integer value predicate doesn't match, apply small number conversion",
-							Unfolding.beckon(5), n -> n > 10, n -> "Number: " + n, n -> "Small: " + n,
-							Unfolding.beckon("Small: 5")),
-					new TestCase<>("Boolean value predicate doesn't match, apply conditional text",
-							Unfolding.beckon(false), b -> b, _ -> "It's true", _ -> "It's false",
-							Unfolding.beckon("It's false"))
-			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.trueMapper, tc.falseMapper,
-					tc.expectedResult));
+			return Stream.of(new TestCase<>("String length predicate doesn't match, apply suffix transformation",
+										 Unfolding.beckon("hi"), s -> s.length() > 3, String::toUpperCase, s -> s + "_suffix",
+										 Unfolding.beckon("hi_suffix")),
+								 new TestCase<>("Integer value predicate doesn't match, apply small number conversion",
+										 Unfolding.beckon(5), n -> n > 10, n -> "Number: " + n, n -> "Small: " + n,
+										 Unfolding.beckon("Small: 5")),
+								 new TestCase<>("Boolean value predicate doesn't match, apply conditional text",
+										 Unfolding.beckon(false), b -> b, _ -> "It's true", _ -> "It's false",
+										 Unfolding.beckon("It's false")))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.trueMapper,
+								 tc.falseMapper, tc.expectedResult));
 		}
 
 		private static Stream<Arguments> emptyUnfoldingTestCases()
 		{
-			return Stream.of(
-					new EmptyTestCase<>("Empty unfolding with true predicate should remain empty",
-							Unfolding.<String>chaos(), _ -> true, String::toUpperCase, s -> s + "_suffix"),
-					new EmptyTestCase<>("Empty unfolding with false predicate should remain empty",
-							Unfolding.<Integer>chaos(), n -> n > 10, n -> n * 2, n -> n / 2)
-			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.trueMapper, tc.falseMapper));
+			return Stream.of(new EmptyTestCase<>("Empty unfolding with true predicate should remain empty",
+										 Unfolding.<String>chaos(), _ -> true, String::toUpperCase, s -> s + "_suffix"),
+								 new EmptyTestCase<>("Empty unfolding with false predicate should remain empty",
+										 Unfolding.<Integer>chaos(), n -> n > 10, n -> n * 2, n -> n / 2))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.trueMapper,
+								 tc.falseMapper));
 		}
 
 		private static Stream<Arguments> nullResultTestCases()
 		{
-			return Stream.of(
-					new EmptyTestCase<>("TrueMapper returning null should result in empty unfolding",
-							Unfolding.beckon("test"), s -> s.length() > 3, _ -> null, s -> s + "_suffix"),
-					new EmptyTestCase<>("FalseMapper returning null should result in empty unfolding",
-							Unfolding.beckon("hi"), s -> s.length() > 3, String::toUpperCase, _ -> null)
-			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.trueMapper, tc.falseMapper));
+			return Stream.of(new EmptyTestCase<>("TrueMapper returning null should result in empty unfolding",
+										 Unfolding.beckon("test"), s -> s.length() > 3, _ -> null, s -> s + "_suffix"),
+								 new EmptyTestCase<>("FalseMapper returning null should result in empty unfolding",
+										 Unfolding.beckon("hi"), s -> s.length() > 3, String::toUpperCase, _ -> null))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate, tc.trueMapper,
+								 tc.falseMapper));
 		}
 
 		private record TestCase<T, R>(String description, Unfolding<T> unfolding, Predicate<T> predicate,
@@ -639,6 +631,7 @@ class UnfoldingTest
 		}
 	}
 
+
 	@Nested
 	@DisplayName("Tests for discern() method")
 	class DiscernTests
@@ -646,13 +639,12 @@ class UnfoldingTest
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("presentResultTestCases")
 		@DisplayName("should keep value when predicate matches")
-		<T> void shouldKeepValueWhenPredicateMatches(String description, Unfolding<T> unfolding,
-													 Predicate<T> predicate)
+		<T> void shouldKeepValueWhenPredicateMatches(String description, Unfolding<T> unfolding, Predicate<T> predicate)
 		{
 			Unfolding<T> result = unfolding.discern(predicate);
 
-			assertThat(result.supple()).as("discern() for %s with matching predicate should remain present",
-					unfolding).isTrue();
+			assertThat(result.supple()).as("discern() for %s with matching predicate should remain present", unfolding)
+									   .isTrue();
 			assertThat(result.summon()).as("discern() result value should match original")
 									   .isEqualTo(unfolding.summon());
 		}
@@ -660,8 +652,8 @@ class UnfoldingTest
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("emptyResultTestCases")
 		@DisplayName("should discard value when predicate doesn't match")
-		<T> void shouldDiscardValueWhenPredicateDoesntMatch(String description, Unfolding<T> unfolding,
-															Predicate<T> predicate)
+		<T> void shouldDiscardValueWhenPredicateDoesnotMatch(String description, Unfolding<T> unfolding,
+															 Predicate<T> predicate)
 		{
 			Unfolding<T> result = unfolding.discern(predicate);
 
@@ -676,10 +668,11 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 			Predicate<String> nullPredicate = null;
 
-			assertThatThrownBy(() -> unfolding.discern(nullPredicate))
-					.as("discern() with null predicate should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("judgement may not be null");
+			assertThatThrownBy(() -> unfolding.discern(nullPredicate)).as(
+																			  "discern() with null predicate should throw NullPointerException")
+																	  .isInstanceOf(NullPointerException.class)
+																	  .hasMessageContaining(
+																			  "judgement may not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
@@ -750,10 +743,11 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 			Consumer<String> nullConsumer = null;
 
-			assertThatThrownBy(() -> unfolding.unlace(nullConsumer))
-					.as("unlace() with null consumer should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("impregnator may not be null");
+			assertThatThrownBy(() -> unfolding.unlace(nullConsumer)).as(
+																			"unlace() with null consumer should throw NullPointerException")
+																	.isInstanceOf(NullPointerException.class)
+																	.hasMessageContaining(
+																			"impregnator may not be null");
 		}
 	}
 
@@ -939,9 +933,7 @@ class UnfoldingTest
 			{
 				var unfolding = Unfolding.augur(Optional.empty());
 
-				assertThat(unfolding.sterile())
-						.as("An empty optional creates a sterile unfolding")
-						.isTrue();
+				assertThat(unfolding.sterile()).as("An empty optional creates a sterile unfolding").isTrue();
 			}
 
 			@DisplayName("should create a non-empty unfolding")
@@ -950,12 +942,9 @@ class UnfoldingTest
 			{
 				var unfolding = Unfolding.augur(Optional.of("test"));
 
-				assertThat(unfolding.supple())
-						.as("A non-empty optional creates a present unfolding")
-						.isTrue();
-				assertThat(unfolding.summon())
-						.as("summon() should return the value from the optional")
-						.isEqualTo("test");
+				assertThat(unfolding.supple()).as("A non-empty optional creates a present unfolding").isTrue();
+				assertThat(unfolding.summon()).as("summon() should return the value from the optional")
+											  .isEqualTo("test");
 			}
 		}
 
@@ -969,9 +958,7 @@ class UnfoldingTest
 			{
 				var unfolding = Unfolding.distill(Stream.empty());
 
-				assertThat(unfolding.sterile())
-						.as("An empty stream creates a sterile unfolding")
-						.isTrue();
+				assertThat(unfolding.sterile()).as("An empty stream creates a sterile unfolding").isTrue();
 			}
 
 			@DisplayName("Should create a present unfolding from a non-empty stream")
@@ -980,12 +967,8 @@ class UnfoldingTest
 			{
 				var unfolding = Unfolding.distill(Stream.of("test"));
 
-				assertThat(unfolding.supple())
-						.as("A non-empty stream creates a present unfolding")
-						.isTrue();
-				assertThat(unfolding.summon())
-						.as("summon() should return the value from the stream")
-						.isEqualTo("test");
+				assertThat(unfolding.supple()).as("A non-empty stream creates a present unfolding").isTrue();
+				assertThat(unfolding.summon()).as("summon() should return the value from the stream").isEqualTo("test");
 			}
 
 			@DisplayName("should create a chaotic unfolding from an empty collection")
@@ -994,13 +977,10 @@ class UnfoldingTest
 			<T> void shouldCreateAChaoticUnfoldingFromEmptyCollection(final String description,
 																	  final Collection<T> collection)
 			{
-				assertThat(collection)
-						.as("The provided collection must be empty for this test case")
-						.isEmpty();
+				assertThat(collection).as("The provided collection must be empty for this test case").isEmpty();
 
-				assertThat(Unfolding.distill(collection.stream()).sterile())
-						.as("An empty collection creates a sterile unfolding")
-						.isTrue();
+				assertThat(Unfolding.distill(collection.stream()).sterile()).as(
+						"An empty collection creates a sterile unfolding").isTrue();
 			}
 
 			@DisplayName("should create an unfolding with one of the elements from collection")
@@ -1012,25 +992,20 @@ class UnfoldingTest
 
 				var unfolding = Unfolding.distill(values.stream());
 
-				assertThat(unfolding.supple())
-						.as("distill() should create a supple unfolding")
-						.isTrue();
+				assertThat(unfolding.supple()).as("distill() should create a supple unfolding").isTrue();
 
-				assertThat(unfolding.summon())
-						.as("summon() should return the value from the stream")
-						.isIn(values);
+				assertThat(unfolding.summon()).as("summon() should return the value from the stream").isIn(values);
 			}
 
 			private static Stream<Arguments> emptyCollections()
 			{
-				return Stream.of(
-						new CollectionTestCase<>("List.of()", List.of()),
-						new CollectionTestCase<>("Set.of()", Set.of()),
-						new CollectionTestCase<>("Collections.emptySet()", Collections.emptySet()),
-						new CollectionTestCase<>("Collections.emptyList()", Collections.emptyList()),
-						new CollectionTestCase<>("Arraylist", new ArrayList<>()),
-						new CollectionTestCase<>("HashSet", new HashSet<>())
-				).map(tc -> Arguments.of(tc.description(), tc.values()));
+				return Stream.of(new CollectionTestCase<>("List.of()", List.of()),
+									 new CollectionTestCase<>("Set.of()", Set.of()),
+									 new CollectionTestCase<>("Collections.emptySet()", Collections.emptySet()),
+									 new CollectionTestCase<>("Collections.emptyList()", Collections.emptyList()),
+									 new CollectionTestCase<>("Arraylist", new ArrayList<>()),
+									 new CollectionTestCase<>("HashSet", new HashSet<>()))
+							 .map(tc -> Arguments.of(tc.description(), tc.values()));
 			}
 
 			private static Stream<Arguments> collectionTestCases()
@@ -1040,8 +1015,7 @@ class UnfoldingTest
 						new CollectionTestCase<>("a single element list should produce the corresponding unfolding",
 								List.of(1.3e8)),
 						new CollectionTestCase<>("a multiple element list should produce the corresponding unfolding",
-								List.of(1, 2))
-				).map(tc -> Arguments.of(tc.description, tc.values));
+								List.of(1, 2))).map(tc -> Arguments.of(tc.description, tc.values));
 			}
 
 			private record CollectionTestCase<T>(String description, Collection<T> values)
@@ -1100,13 +1074,11 @@ class UnfoldingTest
 		@MethodSource("presentResultTestCases")
 		@DisplayName("should transform present value to another unfolding")
 		<T, R> void shouldTransformToPresentValue(String description, Unfolding<T> unfolding,
-												  Function<T, Unfolding<R>> transformer,
-												  Unfolding<R> expectedResult)
+												  Function<T, Unfolding<R>> transformer, Unfolding<R> expectedResult)
 		{
 			Unfolding<R> result = unfolding.entwine(transformer);
 
-			assertThat(result.supple()).as("entwine() for %s should result in present unfolding",
-					unfolding).isTrue();
+			assertThat(result.supple()).as("entwine() for %s should result in present unfolding", unfolding).isTrue();
 			assertThat(result.summon()).as("entwine() result value should match expected")
 									   .isEqualTo(expectedResult.summon());
 		}
@@ -1119,8 +1091,7 @@ class UnfoldingTest
 		{
 			Unfolding<R> result = unfolding.entwine(transformer);
 
-			assertThat(result.sterile()).as("entwine() for %s should result in empty unfolding",
-					unfolding).isTrue();
+			assertThat(result.sterile()).as("entwine() for %s should result in empty unfolding", unfolding).isTrue();
 		}
 
 		@DisplayName("should throw exception for null transformer")
@@ -1130,46 +1101,34 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 			Function<String, Unfolding<Integer>> nullTransformer = null;
 
-			assertThatThrownBy(() -> unfolding.entwine(nullTransformer))
-					.as("entwine() with null transformer should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class);
+			assertThatThrownBy(() -> unfolding.entwine(nullTransformer)).as(
+																				"entwine() with null transformer should throw NullPointerException")
+																		.isInstanceOf(NullPointerException.class);
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
 		{
 			return Stream.of(
-								 new PresentResultTestCase<>(
-										 "Present value should be transformed to another present unfolding",
-										 Unfolding.beckon("hello"),
-										 s -> Unfolding.beckon(s.length()),
-										 Unfolding.beckon(5)),
+								 new PresentResultTestCase<>("Present value should be transformed to another present unfolding",
+										 Unfolding.beckon("hello"), s -> Unfolding.beckon(s.length()), Unfolding.beckon(5)),
 								 new PresentResultTestCase<>(
 										 "Present value should be transformed to another present unfolding with same type",
-										 Unfolding.beckon("hello"),
-										 s -> Unfolding.beckon(s.toUpperCase()),
-										 Unfolding.beckon("HELLO"))
-						 )
+										 Unfolding.beckon("hello"), s -> Unfolding.beckon(s.toUpperCase()),
+										 Unfolding.beckon("HELLO")))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.transformer, tc.expectedResult));
 		}
 
 		private static Stream<Arguments> emptyResultTestCases()
 		{
-			return Stream.of(
-								 new EmptyResultTestCase<>(
-										 "Empty unfolding should remain empty regardless of transformer",
-										 Unfolding.<String>chaos(),
-										 s -> Unfolding.beckon(s.length())),
-								 new EmptyResultTestCase<>(
-										 "Present value should be transformed to empty unfolding when transformer returns empty",
-										 Unfolding.beckon(42),
-										 _ -> Unfolding.<String>chaos())
-						 )
+			return Stream.of(new EmptyResultTestCase<>("Empty unfolding should remain empty regardless of transformer",
+								 Unfolding.<String>chaos(), s -> Unfolding.beckon(s.length())), new EmptyResultTestCase<>(
+								 "Present value should be transformed to empty unfolding when transformer returns empty",
+								 Unfolding.beckon(42), _ -> Unfolding.<String>chaos()))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.transformer));
 		}
 
 		private record PresentResultTestCase<T, R>(String description, Unfolding<T> unfolding,
-												   Function<T, Unfolding<R>> transformer,
-												   Unfolding<R> expectedResult)
+												   Function<T, Unfolding<R>> transformer, Unfolding<R> expectedResult)
 		{
 		}
 
@@ -1187,13 +1146,11 @@ class UnfoldingTest
 		@MethodSource("presentResultTestCases")
 		@DisplayName("should transform present value to pair containing original and transformed values")
 		<T, R> void shouldTransformToPresentValue(String description, Unfolding<T> unfolding,
-												  Function<T, R> transformer,
-												  Unfolding<Pair<T, R>> expectedResult)
+												  Function<T, R> transformer, Unfolding<Pair<T, R>> expectedResult)
 		{
 			Unfolding<Pair<T, R>> result = unfolding.interlace(transformer);
 
-			assertThat(result.supple()).as("interlace() for %s should result in present unfolding",
-					unfolding).isTrue();
+			assertThat(result.supple()).as("interlace() for %s should result in present unfolding", unfolding).isTrue();
 			assertThat(result.summon().first()).as("interlace() result first value should match original")
 											   .isEqualTo(unfolding.summon());
 			assertThat(result.summon().second()).as("interlace() result second value should match transformed")
@@ -1208,8 +1165,7 @@ class UnfoldingTest
 		{
 			Unfolding<Pair<T, R>> result = unfolding.interlace(transformer);
 
-			assertThat(result.sterile()).as("interlace() for %s should result in empty unfolding",
-					unfolding).isTrue();
+			assertThat(result.sterile()).as("interlace() for %s should result in empty unfolding", unfolding).isTrue();
 		}
 
 		@DisplayName("should throw exception for null transformer")
@@ -1219,63 +1175,44 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 			Function<String, Integer> nullTransformer = null;
 
-			assertThatThrownBy(() -> unfolding.interlace(nullTransformer))
-					.as("interlace() with null transformer should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("interlacing may not be null");
+			assertThatThrownBy(() -> unfolding.interlace(nullTransformer)).as(
+																				  "interlace() with null transformer should throw NullPointerException")
+																		  .isInstanceOf(NullPointerException.class)
+																		  .hasMessageContaining(
+																				  "interlacing may not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
 		{
 			return Stream.of(
-								 new PresentResultTestCase<>(
-										 "Present string value should be transformed to pair with length",
-										 Unfolding.beckon("hello"),
-										 String::length,
-										 Unfolding.beckon(Pair.of("hello", 5))),
-								 new PresentResultTestCase<>(
-										 "Present string value should be transformed to pair with uppercase",
-										 Unfolding.beckon("hello"),
-										 String::toUpperCase,
-										 Unfolding.beckon(Pair.of("hello", "HELLO"))),
-								 new PresentResultTestCase<>(
+								 new PresentResultTestCase<>("Present string value should be transformed to pair with length",
+										 Unfolding.beckon("hello"), String::length, Unfolding.beckon(Pair.of("hello", 5))),
+								 new PresentResultTestCase<>("Present string value should be transformed to pair with uppercase",
+										 Unfolding.beckon("hello"), String::toUpperCase,
+										 Unfolding.beckon(Pair.of("hello", "HELLO"))), new PresentResultTestCase<>(
 										 "Present integer value should be transformed to pair with string representation",
-										 Unfolding.beckon(42),
-										 Object::toString,
-										 Unfolding.beckon(Pair.of(42, "42"))),
+										 Unfolding.beckon(42), Object::toString, Unfolding.beckon(Pair.of(42, "42"))),
 								 new PresentResultTestCase<>(
 										 "Present value should be transformed to pair with null when transformer returns null",
-										 Unfolding.beckon("test"),
-										 _ -> null,
-										 Unfolding.beckon(Pair.of("test", null))),
-								 new PresentResultTestCase<>(
-										 "Present empty string should be transformed correctly",
-										 Unfolding.beckon(""),
-										 String::length,
-										 Unfolding.beckon(Pair.of("", 0)))
-						 )
+										 Unfolding.beckon("test"), _ -> null, Unfolding.beckon(Pair.of("test", null))),
+								 new PresentResultTestCase<>("Present empty string should be transformed correctly",
+										 Unfolding.beckon(""), String::length, Unfolding.beckon(Pair.of("", 0))))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.transformer, tc.expectedResult));
 		}
 
 		private static Stream<Arguments> emptyResultTestCases()
 		{
-			return Stream.of(
-								 new EmptyResultTestCase<>(
-										 "Empty unfolding should remain empty regardless of transformer",
-										 Unfolding.chaos(),
-										 String::length)
-						 )
+			return Stream.of(new EmptyResultTestCase<>("Empty unfolding should remain empty regardless of transformer",
+								 Unfolding.chaos(), String::length))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.transformer));
 		}
 
 		private record PresentResultTestCase<T, R>(String description, Unfolding<T> unfolding,
-												   Function<T, R> transformer,
-												   Unfolding<Pair<T, R>> expectedResult)
+												   Function<T, R> transformer, Unfolding<Pair<T, R>> expectedResult)
 		{
 		}
 
-		private record EmptyResultTestCase<T, R>(String description, Unfolding<T> unfolding,
-												 Function<T, R> transformer)
+		private record EmptyResultTestCase<T, R>(String description, Unfolding<T> unfolding, Function<T, R> transformer)
 		{
 		}
 	}
@@ -1287,19 +1224,15 @@ class UnfoldingTest
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("suppleBraidTestCases")
 		@DisplayName("should braid two supple unfoldings")
-		<T, U, R> void shouldBraidTwoSuppleUnfoldings(String description, Unfolding<T> journey,
-													  Unfolding<U> consort,
-													  BiFunction<T, U, R> weaver,
-													  Unfolding<R> expectedResult)
+		<T, U, R> void shouldBraidTwoSuppleUnfoldings(String description, Unfolding<T> journey, Unfolding<U> consort,
+													  BiFunction<T, U, R> weaver, Unfolding<R> expectedResult)
 		{
 			Unfolding<R> result = journey.braid(consort, weaver);
 
-			assertThat(result.supple())
-					.as("braid() for %s should result in expected unfolding", journey)
-					.isEqualTo(expectedResult.supple());
-			assertThat(result.summon())
-					.as("braid() result value should match expected")
-					.isEqualTo(expectedResult.summon());
+			assertThat(result.supple()).as("braid() for %s should result in expected unfolding", journey)
+									   .isEqualTo(expectedResult.supple());
+			assertThat(result.summon()).as("braid() result value should match expected")
+									   .isEqualTo(expectedResult.summon());
 		}
 
 		@DisplayName("should throw exception for null consort")
@@ -1310,10 +1243,11 @@ class UnfoldingTest
 			Unfolding<String> nullConsort = null;
 			BiFunction<String, String, String> weaver = String::concat;
 
-			assertThatThrownBy(() -> journey.braid(nullConsort, weaver))
-					.as("braid() with null consort should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("consort may not be null");
+			assertThatThrownBy(() -> journey.braid(nullConsort, weaver)).as(
+																				"braid() with null consort should throw NullPointerException")
+																		.isInstanceOf(NullPointerException.class)
+																		.hasMessageContaining(
+																				"consort may not be null");
 		}
 
 		@DisplayName("should throw exception for null weaver")
@@ -1324,10 +1258,10 @@ class UnfoldingTest
 			Unfolding<String> consort = Unfolding.beckon("partner");
 			BiFunction<String, String, String> nullWeaver = null;
 
-			assertThatThrownBy(() -> journey.braid(consort, nullWeaver))
-					.as("braid() with null weaver should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("weaver may not be null");
+			assertThatThrownBy(() -> journey.braid(consort, nullWeaver)).as(
+																				"braid() with null weaver should throw NullPointerException")
+																		.isInstanceOf(NullPointerException.class)
+																		.hasMessageContaining("weaver may not be null");
 		}
 
 		@DisplayName("should return empty unfolding when journey is empty")
@@ -1340,9 +1274,7 @@ class UnfoldingTest
 
 			Unfolding<String> result = emptyJourney.braid(consort, weaver);
 
-			assertThat(result.sterile())
-					.as("braid() with empty journey should result in empty unfolding")
-					.isTrue();
+			assertThat(result.sterile()).as("braid() with empty journey should result in empty unfolding").isTrue();
 		}
 
 		@DisplayName("should return empty unfolding when consort is empty")
@@ -1355,9 +1287,7 @@ class UnfoldingTest
 
 			Unfolding<String> result = journey.braid(emptyConsort, weaver);
 
-			assertThat(result.sterile())
-					.as("braid() with empty consort should result in empty unfolding")
-					.isTrue();
+			assertThat(result.sterile()).as("braid() with empty consort should result in empty unfolding").isTrue();
 		}
 
 		@DisplayName("should return empty unfolding when weaver provides null result")
@@ -1370,47 +1300,28 @@ class UnfoldingTest
 
 			Unfolding<String> result = journey.braid(consort, nullResultWeaver);
 
-			assertThat(result.sterile())
-					.as("braid() with weaver returning null should result in empty unfolding")
-					.isTrue();
+			assertThat(result.sterile()).as("braid() with weaver returning null should result in empty unfolding")
+										.isTrue();
 		}
 
 		private static Stream<Arguments> suppleBraidTestCases()
 		{
-			return Stream.of(
-								 new SuppleBraidTestCase<>(
-										 "Two string unfoldings should be combined with concatenation",
-										 Unfolding.beckon("hello"),
-										 Unfolding.beckon(" world"),
-										 String::concat,
-										 Unfolding.beckon("hello world")),
-								 new SuppleBraidTestCase<>(
+			return Stream.of(new SuppleBraidTestCase<>("Two string unfoldings should be combined with concatenation",
+										 Unfolding.beckon("hello"), Unfolding.beckon(" world"), String::concat,
+										 Unfolding.beckon("hello world")), new SuppleBraidTestCase<>(
 										 "Integer and string unfoldings should be combined with toString and concatenation",
-										 Unfolding.beckon(42),
-										 Unfolding.beckon(" is the answer"),
-										 (i, s) -> i.toString() + s,
+										 Unfolding.beckon(42), Unfolding.beckon(" is the answer"), (i, s) -> i.toString() + s,
 										 Unfolding.beckon("42 is the answer")),
-								 new SuppleBraidTestCase<>(
-										 "Two integer unfoldings should be combined with addition",
-										 Unfolding.beckon(10),
-										 Unfolding.beckon(5),
-										 Integer::sum,
-										 Unfolding.beckon(15)),
-								 new SuppleBraidTestCase<>(
-										 "Two unfoldings should be combined to create a pair",
-										 Unfolding.beckon("key"),
-										 Unfolding.beckon("value"),
-										 Pair::of,
-										 Unfolding.beckon(Pair.of("key", "value")))
-						 )
-						 .map(tc -> Arguments.of(tc.description, tc.journey, tc.consort, tc.weaver,
-								 tc.expectedResult));
+								 new SuppleBraidTestCase<>("Two integer unfoldings should be combined with addition",
+										 Unfolding.beckon(10), Unfolding.beckon(5), Integer::sum, Unfolding.beckon(15)),
+								 new SuppleBraidTestCase<>("Two unfoldings should be combined to create a pair",
+										 Unfolding.beckon("key"), Unfolding.beckon("value"), Pair::of,
+										 Unfolding.beckon(Pair.of("key", "value"))))
+						 .map(tc -> Arguments.of(tc.description, tc.journey, tc.consort, tc.weaver, tc.expectedResult));
 		}
 
-		private record SuppleBraidTestCase<T, U, R>(String description, Unfolding<T> journey,
-													Unfolding<U> consort,
-													BiFunction<T, U, R> weaver,
-													Unfolding<R> expectedResult)
+		private record SuppleBraidTestCase<T, U, R>(String description, Unfolding<T> journey, Unfolding<U> consort,
+													BiFunction<T, U, R> weaver, Unfolding<R> expectedResult)
 		{
 		}
 	}
@@ -1422,18 +1333,15 @@ class UnfoldingTest
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("suppleResurrectTestCases")
 		@DisplayName("should resurrect myth unfolding")
-		<T> void shouldResurrectMythUnfolding(String description, Unfolding<T> unfolding,
-											  Supplier<Unfolding<T>> grace,
+		<T> void shouldResurrectMythUnfolding(String description, Unfolding<T> unfolding, Supplier<Unfolding<T>> grace,
 											  Unfolding<T> expectedResult)
 		{
 			Unfolding<T> result = unfolding.resurrect(grace);
 
-			assertThat(result.supple())
-					.as("resurrect() for %s should result in expected unfolding", unfolding)
-					.isEqualTo(expectedResult.supple());
-			assertThat(result.summon())
-					.as("resurrect() result value should match expected")
-					.isEqualTo(expectedResult.summon());
+			assertThat(result.supple()).as("resurrect() for %s should result in expected unfolding", unfolding)
+									   .isEqualTo(expectedResult.supple());
+			assertThat(result.summon()).as("resurrect() result value should match expected")
+									   .isEqualTo(expectedResult.summon());
 		}
 
 		@DisplayName("should throw exception for null grace supplier")
@@ -1443,10 +1351,10 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.chaos();
 			Supplier<Unfolding<String>> nullGrace = null;
 
-			assertThatThrownBy(() -> unfolding.resurrect(nullGrace))
-					.as("resurrect() with null grace supplier should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("grace may not be null");
+			assertThatThrownBy(() -> unfolding.resurrect(nullGrace)).as(
+																			"resurrect() with null grace supplier should throw NullPointerException")
+																	.isInstanceOf(NullPointerException.class)
+																	.hasMessageContaining("grace may not be null");
 		}
 
 		@DisplayName("should return empty unfolding when grace supplier returns null")
@@ -1458,9 +1366,8 @@ class UnfoldingTest
 
 			Unfolding<String> result = unfolding.resurrect(nullResultGrace);
 
-			assertThat(result.sterile())
-					.as("resurrect() with grace supplier returning null should result in empty unfolding")
-					.isTrue();
+			assertThat(result.sterile()).as(
+					"resurrect() with grace supplier returning null should result in empty unfolding").isTrue();
 		}
 
 		@DisplayName("should return empty unfolding when grace supplier returns empty unfolding")
@@ -1472,36 +1379,24 @@ class UnfoldingTest
 
 			Unfolding<String> result = unfolding.resurrect(emptyUnfoldingGrace);
 
-			assertThat(result.sterile())
-					.as("resurrect() with grace supplier returning empty unfolding should result in empty unfolding")
-					.isTrue();
+			assertThat(result.sterile()).as(
+												"resurrect() with grace supplier returning empty unfolding should result in empty unfolding")
+										.isTrue();
 		}
 
 		private static Stream<Arguments> suppleResurrectTestCases()
 		{
-			return Stream.of(
-								 new SuppleResurrectTestCase<>(
-										 "Myth unfolding should return itself regardless of grace",
-										 Unfolding.beckon("test"),
-										 () -> Unfolding.beckon("grace"),
-										 Unfolding.beckon("test")),
-								 new SuppleResurrectTestCase<>(
-										 "Shell unfolding should return grace unfolding",
-										 Unfolding.chaos(),
-										 () -> Unfolding.beckon("grace"),
-										 Unfolding.beckon("grace")),
-								 new SuppleResurrectTestCase<>(
-										 "Shell unfolding with integer grace",
-										 Unfolding.chaos(),
-										 () -> Unfolding.beckon(42),
-										 Unfolding.beckon(42))
-						 )
+			return Stream.of(new SuppleResurrectTestCase<>("Myth unfolding should return itself regardless of grace",
+										 Unfolding.beckon("test"), () -> Unfolding.beckon("grace"), Unfolding.beckon("test")),
+								 new SuppleResurrectTestCase<>("Shell unfolding should return grace unfolding", Unfolding.chaos(),
+										 () -> Unfolding.beckon("grace"), Unfolding.beckon("grace")),
+								 new SuppleResurrectTestCase<>("Shell unfolding with integer grace", Unfolding.chaos(),
+										 () -> Unfolding.beckon(42), Unfolding.beckon(42)))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.grace, tc.expectedResult));
 		}
 
 		private record SuppleResurrectTestCase<T>(String description, Unfolding<T> unfolding,
-												  Supplier<Unfolding<T>> grace,
-												  Unfolding<T> expectedResult)
+												  Supplier<Unfolding<T>> grace, Unfolding<T> expectedResult)
 		{
 		}
 	}
@@ -1513,14 +1408,12 @@ class UnfoldingTest
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("presentResultTestCases")
 		@DisplayName("should transform present value with consort to new value")
-		<T, U, R> void shouldTransformToPresentValue(String description, Unfolding<T> unfolding,
-													 U consort, BiFunction<T, U, R> conjugation,
-													 Unfolding<R> expectedResult)
+		<T, U, R> void shouldTransformToPresentValue(String description, Unfolding<T> unfolding, U consort,
+													 BiFunction<T, U, R> conjugation, Unfolding<R> expectedResult)
 		{
 			Unfolding<R> result = unfolding.conjoin(consort, conjugation);
 
-			assertThat(result.supple()).as("conjoin() for %s should result in present unfolding",
-					unfolding).isTrue();
+			assertThat(result.supple()).as("conjoin() for %s should result in present unfolding", unfolding).isTrue();
 			assertThat(result.summon()).as("conjoin() result should match expected value")
 									   .isEqualTo(expectedResult.summon());
 		}
@@ -1528,13 +1421,12 @@ class UnfoldingTest
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("emptyResultTestCases")
 		@DisplayName("should transform to empty unfolding when appropriate")
-		<T, U, R> void shouldTransformToEmptyUnfolding(String description, Unfolding<T> unfolding,
-													   U consort, BiFunction<T, U, R> conjugation)
+		<T, U, R> void shouldTransformToEmptyUnfolding(String description, Unfolding<T> unfolding, U consort,
+													   BiFunction<T, U, R> conjugation)
 		{
 			Unfolding<R> result = unfolding.conjoin(consort, conjugation);
 
-			assertThat(result.sterile()).as("conjoin() for %s should result in empty unfolding",
-					unfolding).isTrue();
+			assertThat(result.sterile()).as("conjoin() for %s should result in empty unfolding", unfolding).isTrue();
 		}
 
 		@DisplayName("should throw exception for null consort")
@@ -1545,10 +1437,9 @@ class UnfoldingTest
 			String nullConsort = null;
 			BiFunction<String, String, String> conjugation = String::concat;
 
-			assertThatThrownBy(() -> unfolding.conjoin(nullConsort, conjugation))
-					.as("conjoin() with null consort should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("consort may not be null");
+			assertThatThrownBy(() -> unfolding.conjoin(nullConsort, conjugation)).as(
+					"conjoin() with null consort should throw NullPointerException").isInstanceOf(
+					NullPointerException.class).hasMessageContaining("consort may not be null");
 		}
 
 		@DisplayName("should throw exception for null conjugation function")
@@ -1559,70 +1450,42 @@ class UnfoldingTest
 			String consort = "partner";
 			BiFunction<String, String, String> nullConjugation = null;
 
-			assertThatThrownBy(() -> unfolding.conjoin(consort, nullConjugation))
-					.as("conjoin() with null conjugation should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("conjugation may not be null");
+			assertThatThrownBy(() -> unfolding.conjoin(consort, nullConjugation)).as(
+					"conjoin() with null conjugation should throw NullPointerException").isInstanceOf(
+					NullPointerException.class).hasMessageContaining("conjugation may not be null");
 		}
 
 		private static Stream<Arguments> presentResultTestCases()
 		{
-			return Stream.of(
-								 new PresentResultTestCase<>(
-										 "Present string value should be combined with another string",
-										 Unfolding.beckon("hello"),
-										 " world",
-										 String::concat,
-										 Unfolding.beckon("hello world")),
-								 new PresentResultTestCase<>(
-										 "Present string value should be combined with an integer",
-										 Unfolding.beckon("Count: "),
-										 42,
-										 (s, i) -> s + i,
-										 Unfolding.beckon("Count: 42")),
-								 new PresentResultTestCase<>(
-										 "Present integer value should be combined with another integer",
-										 Unfolding.beckon(10),
-										 5,
-										 Integer::sum,
-										 Unfolding.beckon(15)),
-								 new PresentResultTestCase<>(
-										 "Present value should be combined with consort to create a pair",
-										 Unfolding.beckon("key"),
-										 "value",
-										 Pair::of,
-										 Unfolding.beckon(Pair.of("key", "value"))),
-								 new PresentResultTestCase<>(
-										 "Present empty string should be combined correctly",
-										 Unfolding.beckon(""),
-										 "suffix",
-										 String::concat,
-										 Unfolding.beckon("suffix"))
-						 )
+			return Stream.of(new PresentResultTestCase<>("Present string value should be combined with another string",
+										 Unfolding.beckon("hello"), " world", String::concat, Unfolding.beckon("hello world")),
+								 new PresentResultTestCase<>("Present string value should be combined with an integer",
+										 Unfolding.beckon("Count: "), 42, (s, i) -> s + i, Unfolding.beckon("Count: 42")),
+								 new PresentResultTestCase<>("Present integer value should be combined with another integer",
+										 Unfolding.beckon(10), 5, Integer::sum, Unfolding.beckon(15)),
+								 new PresentResultTestCase<>("Present value should be combined with consort to create a pair",
+										 Unfolding.beckon("key"), "value", Pair::of, Unfolding.beckon(Pair.of("key", "value"))),
+								 new PresentResultTestCase<>("Present empty string should be combined correctly",
+										 Unfolding.beckon(""), "suffix", String::concat, Unfolding.beckon("suffix")))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.consort, tc.conjugation,
 								 tc.expectedResult));
 		}
 
 		private static Stream<Arguments> emptyResultTestCases()
 		{
-			return Stream.of(
-								 new EmptyResultTestCase<>(
-										 "Empty unfolding should remain empty regardless of consort and conjugation",
-										 Unfolding.chaos(),
-										 "partner",
-										 String::concat)
-						 )
+			return Stream.of(new EmptyResultTestCase<>(
+								 "Empty unfolding should remain empty regardless of consort and conjugation", Unfolding.chaos(),
+								 "partner", String::concat))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.consort, tc.conjugation));
 		}
 
-		private record PresentResultTestCase<T, U, R>(String description, Unfolding<T> unfolding,
-													  U consort, BiFunction<T, U, R> conjugation,
-													  Unfolding<R> expectedResult)
+		private record PresentResultTestCase<T, U, R>(String description, Unfolding<T> unfolding, U consort,
+													  BiFunction<T, U, R> conjugation, Unfolding<R> expectedResult)
 		{
 		}
 
-		private record EmptyResultTestCase<T, U, R>(String description, Unfolding<T> unfolding,
-													U consort, BiFunction<T, U, R> conjugation)
+		private record EmptyResultTestCase<T, U, R>(String description, Unfolding<T> unfolding, U consort,
+													BiFunction<T, U, R> conjugation)
 		{
 		}
 	}
@@ -1638,9 +1501,8 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 			RuntimeException testException = new RuntimeException("Test exception");
 
-			assertThatThrownBy(() -> unfolding.interdict(() -> testException))
-					.as("interdict() for present value should throw the supplied exception")
-					.isSameAs(testException);
+			assertThatThrownBy(() -> unfolding.interdict(() -> testException)).as(
+					"interdict() for present value should throw the supplied exception").isSameAs(testException);
 		}
 
 		@DisplayName("should not throw exception for empty unfolding")
@@ -1650,9 +1512,8 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.chaos();
 			RuntimeException testException = new RuntimeException("Test exception");
 
-			assertThatCode(() -> unfolding.interdict(() -> testException))
-					.as("interdict() for empty unfolding should not throw exception")
-					.doesNotThrowAnyException();
+			assertThatCode(() -> unfolding.interdict(() -> testException)).as(
+					"interdict() for empty unfolding should not throw exception").doesNotThrowAnyException();
 		}
 
 		@DisplayName("should throw exception for null supplier")
@@ -1662,9 +1523,9 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 			Supplier<RuntimeException> nullSupplier = null;
 
-			assertThatThrownBy(() -> unfolding.interdict(nullSupplier))
-					.as("interdict() with null supplier should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class);
+			assertThatThrownBy(() -> unfolding.interdict(nullSupplier)).as(
+																			   "interdict() with null supplier should throw NullPointerException")
+																	   .isInstanceOf(NullPointerException.class);
 		}
 
 		@DisplayName("should throw exception when supplier returns null")
@@ -1673,9 +1534,9 @@ class UnfoldingTest
 		{
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 
-			assertThatThrownBy(() -> unfolding.interdict(() -> null))
-					.as("interdict() with supplier returning null should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class);
+			assertThatThrownBy(() -> unfolding.interdict(() -> null)).as(
+																			 "interdict() with supplier returning null should throw NullPointerException")
+																	 .isInstanceOf(NullPointerException.class);
 		}
 	}
 
@@ -1686,15 +1547,14 @@ class UnfoldingTest
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("successTestCases")
 		@DisplayName("should keep value when predicate matches")
-		<T> void shouldKeepValueWhenPredicateMatches(String description, Unfolding<T> unfolding,
-													 Predicate<T> predicate)
+		<T> void shouldKeepValueWhenPredicateMatches(String description, Unfolding<T> unfolding, Predicate<T> predicate)
 		{
 			RuntimeException testException = new RuntimeException("Test exception");
 			Unfolding<T> result = unfolding.discern(predicate, () -> testException);
 
 			assertThat(result.supple()).as(
-					"discern() with exception supplier for %s with matching predicate should remain present",
-					unfolding).isTrue();
+											   "discern() with exception supplier for %s with matching predicate should remain present", unfolding)
+									   .isTrue();
 			assertThat(result.summon()).as("discern() with exception supplier result value should match original")
 									   .isEqualTo(unfolding.summon());
 		}
@@ -1707,10 +1567,9 @@ class UnfoldingTest
 		{
 			RuntimeException testException = new RuntimeException("Test exception");
 
-			assertThatThrownBy(() -> unfolding.discern(predicate, () -> testException))
-					.as("discern() with exception supplier for %s with non-matching predicate should throw exception",
-							unfolding)
-					.isSameAs(testException);
+			assertThatThrownBy(() -> unfolding.discern(predicate, () -> testException)).as(
+					"discern() with exception supplier for %s with non-matching predicate should throw exception",
+					unfolding).isSameAs(testException);
 		}
 
 		@DisplayName("should throw exception for null predicate")
@@ -1721,10 +1580,12 @@ class UnfoldingTest
 			Predicate<String> nullPredicate = null;
 			RuntimeException testException = new RuntimeException("Test exception");
 
-			assertThatThrownBy(() -> unfolding.discern(nullPredicate, () -> testException))
-					.as("discern() with exception supplier with null predicate should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("judgement may not be null");
+			assertThatThrownBy(() -> unfolding.discern(nullPredicate, () -> testException)).as(
+																								   "discern() with exception supplier with null predicate should throw NullPointerException")
+																						   .isInstanceOf(
+																								   NullPointerException.class)
+																						   .hasMessageContaining(
+																								   "judgement may not be null");
 		}
 
 		@DisplayName("should throw exception for null exception supplier")
@@ -1734,10 +1595,9 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 			Supplier<RuntimeException> nullSupplier = null;
 
-			assertThatThrownBy(() -> unfolding.discern(_ -> true, nullSupplier))
-					.as("discern() with null exception supplier should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class)
-					.hasMessageContaining("exceptionSupplier may not be null");
+			assertThatThrownBy(() -> unfolding.discern(_ -> true, nullSupplier)).as(
+					"discern() with null exception supplier should throw NullPointerException").isInstanceOf(
+					NullPointerException.class).hasMessageContaining("exceptionSupplier may not be null");
 		}
 
 		@DisplayName("should throw exception when supplier returns null")
@@ -1746,9 +1606,9 @@ class UnfoldingTest
 		{
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 
-			assertThatThrownBy(() -> unfolding.discern(_ -> false, () -> null))
-					.as("discern() with supplier returning null should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class);
+			assertThatThrownBy(() -> unfolding.discern(_ -> false, () -> null)).as(
+					"discern() with supplier returning null should throw NullPointerException").isInstanceOf(
+					NullPointerException.class);
 		}
 
 		@DisplayName("should always throw exception for empty unfolding")
@@ -1758,15 +1618,14 @@ class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.chaos();
 			RuntimeException testException = new RuntimeException("Test exception");
 
-			assertThatThrownBy(() -> unfolding.discern(_ -> true, () -> testException))
-					.as("discern() with exception supplier for empty unfolding should throw exception")
-					.isSameAs(testException);
+			assertThatThrownBy(() -> unfolding.discern(_ -> true, () -> testException)).as(
+																							   "discern() with exception supplier for empty unfolding should throw exception")
+																					   .isSameAs(testException);
 		}
 
 		private static Stream<Arguments> successTestCases()
 		{
-			return Stream.of(
-								 new SuccessTestCase<>("Present value matching predicate should remain unchanged",
+			return Stream.of(new SuccessTestCase<>("Present value matching predicate should remain unchanged",
 										 Unfolding.beckon("hello"), s -> s.length() > 3),
 								 new SuccessTestCase<>("Predicate with complex logic should work correctly (even numbers)",
 										 Unfolding.beckon(42), n -> n % 2 == 0))
@@ -1775,8 +1634,7 @@ class UnfoldingTest
 
 		private static Stream<Arguments> exceptionTestCases()
 		{
-			return Stream.of(
-								 new ExceptionTestCase<>("Present value not matching predicate should throw exception",
+			return Stream.of(new ExceptionTestCase<>("Present value not matching predicate should throw exception",
 										 Unfolding.beckon("hi"), s -> s.length() > 3),
 								 new ExceptionTestCase<>("Predicate with complex logic should work correctly (odd numbers)",
 										 Unfolding.beckon(43), n -> n % 2 == 0))
@@ -1805,8 +1663,7 @@ class UnfoldingTest
 
 			String result =
 					unfolding.metamorphose(String::toUpperCase).unlace(capturedValues::add).discern(s -> s.length() > 5)
-							 .develop(s -> s.contains("WORLD"), s -> s + "!")
-							 .concludeWith(s -> s.substring(0, 5));
+							 .develop(s -> s.contains("WORLD"), s -> s + "!").concludeWith(s -> s.substring(0, 5));
 
 			assertThat(result).as("Chained operations should produce expected result").isEqualTo("HELLO");
 			assertThat(capturedValues).as("unlace() should have been applied during chain")
@@ -1847,11 +1704,8 @@ class UnfoldingTest
 			Unfolding<Integer> unfolding = Unfolding.beckon(42);
 			List<String> capturedValues = new ArrayList<>();
 
-			String result = unfolding.metamorphose(n -> n * 2)
-									 .discern(n -> n < 50)
-									 .metamorphose(Object::toString)
-									 .unlace(capturedValues::add)
-									 .rescue("Not found");
+			String result = unfolding.metamorphose(n -> n * 2).discern(n -> n < 50).metamorphose(Object::toString)
+									 .unlace(capturedValues::add).rescue("Not found");
 
 			assertThat(result).as("Chain with filter making unfolding empty should use fallback")
 							  .isEqualTo("Not found");
@@ -1887,26 +1741,23 @@ class UnfoldingTest
 
 		private static Stream<Arguments> presentValueTestCases()
 		{
-			return Stream.of(
-					new PresentTestCase<>("String value should be converted to stream with that value",
-							Unfolding.beckon("test"), "test"),
-					new PresentTestCase<>("Integer value should be converted to stream with that value",
-							Unfolding.beckon(42), 42),
-					new PresentTestCase<>("Boolean value should be converted to stream with that value",
-							Unfolding.beckon(true), true)
-			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedValue));
+			return Stream.of(new PresentTestCase<>("String value should be converted to stream with that value",
+										 Unfolding.beckon("test"), "test"),
+								 new PresentTestCase<>("Integer value should be converted to stream with that value",
+										 Unfolding.beckon(42), 42),
+								 new PresentTestCase<>("Boolean value should be converted to stream with that value",
+										 Unfolding.beckon(true), true))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedValue));
 		}
 
 		private static Stream<Arguments> emptyUnfoldingTestCases()
 		{
-			return Stream.of(
-					new EmptyTestCase<>("Empty String unfolding should convert to empty stream",
+			return Stream.of(new EmptyTestCase<>("Empty String unfolding should convert to empty stream",
 							Unfolding.<String>chaos()),
 					new EmptyTestCase<>("Empty Integer unfolding should convert to empty stream",
 							Unfolding.<Integer>chaos()),
 					new EmptyTestCase<>("Empty Boolean unfolding should convert to empty stream",
-							Unfolding.<Boolean>chaos())
-			).map(tc -> Arguments.of(tc.description, tc.unfolding));
+							Unfolding.<Boolean>chaos())).map(tc -> Arguments.of(tc.description, tc.unfolding));
 		}
 
 		private record PresentTestCase<T>(String description, Unfolding<T> unfolding, T expectedValue)
@@ -1948,25 +1799,23 @@ class UnfoldingTest
 		private static Stream<Arguments> presentValueTestCases()
 		{
 			return Stream.of(
-					new PresentTestCase<>("String value should be formatted correctly",
-							Unfolding.beckon("test"), "Unfolding[test]"),
-					new PresentTestCase<>("Integer value should be formatted correctly",
-							Unfolding.beckon(42), "Unfolding[42]"),
-					new PresentTestCase<>("Boolean value should be formatted correctly",
-							Unfolding.beckon(true), "Unfolding[true]")
-			).map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedResult));
+								 new PresentTestCase<>("String value should be formatted correctly", Unfolding.beckon("test"),
+										 "Unfolding[test]"),
+								 new PresentTestCase<>("Integer value should be formatted correctly", Unfolding.beckon(42),
+										 "Unfolding[42]"),
+								 new PresentTestCase<>("Boolean value should be formatted correctly", Unfolding.beckon(true),
+										 "Unfolding[true]"))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.expectedResult));
 		}
 
 		private static Stream<Arguments> emptyUnfoldingTestCases()
 		{
-			return Stream.of(
-					new EmptyTestCase<>("Empty String unfolding should be formatted correctly",
+			return Stream.of(new EmptyTestCase<>("Empty String unfolding should be formatted correctly",
 							Unfolding.<String>chaos()),
 					new EmptyTestCase<>("Empty Integer unfolding should be formatted correctly",
 							Unfolding.<Integer>chaos()),
 					new EmptyTestCase<>("Empty Boolean unfolding should be formatted correctly",
-							Unfolding.<Boolean>chaos())
-			).map(tc -> Arguments.of(tc.description, tc.unfolding));
+							Unfolding.<Boolean>chaos())).map(tc -> Arguments.of(tc.description, tc.unfolding));
 		}
 
 		private record PresentTestCase<T>(String description, Unfolding<T> unfolding, String expectedResult)
@@ -1987,14 +1836,12 @@ class UnfoldingTest
 		void shouldSatisfyReflexivity()
 		{
 			Unfolding<String> stringUnfolding = Unfolding.beckon("test");
-			assertThat(stringUnfolding.equals(stringUnfolding))
-					.as("An unfolding should equal itself (reflexivity)")
-					.isTrue();
+			assertThat(stringUnfolding.equals(stringUnfolding)).as("An unfolding should equal itself (reflexivity)")
+															   .isTrue();
 
 			Unfolding<Integer> emptyUnfolding = Unfolding.chaos();
-			assertThat(emptyUnfolding.equals(emptyUnfolding))
-					.as("An empty unfolding should equal itself (reflexivity)")
-					.isTrue();
+			assertThat(emptyUnfolding.equals(emptyUnfolding)).as("An empty unfolding should equal itself (reflexivity)")
+															 .isTrue();
 		}
 
 		@DisplayName("should satisfy symmetry (x.equals(y) == y.equals(x))")
@@ -2004,23 +1851,22 @@ class UnfoldingTest
 			Unfolding<String> unfolding1 = Unfolding.beckon("test");
 			Unfolding<String> unfolding2 = Unfolding.beckon("test");
 
-			assertThat(unfolding1.equals(unfolding2))
-					.as("First unfolding should equal second unfolding with same value")
-					.isEqualTo(unfolding2.equals(unfolding1));
+			assertThat(unfolding1.equals(unfolding2)).as(
+															 "First unfolding should equal second unfolding with same value")
+													 .isEqualTo(unfolding2.equals(unfolding1));
 
 			Unfolding<String> presentUnfolding = Unfolding.beckon("test");
 			Unfolding<String> emptyUnfolding = Unfolding.chaos();
 
-			assertThat(presentUnfolding.equals(emptyUnfolding))
-					.as("Present unfolding equality with empty unfolding should be symmetric")
-					.isEqualTo(emptyUnfolding.equals(presentUnfolding));
+			assertThat(presentUnfolding.equals(emptyUnfolding)).as(
+																	   "Present unfolding equality with empty unfolding should be symmetric")
+															   .isEqualTo(emptyUnfolding.equals(presentUnfolding));
 
 			Unfolding<String> emptyUnfolding1 = Unfolding.chaos();
 			Unfolding<Integer> emptyUnfolding2 = Unfolding.chaos();
 
-			assertThat(emptyUnfolding1.equals(emptyUnfolding2))
-					.as("Empty unfolding equality should be symmetric")
-					.isEqualTo(emptyUnfolding2.equals(emptyUnfolding1));
+			assertThat(emptyUnfolding1.equals(emptyUnfolding2)).as("Empty unfolding equality should be symmetric")
+															   .isEqualTo(emptyUnfolding2.equals(emptyUnfolding1));
 		}
 
 		@DisplayName("should satisfy transitivity (if x.equals(y) and y.equals(z), then x.equals(z))")
@@ -2034,13 +1880,11 @@ class UnfoldingTest
 			boolean firstEqualsSecond = unfolding1.equals(unfolding2);
 			boolean secondEqualsThird = unfolding2.equals(unfolding3);
 
-			assertThat(firstEqualsSecond && secondEqualsThird)
-					.as("Precondition: first equals second and second equals third")
-					.isTrue();
+			assertThat(firstEqualsSecond && secondEqualsThird).as(
+					"Precondition: first equals second and second equals third").isTrue();
 
-			assertThat(unfolding1.equals(unfolding3))
-					.as("Transitivity: if first equals second and second equals third, then first equals third")
-					.isTrue();
+			assertThat(unfolding1.equals(unfolding3)).as(
+					"Transitivity: if first equals second and second equals third, then first equals third").isTrue();
 
 			Unfolding<String> emptyUnfolding1 = Unfolding.chaos();
 			Unfolding<Integer> emptyUnfolding2 = Unfolding.chaos();
@@ -2049,35 +1893,27 @@ class UnfoldingTest
 			boolean firstEmptyEqualsSecond = emptyUnfolding1.equals(emptyUnfolding2);
 			boolean secondEmptyEqualsThird = emptyUnfolding2.equals(emptyUnfolding3);
 
-			assertThat(firstEmptyEqualsSecond && secondEmptyEqualsThird)
-					.as("Precondition: first empty equals second empty and second empty equals third empty")
-					.isTrue();
+			assertThat(firstEmptyEqualsSecond && secondEmptyEqualsThird).as(
+					"Precondition: first empty equals second empty and second empty equals third empty").isTrue();
 
-			assertThat(emptyUnfolding1.equals(emptyUnfolding3))
-					.as("Transitivity for empty: if first equals second and second equals third, then first equals third")
-					.isTrue();
+			assertThat(emptyUnfolding1.equals(emptyUnfolding3)).as(
+																	   "Transitivity for empty: if first equals second and second equals third, then first equals third")
+															   .isTrue();
 		}
 
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("hashCodeConsistencyTestCases")
 		@DisplayName("should have consistent hashCode with equals (if x.equals(y), then x.hashCode() == y.hashCode())")
-		<T, U> void shouldHaveConsistentHashCodeWithEquals(
-				String description,
-				Unfolding<T> first,
-				Unfolding<U> second,
-				boolean shouldBeEqual
-		)
+		<T, U> void shouldHaveConsistentHashCodeWithEquals(String description, Unfolding<T> first, Unfolding<U> second,
+														   boolean shouldBeEqual)
 		{
-			assertThat(first.equals(second))
-					.as(description)
-					.isEqualTo(shouldBeEqual);
+			assertThat(first.equals(second)).as(description).isEqualTo(shouldBeEqual);
 
 			// If they should be equal, their hashCodes must be equal too
 			if (shouldBeEqual)
 			{
-				assertThat(first.hashCode())
-						.as("Equal unfoldings should have the same hashCode")
-						.isEqualTo(second.hashCode());
+				assertThat(first.hashCode()).as("Equal unfoldings should have the same hashCode")
+											.isEqualTo(second.hashCode());
 			}
 
 			// Note: Different unfoldings may have the same hashCode by coincidence,
@@ -2090,9 +1926,7 @@ class UnfoldingTest
 		<T, U> void shouldHandleEqualityWithDifferentValueTypesCorrectly(String description, Unfolding<T> first,
 																		 Unfolding<U> second, boolean shouldBeEqual)
 		{
-			assertThat(first.equals(second))
-					.as(description)
-					.isEqualTo(shouldBeEqual);
+			assertThat(first.equals(second)).as(description).isEqualTo(shouldBeEqual);
 		}
 
 		@DisplayName("should handle equality with null values and empty unfoldings correctly")
@@ -2103,66 +1937,51 @@ class UnfoldingTest
 			Unfolding<Integer> emptyIntegerUnfolding = Unfolding.chaos();
 			Unfolding<List<String>> emptyListUnfolding = Unfolding.chaos();
 
-			assertThat(emptyStringUnfolding.equals(emptyIntegerUnfolding))
-					.as("Empty unfoldings of different types should be equal")
-					.isTrue();
+			assertThat(emptyStringUnfolding.equals(emptyIntegerUnfolding)).as(
+					"Empty unfoldings of different types should be equal").isTrue();
 
-			assertThat(emptyIntegerUnfolding.equals(emptyListUnfolding))
-					.as("Empty unfoldings of different types should be equal")
-					.isTrue();
+			assertThat(emptyIntegerUnfolding.equals(emptyListUnfolding)).as(
+					"Empty unfoldings of different types should be equal").isTrue();
 
 			Unfolding<String> nullStringUnfolding = Unfolding.beckon(null);
 			Unfolding<Integer> nullIntegerUnfolding = Unfolding.beckon(null);
 
-			assertThat(nullStringUnfolding.equals(emptyStringUnfolding))
-					.as("Unfolding.beckon(null) should equal Unfolding.chaos()")
-					.isTrue();
+			assertThat(nullStringUnfolding.equals(emptyStringUnfolding)).as(
+					"Unfolding.beckon(null) should equal Unfolding.chaos()").isTrue();
 
-			assertThat(nullIntegerUnfolding.equals(emptyIntegerUnfolding))
-					.as("Unfolding.beckon(null) should equal Unfolding.chaos()")
-					.isTrue();
+			assertThat(nullIntegerUnfolding.equals(emptyIntegerUnfolding)).as(
+					"Unfolding.beckon(null) should equal Unfolding.chaos()").isTrue();
 
-			assertThat(nullStringUnfolding.equals(nullIntegerUnfolding))
-					.as("Unfolding.beckon(null) instances should be equal regardless of type")
-					.isTrue();
+			assertThat(nullStringUnfolding.equals(nullIntegerUnfolding)).as(
+					"Unfolding.beckon(null) instances should be equal regardless of type").isTrue();
 
 			Unfolding<String> presentUnfolding = Unfolding.beckon("test");
 
-			assertThat(emptyStringUnfolding.equals(presentUnfolding))
-					.as("Empty unfolding should not equal present unfolding")
-					.isFalse();
+			assertThat(emptyStringUnfolding.equals(presentUnfolding)).as(
+					"Empty unfolding should not equal present unfolding").isFalse();
 
-			assertThat(nullStringUnfolding.equals(presentUnfolding))
-					.as("Unfolding.beckon(null) should not equal present unfolding")
-					.isFalse();
+			assertThat(nullStringUnfolding.equals(presentUnfolding)).as(
+					"Unfolding.beckon(null) should not equal present unfolding").isFalse();
 
 			Unfolding<String> emptyStringValueUnfolding = Unfolding.beckon("");
 
-			assertThat(emptyStringValueUnfolding.equals(emptyStringUnfolding))
-					.as("Unfolding with empty string should not equal empty unfolding")
-					.isFalse();
+			assertThat(emptyStringValueUnfolding.equals(emptyStringUnfolding)).as(
+					"Unfolding with empty string should not equal empty unfolding").isFalse();
 
-			assertThat(emptyStringValueUnfolding.equals(nullStringUnfolding))
-					.as("Unfolding with empty string should not equal Unfolding.beckon(null)")
-					.isFalse();
+			assertThat(emptyStringValueUnfolding.equals(nullStringUnfolding)).as(
+					"Unfolding with empty string should not equal Unfolding.beckon(null)").isFalse();
 
-			assertThat(presentUnfolding == null)
-					.as("Unfolding should not equal null")
-					.isFalse();
+			assertThat(presentUnfolding == null).as("Unfolding should not equal null").isFalse();
 
-			assertThat(emptyStringUnfolding == null)
-					.as("Empty unfolding should not equal null")
-					.isFalse();
+			assertThat(emptyStringUnfolding == null).as("Empty unfolding should not equal null").isFalse();
 
 			String stringObject = "test";
 
-			assertThat(presentUnfolding.equals(stringObject))
-					.as("Unfolding should not equal non-Unfolding object")
-					.isFalse();
+			assertThat(presentUnfolding.equals(stringObject)).as("Unfolding should not equal non-Unfolding object")
+															 .isFalse();
 
-			assertThat(emptyStringUnfolding.equals(stringObject))
-					.as("Empty unfolding should not equal non-Unfolding object")
-					.isFalse();
+			assertThat(emptyStringUnfolding.equals(stringObject)).as(
+					"Empty unfolding should not equal non-Unfolding object").isFalse();
 		}
 
 		@ParameterizedTest(name = "{0}")
@@ -2171,13 +1990,9 @@ class UnfoldingTest
 		<T, U> void shouldHandleEmptinessComparisonCorrectly(String description, Unfolding<T> first,
 															 Unfolding<U> second, boolean shouldBeEqual)
 		{
-			assertThat(first.equals(second))
-					.as(description)
-					.isEqualTo(shouldBeEqual);
+			assertThat(first.equals(second)).as(description).isEqualTo(shouldBeEqual);
 
-			assertThat(second.equals(first))
-					.as(description + " (symmetric check)")
-					.isEqualTo(shouldBeEqual);
+			assertThat(second.equals(first)).as(description + " (symmetric check)").isEqualTo(shouldBeEqual);
 		}
 
 		private static Stream<Arguments> hashCodeConsistencyTestCases()
@@ -2190,14 +2005,13 @@ class UnfoldingTest
 			Unfolding<String> emptyUnfolding1 = Unfolding.chaos();
 			Unfolding<Integer> emptyUnfolding2 = Unfolding.chaos();
 
-			return Stream.of(
-					new HashCodeTestCase<>("Unfoldings with same value should be equal and have same hashCode",
-							unfolding1, unfolding2, true),
-					new HashCodeTestCase<>("Unfoldings with different values should not be equal",
-							unfolding1, unfolding3, false),
-					new HashCodeTestCase<>("Empty unfoldings should be equal and have same hashCode",
-							emptyUnfolding1, emptyUnfolding2, true)
-			).map(tc -> Arguments.of(tc.description, tc.first, tc.second, tc.shouldBeEqual));
+			return Stream.of(new HashCodeTestCase<>("Unfoldings with same value should be equal and have same hashCode",
+										 unfolding1, unfolding2, true),
+								 new HashCodeTestCase<>("Unfoldings with different values should not be equal", unfolding1,
+										 unfolding3, false),
+								 new HashCodeTestCase<>("Empty unfoldings should be equal and have same hashCode", emptyUnfolding1,
+										 emptyUnfolding2, true))
+						 .map(tc -> Arguments.of(tc.description, tc.first, tc.second, tc.shouldBeEqual));
 		}
 
 		private static Stream<Arguments> equalityWithDifferentValueTypesTestCases()
@@ -2225,21 +2039,21 @@ class UnfoldingTest
 			Unfolding<String> stringNumberUnfolding = Unfolding.beckon("123");
 
 			return Stream.of(
-					new EqualityTestCase<>("Unfoldings with same string value should be equal",
-							stringUnfolding1, stringUnfolding2, true),
-					new EqualityTestCase<>("Unfoldings with different string values should not be equal",
-							stringUnfolding1, differentStringUnfolding, false),
-					new EqualityTestCase<>("Unfoldings with same integer value should be equal",
-							intUnfolding1, intUnfolding2, true),
-					new EqualityTestCase<>("Unfoldings with different integer values should not be equal",
-							intUnfolding1, differentIntUnfolding, false),
-					new EqualityTestCase<>("Unfoldings with equal list values should be equal",
-							listUnfolding1, listUnfolding2, true),
-					new EqualityTestCase<>("Unfoldings with different list values should not be equal",
-							listUnfolding1, differentListUnfolding, false),
-					new EqualityTestCase<>("Unfoldings with different types but similar values should not be equal",
-							integerUnfolding, stringNumberUnfolding, false)
-			).map(tc -> Arguments.of(tc.description, tc.first, tc.second, tc.shouldBeEqual));
+								 new EqualityTestCase<>("Unfoldings with same string value should be equal", stringUnfolding1,
+										 stringUnfolding2, true),
+								 new EqualityTestCase<>("Unfoldings with different string values should not be equal",
+										 stringUnfolding1, differentStringUnfolding, false),
+								 new EqualityTestCase<>("Unfoldings with same integer value should be equal", intUnfolding1,
+										 intUnfolding2, true),
+								 new EqualityTestCase<>("Unfoldings with different integer values should not be equal",
+										 intUnfolding1, differentIntUnfolding, false),
+								 new EqualityTestCase<>("Unfoldings with equal list values should be equal", listUnfolding1,
+										 listUnfolding2, true),
+								 new EqualityTestCase<>("Unfoldings with different list values should not be equal", listUnfolding1,
+										 differentListUnfolding, false),
+								 new EqualityTestCase<>("Unfoldings with different types but similar values should not be equal",
+										 integerUnfolding, stringNumberUnfolding, false))
+						 .map(tc -> Arguments.of(tc.description, tc.first, tc.second, tc.shouldBeEqual));
 		}
 
 		private static Stream<Arguments> emptinessComparisonTestCases()
@@ -2251,25 +2065,25 @@ class UnfoldingTest
 			Unfolding<String> emptyStringValueUnfolding = Unfolding.beckon("");
 
 			return Stream.of(
-					new EqualityTestCase<>("Empty unfoldings of same type should be equal",
-							emptyStringUnfolding, emptyStringUnfolding, true),
-					new EqualityTestCase<>("Empty unfoldings of different types should be equal",
-							emptyStringUnfolding, emptyIntegerUnfolding, true),
-					new EqualityTestCase<>("Present unfolding should not equal empty unfolding (string)",
-							presentStringUnfolding, emptyStringUnfolding, false),
-					new EqualityTestCase<>("Empty unfolding should not equal present unfolding (string)",
-							emptyStringUnfolding, presentStringUnfolding, false),
-					new EqualityTestCase<>("Present unfolding should not equal empty unfolding (integer)",
-							presentIntegerUnfolding, emptyIntegerUnfolding, false),
-					new EqualityTestCase<>("Empty unfolding should not equal present unfolding (string)",
-							emptyStringUnfolding, presentStringUnfolding, false),
-					new EqualityTestCase<>("Empty unfolding should not equal present unfolding (integer)",
-							emptyIntegerUnfolding, presentIntegerUnfolding, false),
-					new EqualityTestCase<>("Unfolding with empty string value should not equal empty unfolding",
-							emptyStringValueUnfolding, emptyStringUnfolding, false),
-					new EqualityTestCase<>("Empty unfolding should not equal unfolding with empty string value",
-							emptyStringUnfolding, emptyStringValueUnfolding, false)
-			).map(tc -> Arguments.of(tc.description, tc.first, tc.second, tc.shouldBeEqual));
+								 new EqualityTestCase<>("Empty unfoldings of same type should be equal", emptyStringUnfolding,
+										 emptyStringUnfolding, true),
+								 new EqualityTestCase<>("Empty unfoldings of different types should be equal", emptyStringUnfolding,
+										 emptyIntegerUnfolding, true),
+								 new EqualityTestCase<>("Present unfolding should not equal empty unfolding (string)",
+										 presentStringUnfolding, emptyStringUnfolding, false),
+								 new EqualityTestCase<>("Empty unfolding should not equal present unfolding (string)",
+										 emptyStringUnfolding, presentStringUnfolding, false),
+								 new EqualityTestCase<>("Present unfolding should not equal empty unfolding (integer)",
+										 presentIntegerUnfolding, emptyIntegerUnfolding, false),
+								 new EqualityTestCase<>("Empty unfolding should not equal present unfolding (string)",
+										 emptyStringUnfolding, presentStringUnfolding, false),
+								 new EqualityTestCase<>("Empty unfolding should not equal present unfolding (integer)",
+										 emptyIntegerUnfolding, presentIntegerUnfolding, false),
+								 new EqualityTestCase<>("Unfolding with empty string value should not equal empty unfolding",
+										 emptyStringValueUnfolding, emptyStringUnfolding, false),
+								 new EqualityTestCase<>("Empty unfolding should not equal unfolding with empty string value",
+										 emptyStringUnfolding, emptyStringValueUnfolding, false))
+						 .map(tc -> Arguments.of(tc.description, tc.first, tc.second, tc.shouldBeEqual));
 		}
 
 		private record HashCodeTestCase<T, U>(String description, Unfolding<T> first, Unfolding<U> second,
@@ -2291,10 +2105,8 @@ class UnfoldingTest
 		@DisplayName("Prometheus: The flame that became light")
 		void prometheus()
 		{
-			String result = Unfolding.beckon("flame")
-									 .develop(f -> f.equals("flame"), _ -> "blaze")
-									 .cleave(b -> b.startsWith("b"), _ -> "light", _ -> "smoke")
-									 .rescue("ash");
+			String result = Unfolding.beckon("flame").develop(f -> f.equals("flame"), _ -> "blaze")
+									 .cleave(b -> b.startsWith("b"), _ -> "light", _ -> "smoke").rescue("ash");
 
 			assertThat(result).isEqualTo("light");
 		}
@@ -2303,10 +2115,8 @@ class UnfoldingTest
 		@DisplayName("Orpheus: The song that lost its echo")
 		void orpheus()
 		{
-			String result = Unfolding.<String>chaos()
-									 .develop(s -> s.length() > 5, String::toUpperCase)
-									 .evolve(s -> s.startsWith("A"), _ -> "HARMONY")
-									 .rescue("silence");
+			String result = Unfolding.<String>chaos().develop(s -> s.length() > 5, String::toUpperCase)
+									 .evolve(s -> s.startsWith("A"), _ -> "HARMONY").rescue("silence");
 
 			assertThat(result).isEqualTo("silence");
 		}
@@ -2315,8 +2125,7 @@ class UnfoldingTest
 		@DisplayName("Eurydice: The name that reappeared in reflection")
 		void eurydice()
 		{
-			String result = Unfolding.beckon("Eurydice")
-									 .interlace(String::length)
+			String result = Unfolding.beckon("Eurydice").interlace(String::length)
 									 .metamorphose(pair -> pair.first() + " (" + pair.second() + ")")
 									 .concludeWith(Function.identity());
 
@@ -2327,8 +2136,7 @@ class UnfoldingTest
 		@DisplayName("Icarus: The fall despite bright beginnings")
 		void icarus()
 		{
-			String result = Unfolding.beckon("wings")
-									 .develop(s -> s.equals("wings"), _ -> "sky")
+			String result = Unfolding.beckon("wings").develop(s -> s.equals("wings"), _ -> "sky")
 									 .cleave(s -> s.equals("sun"), _ -> "ascend", _ -> "fall")
 									 .concludeWith(Function.identity());
 
@@ -2339,10 +2147,8 @@ class UnfoldingTest
 		@DisplayName("Theseus: From thread to revelation")
 		void theseus()
 		{
-			String result = Unfolding.beckon("thread")
-									 .develop(s -> s.equals("thread"), _ -> "path")
-									 .evolve(s -> s.equals("path"), _ -> "exit")
-									 .concludeWith(s -> s);
+			String result = Unfolding.beckon("thread").develop(s -> s.equals("thread"), _ -> "path")
+									 .evolve(s -> s.equals("path"), _ -> "exit").concludeWith(s -> s);
 
 			assertThat(result).isEqualTo("exit");
 		}
@@ -2398,9 +2204,8 @@ class UnfoldingTest
 		@DisplayName("Summoning from sterile should throw")
 		void sterileUnfoldingCannotBeSummoned()
 		{
-			assertThatThrownBy(() -> Unfolding.chaos().summon())
-					.isInstanceOf(EmptyUnfoldingException.class)
-					.hasMessageContaining("empty");
+			assertThatThrownBy(() -> Unfolding.chaos().summon()).isInstanceOf(EmptyUnfoldingException.class)
+																.hasMessageContaining("empty");
 		}
 	}
 
@@ -2463,18 +2268,14 @@ class UnfoldingTest
 				case EPIPHANY -> "He was revealed to the nations after " + daysSinceBirth + " days";
 				case GOOD_FRIDAY -> "He suffered and died after " + daysSinceBirth + " days";
 				case EASTER -> "He rose again in glory after " + daysSinceBirth + " days";
-				case ASCENSION -> "Ascension: He ascended to Heaven after " + daysSinceBirth + " days — and the myth " +
-						"continues.";
+				case ASCENSION ->
+						"Ascension: He ascended to Heaven after " + daysSinceBirth + " days — and the myth " + "continues.";
 			};
 		}
 
 		private enum FeastDay
 		{
-			CHRISTMAS,
-			EPIPHANY,
-			GOOD_FRIDAY,
-			EASTER,
-			ASCENSION
+			CHRISTMAS, EPIPHANY, GOOD_FRIDAY, EASTER, ASCENSION
 		}
 
 		private record SacredEvent(FeastDay feast, LocalDate date, long daysSinceChristmas)
@@ -2497,13 +2298,11 @@ class UnfoldingTest
 		{
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 
-			assertThat(unfolding.decree(RuntimeException::new))
-					.as("A supple unfolding should return the hero when decreed")
-					.isEqualTo("test");
+			assertThat(unfolding.decree(RuntimeException::new)).as(
+					"A supple unfolding should return the hero when decreed").isEqualTo("test");
 
-			assertThatCode(() -> unfolding.decree(RuntimeException::new))
-					.as("A supple unfolding should not throw when decreed")
-					.doesNotThrowAnyException();
+			assertThatCode(() -> unfolding.decree(RuntimeException::new)).as(
+					"A supple unfolding should not throw when decreed").doesNotThrowAnyException();
 		}
 
 		@Test
@@ -2514,10 +2313,9 @@ class UnfoldingTest
 
 			Supplier<RuntimeException> exceptionSupplier = () -> new IllegalStateException("test");
 
-			assertThatThrownBy(() -> unfolding.decree(exceptionSupplier))
-					.as("An empty unfolding should throw when decreed")
-					.isInstanceOf(exceptionSupplier.get().getClass())
-					.hasMessageContaining("test");
+			assertThatThrownBy(() -> unfolding.decree(exceptionSupplier)).as(
+																				 "An empty unfolding should throw when decreed").isInstanceOf(exceptionSupplier.get().getClass())
+																		 .hasMessageContaining("test");
 		}
 	}
 }
