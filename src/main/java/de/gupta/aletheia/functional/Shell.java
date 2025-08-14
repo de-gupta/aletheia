@@ -106,6 +106,13 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <U, R> Unfolding<R> conjoin(final Function<T, U> marriage,
+									   final BiFunction<? super T, ? super U, ? extends R> conjugation)
+	{
+		return instance();
+	}
+
+	@Override
 	public <R, U> Unfolding<U> braid(final Unfolding<R> consort,
 									 final BiFunction<? super T, ? super R, ? extends U> weaver)
 	{

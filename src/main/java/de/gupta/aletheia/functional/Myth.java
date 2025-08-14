@@ -154,7 +154,21 @@ final class Myth<T> implements Unfolding<T>
 	{
 		Objects.requireNonNull(consort, "consort may not be null");
 		Objects.requireNonNull(conjugation, "conjugation may not be null");
+
 		return Unfolding.beckon(conjugation.apply(hero, consort));
+	}
+
+	@Override
+	public <U, R> Unfolding<R> conjoin(final Function<T, U> marriage,
+									   final BiFunction<? super T, ? super U, ? extends R> conjugation)
+	{
+		// TODO: make it more elegant
+		Objects.requireNonNull(marriage, "marriage may not be null");
+		Objects.requireNonNull(conjugation, "conjugation may not be null");
+
+		return (Unfolding<R>) Optional.ofNullable(marriage.apply(hero))
+									  .map(c -> conjoin(c, conjugation))
+									  .orElseGet(Unfolding::chaos);
 	}
 
 	@Override
