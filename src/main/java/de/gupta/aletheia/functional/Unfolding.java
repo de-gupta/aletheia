@@ -75,6 +75,8 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<U, R> Unfolding<R> conjoin(U consort, BiFunction<? super T, ? super U, ? extends R> conjugation);
 
+	<U, R> Unfolding<R> conjoin(Function<T, U> marriage, BiFunction<? super T, ? super U, ? extends R> conjugation);
+
 	<R, U> Unfolding<U> braid(Unfolding<R> consort, BiFunction<? super T, ? super R, ? extends U> weaver);
 
 	<R> R concludeWith(Function<? super T, ? extends R> conclusion);
