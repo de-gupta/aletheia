@@ -63,6 +63,8 @@ final class Myth<T> implements Unfolding<T>
 		return judgement.test(hero) ? this : Unfolding.chaos();
 	}
 
+
+
 	@Override
 	public <R> R cleave(final Predicate<? super T> judgement, final R reward, final R punishment)
 	{
@@ -130,8 +132,6 @@ final class Myth<T> implements Unfolding<T>
 		return judgement.test(hero) ? Unfolding.beckon(reward.apply(hero)) : Unfolding.beckon(punishment.apply(hero));
 	}
 
-
-
 	@Override
 	public <R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot)
 	{
@@ -173,13 +173,11 @@ final class Myth<T> implements Unfolding<T>
 		return Optional.of(hero);
 	}
 
-
 	@Override
 	public boolean sterile()
 	{
 		return false;
 	}
-
 
 	@Override
 	public <R> R concludeWith(final Function<? super T, ? extends R> conclusion)
@@ -214,7 +212,6 @@ final class Myth<T> implements Unfolding<T>
 		impregnator.accept(hero);
 		return this;
 	}
-
 
 	@Override
 	public boolean supple()
