@@ -18,13 +18,13 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public T decree(final Supplier<? extends RuntimeException> exceptionSupplier)
+	public T decree(final Supplier<? extends RuntimeException> wrath)
 	{
-		throw exceptionSupplier.get();
+		throw wrath.get();
 	}
 
 	@Override
-	public void interdict(final Supplier<? extends RuntimeException> exceptionSupplier)
+	public void interdict(final Supplier<? extends RuntimeException> wrath)
 	{
 		// do nothing
 	}
@@ -49,9 +49,9 @@ final class Shell<T> implements Unfolding<T>
 
 	@Override
 	public Unfolding<T> discern(final Predicate<? super T> judgement,
-								final Supplier<? extends RuntimeException> exceptionSupplier)
+								final Supplier<? extends RuntimeException> wrath)
 	{
-		throw exceptionSupplier.get();
+		throw wrath.get();
 	}
 
 	@Override
@@ -106,10 +106,19 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <U, R> Unfolding<R> conjoin(final Function<T, U> marriage,
-									   final BiFunction<? super T, ? super U, ? extends R> conjugation)
+	public <U, R> Unfolding<R> emanate(final Function<? super T, U> marriage,
+									   final BiFunction<? super T, ? super U, R> conjugation)
 	{
 		return instance();
+	}
+
+	@Override
+	public <U, R> Unfolding<R> sanctify(final Function<? super T, U> marriage,
+										final BiFunction<? super T, ? super U, R> conjugation,
+										final Predicate<? super R> judgment,
+										final Supplier<? extends RuntimeException> wrath)
+	{
+		throw wrath.get();
 	}
 
 	@Override

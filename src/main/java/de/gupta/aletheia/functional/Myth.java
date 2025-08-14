@@ -24,15 +24,15 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public T decree(final Supplier<? extends RuntimeException> exceptionSupplier)
+	public T decree(final Supplier<? extends RuntimeException> wrath)
 	{
 		return hero;
 	}
 
 	@Override
-	public void interdict(final Supplier<? extends RuntimeException> exceptionSupplier)
+	public void interdict(final Supplier<? extends RuntimeException> wrath)
 	{
-		throw exceptionSupplier.get();
+		throw wrath.get();
 	}
 
 	@Override
@@ -63,6 +63,19 @@ final class Myth<T> implements Unfolding<T>
 		return judgement.test(hero) ? this : Unfolding.chaos();
 	}
 
+	@Override
+	public Unfolding<T> discern(final Predicate<? super T> judgement,
+								final Supplier<? extends RuntimeException> wrath)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		Objects.requireNonNull(wrath, "exceptionSupplier may not be null");
+
+		if (!judgement.test(hero))
+		{
+			throw wrath.get();
+		}
+		return this;
+	}
 
 
 	@Override
@@ -107,19 +120,7 @@ final class Myth<T> implements Unfolding<T>
 		return judgement.test(hero) ? Unfolding.beckon(evolution.apply(hero)) : Unfolding.chaos();
 	}
 
-	@Override
-	public Unfolding<T> discern(final Predicate<? super T> judgement,
-								final Supplier<? extends RuntimeException> exceptionSupplier)
-	{
-		Objects.requireNonNull(judgement, "judgement may not be null");
-		Objects.requireNonNull(exceptionSupplier, "exceptionSupplier may not be null");
 
-		if (!judgement.test(hero))
-		{
-			throw exceptionSupplier.get();
-		}
-		return this;
-	}
 
 	@Override
 	public <R> Unfolding<R> cleave(final Predicate<? super T> judgement, final Function<? super T, ? extends R> reward,
@@ -159,16 +160,29 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <U, R> Unfolding<R> conjoin(final Function<T, U> marriage,
-									   final BiFunction<? super T, ? super U, ? extends R> conjugation)
+	public <U, R> Unfolding<R> emanate(final Function<? super T, U> marriage,
+									   final BiFunction<? super T, ? super U, R> conjugation)
 	{
-		// TODO: make it more elegant
 		Objects.requireNonNull(marriage, "marriage may not be null");
 		Objects.requireNonNull(conjugation, "conjugation may not be null");
 
-		return (Unfolding<R>) Optional.ofNullable(marriage.apply(hero))
-									  .map(c -> conjoin(c, conjugation))
-									  .orElseGet(Unfolding::chaos);
+		return Optional.ofNullable(marriage.apply(hero))
+					   .map(c -> conjoin(c, conjugation))
+					   .orElseGet(Unfolding::chaos);
+	}
+
+	@Override
+	public <U, R> Unfolding<R> sanctify(final Function<? super T, U> marriage,
+										final BiFunction<? super T, ? super U, R> conjugation,
+										final Predicate<? super R> judgment,
+										final Supplier<? extends RuntimeException> wrath)
+	{
+		Objects.requireNonNull(marriage, "marriage may not be null");
+		Objects.requireNonNull(conjugation, "conjugation may not be null");
+		Objects.requireNonNull(judgment, "judgment may not be null");
+		Objects.requireNonNull(wrath, "wrath may not be null");
+
+		return emanate(marriage, conjugation).discern(judgment, wrath);
 	}
 
 	@Override

@@ -38,9 +38,9 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	T summon();
 
-	T decree(Supplier<? extends RuntimeException> exceptionSupplier);
+	T decree(Supplier<? extends RuntimeException> wrath);
 
-	void interdict(Supplier<? extends RuntimeException> exceptionSupplier);
+	void interdict(Supplier<? extends RuntimeException> wrath);
 
 	boolean sterile();
 
@@ -49,7 +49,7 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	Unfolding<T> discern(Predicate<? super T> judgement);
 
 	Unfolding<T> discern(final Predicate<? super T> judgement,
-						 final Supplier<? extends RuntimeException> exceptionSupplier);
+						 final Supplier<? extends RuntimeException> wrath);
 
 	Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development);
 
@@ -75,7 +75,13 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<U, R> Unfolding<R> conjoin(U consort, BiFunction<? super T, ? super U, ? extends R> conjugation);
 
-	<U, R> Unfolding<R> conjoin(Function<T, U> marriage, BiFunction<? super T, ? super U, ? extends R> conjugation);
+	<U, R> Unfolding<R> emanate(Function<? super T, U> marriage,
+								BiFunction<? super T, ? super U, R> conjugation);
+
+	<U, R> Unfolding<R> sanctify(final Function<? super T, U> marriage,
+								 final BiFunction<? super T, ? super U, R> conjugation,
+								 final Predicate<? super R> judgment,
+								 final Supplier<? extends RuntimeException> wrath);
 
 	<R, U> Unfolding<U> braid(Unfolding<R> consort, BiFunction<? super T, ? super R, ? extends U> weaver);
 
