@@ -85,7 +85,7 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R, U> Unfolding<U> braid(Unfolding<R> consort, BiFunction<? super T, ? super R, ? extends U> weaver);
 
-	<R> R concludeWith(Function<? super T, ? extends R> conclusion);
+	<R> R coronate(Function<? super T, ? extends R> conclusion);
 
 	T rescue(Supplier<? extends T> revelation);
 

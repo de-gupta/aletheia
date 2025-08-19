@@ -129,7 +129,7 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R> R concludeWith(final Function<? super T, ? extends R> conclusion)
+	public <R> R coronate(final Function<? super T, ? extends R> conclusion)
 	{
 		throw EmptyUnfoldingException.instance();
 	}

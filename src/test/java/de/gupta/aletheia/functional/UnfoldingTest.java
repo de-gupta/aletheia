@@ -22,8 +22,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 final class UnfoldingTest
 {
 	@Nested
-	@DisplayName("Tests for concludeWith() method")
-	class ConcludeWithTests
+	@DisplayName("Tests for coronate() method")
+	class CoronateTests
 	{
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("successTestCases")
@@ -31,8 +31,8 @@ final class UnfoldingTest
 		<T, R> void shouldTransformValue(String description, Unfolding<T> unfolding, Function<T, R> extractor,
 										 R expectedResult)
 		{
-			R result = unfolding.concludeWith(extractor);
-			assertThat(result).as("concludeWith() for %s should give %s", unfolding, expectedResult)
+			R result = unfolding.coronate(extractor);
+			assertThat(result).as("coronate() for %s should give %s", unfolding, expectedResult)
 							  .isEqualTo(expectedResult);
 		}
 
@@ -42,10 +42,10 @@ final class UnfoldingTest
 		<T, R> void shouldThrowExceptionForEmptyUnfolding(String description, Unfolding<T> unfolding,
 														  Function<T, R> extractor)
 		{
-			assertThatThrownBy(() -> unfolding.concludeWith(extractor)).as(
-																			   "concludeWith() for %s should throw EmptyUnfoldingException", unfolding)
-																	   .isInstanceOf(EmptyUnfoldingException.class)
-																	   .hasMessageContaining("empty");
+			assertThatThrownBy(() -> unfolding.coronate(extractor)).as(
+																		   "coronate() for %s should throw EmptyUnfoldingException", unfolding)
+																   .isInstanceOf(EmptyUnfoldingException.class)
+																   .hasMessageContaining("empty");
 		}
 
 		@DisplayName("should throw exception for null conclusion")
@@ -55,10 +55,10 @@ final class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.beckon("test");
 			Function<String, Integer> nullConclusion = null;
 
-			assertThatThrownBy(() -> unfolding.concludeWith(nullConclusion)).as(
-																					"concludeWith() with null conclusion should throw NullPointerException")
-																			.isInstanceOf(NullPointerException.class)
-																			.hasMessageContaining(
+			assertThatThrownBy(() -> unfolding.coronate(nullConclusion)).as(
+																				"coronate() with null conclusion should throw NullPointerException")
+																		.isInstanceOf(NullPointerException.class)
+																		.hasMessageContaining(
 																					"conclusion may not be null");
 		}
 
@@ -1663,7 +1663,7 @@ final class UnfoldingTest
 
 			String result =
 					unfolding.metamorphose(String::toUpperCase).unlace(capturedValues::add).discern(s -> s.length() > 5)
-							 .develop(s -> s.contains("WORLD"), s -> s + "!").concludeWith(s -> s.substring(0, 5));
+							 .develop(s -> s.contains("WORLD"), s -> s + "!").coronate(s -> s.substring(0, 5));
 
 			assertThat(result).as("Chained operations should produce expected result").isEqualTo("HELLO");
 			assertThat(capturedValues).as("unlace() should have been applied during chain")
@@ -2127,7 +2127,7 @@ final class UnfoldingTest
 		{
 			String result = Unfolding.beckon("Eurydice").interlace(String::length)
 									 .metamorphose(pair -> pair.first() + " (" + pair.second() + ")")
-									 .concludeWith(Function.identity());
+									 .coronate(Function.identity());
 
 			assertThat(result).isEqualTo("Eurydice (8)");
 		}
@@ -2138,7 +2138,7 @@ final class UnfoldingTest
 		{
 			String result = Unfolding.beckon("wings").develop(s -> s.equals("wings"), _ -> "sky")
 									 .cleave(s -> s.equals("sun"), _ -> "ascend", _ -> "fall")
-									 .concludeWith(Function.identity());
+									 .coronate(Function.identity());
 
 			assertThat(result).isEqualTo("fall");
 		}
@@ -2148,7 +2148,7 @@ final class UnfoldingTest
 		void theseus()
 		{
 			String result = Unfolding.beckon("thread").develop(s -> s.equals("thread"), _ -> "path")
-									 .evolve(s -> s.equals("path"), _ -> "exit").concludeWith(s -> s);
+									 .evolve(s -> s.equals("path"), _ -> "exit").coronate(s -> s);
 
 			assertThat(result).isEqualTo("exit");
 		}
@@ -2245,7 +2245,7 @@ final class UnfoldingTest
 					.metamorphose(pair -> formatSummary(pair.first(), pair.second()))
 
 					// Conclude
-					.concludeWith(Function.identity());
+					.coronate(Function.identity());
 
 			assertThat(poeticSummary).contains("Ascension").contains("11830 days").contains("He ascended to Heaven");
 		}

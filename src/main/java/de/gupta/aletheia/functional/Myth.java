@@ -210,7 +210,7 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R> R concludeWith(final Function<? super T, ? extends R> conclusion)
+	public <R> R coronate(final Function<? super T, ? extends R> conclusion)
 	{
 		Objects.requireNonNull(conclusion, "conclusion may not be null");
 		return conclusion.apply(hero);
