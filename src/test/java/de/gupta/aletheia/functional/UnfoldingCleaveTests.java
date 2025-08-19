@@ -8,6 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -172,53 +173,114 @@ final class UnfoldingCleaveTests
 					.hasMessage("punishment may not be null");
 		}
 
+		@Test
+		@DisplayName("cleave(Map, punishment) — throws when a predicate inside map is null")
+		void throwsIfAnyPredicateIsNull()
+		{
+			// Build via HashMap to avoid Map.of()'s null prohibition, then wrap with TreeMap
+			OrderedPredicate<String> nullPred = OrderedPredicate.of(0, null);
+			Map<Predicate<? super String>, Function<? super String, String>> helper = new HashMap<>();
+			helper.put(nullPred, _ -> "X");
+			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>(helper);
+
+			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(judgments, "punish"))
+					.isInstanceOf(NullPointerException.class);
+		}
+
+		@Test
+		@DisplayName("cleave(Map, punishment) — throws when a mapper function for a matching predicate is null")
+		void throwsIfAnyMapperIsNullAndPredicateMatches()
+		{
+			Map<Predicate<? super String>, Function<? super String, String>> helper = new HashMap<>();
+			helper.put(OrderedPredicate.of(0, _ -> true), null);
+
+			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>(helper);
+
+			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(judgments, "punish"))
+					.isInstanceOf(NullPointerException.class);
+		}
+
+		@Test
+		@DisplayName("cleave(Map, punishment) — empty unfolding throws")
+		void emptyUnfoldingThrowsOnCleaveWithMap()
+		{
+			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>(
+					Map.of(OrderedPredicate.of(0, _ -> true), _ -> "ok"));
+			assertThatThrownBy(() -> Unfolding.<String>chaos().cleave(judgments, "punish"))
+					.isInstanceOf(EmptyUnfoldingException.class);
+		}
+
 		private static Stream<Arguments> judgmentScenarios()
 		{
-			final OrderedPredicate<String> startsWith0 = OrderedPredicate.of(0, s -> s.startsWith("0"));
-			final OrderedPredicate<String> startsWith1 = OrderedPredicate.of(1, s -> s.startsWith("1"));
-			return Stream.of(
-					TestCase.from("First condition satisfied",
-							"01",
-							Map.of(startsWith0, _ -> "Zero", startsWith1, _ -> "One"),
-							"Default", "Zero"),
-					TestCase.from("Second condition satisfied",
-							"10",
-							Map.of(startsWith0, _ -> "Zero", startsWith1, _ -> "One"),
-							"Default", "One"),
-					TestCase.from("No condition satisfied",
-							"20",
-							Map.of(startsWith0, _ -> "Zero", startsWith1, _ -> "One"),
-							"Default", "Default")
-			).map(tc -> Arguments.of(tc.description(), tc.hero(), tc.judgments(), tc.punishment(), tc.expected()));
+			final OrderedPredicate<String> isOdysseus = OrderedPredicate.of(0, s -> s.startsWith("Odysseus"));
+			final OrderedPredicate<String> isAchilles = OrderedPredicate.of(1, s -> s.startsWith("Achilles"));
+			final OrderedPredicate<String> anyNonEmpty = OrderedPredicate.of(0, s -> s != null && !s.isEmpty());
+			final OrderedPredicate<String> startsWithLowerA = OrderedPredicate.of(1, s -> s.startsWith("a"));
+			final OrderedPredicate<String> alwaysTrueLow = OrderedPredicate.of(99, _ -> true);
 
-//			return Stream.of(
-//					Arguments.of(
-//							"first match wins (starts with 'O')",
-//							map(
-//									entry(name -> name.startsWith("O"), name -> "Hero of Olympus"),
-//									entry(name -> name.contains("yss"), name -> "Wanderer")
-//							),
-//							"Unknown",
-//							"Hero of Olympus"
-//					),
-//					Arguments.of(
-//							"insertion order respected (contains 'yss' before starts with 'O')",
-//							map(
-//									entry(name -> name.contains("yss"), name -> "Wanderer"),
-//									entry(name -> name.startsWith("O"), name -> "Hero of Olympus")
-//							),
-//							"Unknown",
-//							"Wanderer"
-//					),
-//					Arguments.of(
-//							"no match → punishment returned",
-//							map(
-//									entry(name -> name.endsWith("x"), name -> "Ghost")
-//							),
-//							"Exile",
-//							"Exile"
-//					)
-//			);
+			final OrderedPredicate<Integer> negative = OrderedPredicate.of(0, n -> n < 0);
+			final OrderedPredicate<Integer> divisibleBy5 = OrderedPredicate.of(1, n -> n % 5 == 0);
+
+			final OrderedPredicate<Boolean> oracleSpeaksTruth = OrderedPredicate.of(0, b -> b);
+			final OrderedPredicate<Boolean> oracleSpeaksFalsehood = OrderedPredicate.of(1, b -> !b);
+
+			final OrderedPredicate<String> never0 = OrderedPredicate.of(0, s -> false);
+			final OrderedPredicate<String> never1 = OrderedPredicate.of(1, s -> false);
+			final OrderedPredicate<String> never2 = OrderedPredicate.of(2, s -> false);
+			final OrderedPredicate<String> never3 = OrderedPredicate.of(3, s -> false);
+			final OrderedPredicate<String> never4 = OrderedPredicate.of(4, s -> false);
+			final OrderedPredicate<String> equalsZzz = OrderedPredicate.of(5, "zzz"::equals);
+
+			final OrderedPredicate<String> order5StartsWithA = OrderedPredicate.of(5, s -> s.startsWith("A"));
+			final OrderedPredicate<String> order5StartsWithB = OrderedPredicate.of(5, s -> s.startsWith("B"));
+
+			return Stream.of(
+					// Basic behavior remains covered (mythic)
+					TestCase.from("Odysseus finds Penelope when his name is spoken",
+							"Odysseus survives",
+							Map.of(isOdysseus, _ -> "Penelope", isAchilles, _ -> "Briseis"),
+							"Apollo", "Penelope"),
+					TestCase.from("Achilles is bound to Briseis when his deeds are sung",
+							"Achilles dies",
+							Map.of(isOdysseus, _ -> "Penelope", isAchilles, _ -> "Briseis"),
+							"Artemis", "Briseis"),
+					TestCase.from("When neither hero answers, the Fates return the punishment",
+							"Mortal",
+							Map.of(isOdysseus, _ -> "Penelope", isAchilles, _ -> "Briseis"),
+							"Zeus", "Zeus"),
+					TestCase.from("Even Athena abides the empty oracle: punishment remains",
+							"Athena",
+							Map.of(),
+							"Zeus", "Zeus"),
+
+					// Edge cases (mythic flavor)
+					TestCase.from("When many omens agree, the earliest order speaks first",
+							"alpha",
+							Map.of(anyNonEmpty, _ -> "Len>0", startsWithLowerA, _ -> "StartsWithA"),
+							"Punish", "Len>0"),
+//					TestCase.from("If omens share the same rank, the later inscription overwrites the former",
+//							"Alpha",
+//							Map.of(order5StartsWithA, _ -> "A", order5StartsWithB, _ -> "B"),
+//							"Zeus", "Zeus"),
+					TestCase.from("The ever-true prophecy at the tail end cannot overthrow the first sign",
+							"123",
+							Map.of(OrderedPredicate.of(0, s -> s.startsWith("1")), _ -> "StartsWith1", alwaysTrueLow,
+									_ -> "Always"),
+							"Apollo", "StartsWith1"),
+					TestCase.from("Generic type: Integer champion — divisible by five wins the laurel",
+							15,
+							Map.of(negative, _ -> "neg", divisibleBy5, _ -> "div5"),
+							"punish", "div5"),
+					TestCase.from("Generic type: Boolean oracle — truth is favored in the shrine",
+							true,
+							Map.of(oracleSpeaksTruth, _ -> "Apollo smiles", oracleSpeaksFalsehood, _ -> "Hades scowls"),
+							"Nemesis", "Apollo smiles"),
+					TestCase.from("Across many false signs, only the final rune awakens the answer",
+							"zzz",
+							Map.of(never0, _ -> "x0", never1, _ -> "x1", never2, _ -> "x2", never3, _ -> "x3", never4,
+									_ -> "x4", equalsZzz, _ -> "Zed"),
+							"punish", "Zed")
+			).map(tc -> Arguments.of(tc.description(), tc.hero(), tc.judgments(), tc.punishment(), tc.expected()));
 		}
 
 		private record TestCase<K, V>(String description, K hero,

@@ -98,6 +98,12 @@ final class Myth<T> implements Unfolding<T>
 		Objects.requireNonNull(judgments, "judgments may not be null");
 		Objects.requireNonNull(punishment, "punishment may not be null");
 
+		judgments.forEach((judgement, reward) ->
+		{
+			Objects.requireNonNull(judgement, "judgement may not be null");
+			Objects.requireNonNull(reward, "reward may not be null");
+		});
+
 		return judgments.entrySet()
 						.stream()
 						.filter(entry -> entry.getKey().test(hero))
