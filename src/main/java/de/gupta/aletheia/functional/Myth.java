@@ -53,14 +53,17 @@ final class Myth<T> implements Unfolding<T>
 		return "Unfolding[" + hero + "]";
 	}
 
-	private Myth(final T hero)
-	{
-		this.hero = hero;
-	}	@Override
+	@Override
 	public Unfolding<T> discern(final Predicate<? super T> judgement)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
 		return judgement.test(hero) ? this : Unfolding.chaos();
+	}
+
+	@Override
+	public Unfolding<T> resurrect(final Supplier<Unfolding<T>> grace)
+	{
+		return this;
 	}
 
 	@Override
@@ -119,7 +122,6 @@ final class Myth<T> implements Unfolding<T>
 
 		return judgement.test(hero) ? Unfolding.beckon(evolution.apply(hero)) : Unfolding.chaos();
 	}
-
 
 
 	@Override
@@ -221,11 +223,15 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public Unfolding<T> resurrect(final Supplier<Unfolding<T>> grace)
+	public Unfolding<T> revive(final Supplier<T> grace)
 	{
-		return Unfolding.beckon(hero);
+		return this;
 	}
 
+	private Myth(final T hero)
+	{
+		this.hero = hero;
+	}
 
 	@Override
 	public Stream<T> stream()

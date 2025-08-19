@@ -155,6 +155,14 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public Unfolding<T> revive(final Supplier<T> grace)
+	{
+		Objects.requireNonNull(grace, "grace may not be null");
+
+		return Optional.ofNullable(grace.get()).map(Unfolding::beckon).orElseGet(Shell::instance);
+	}
+
+	@Override
 	public Stream<T> stream()
 	{
 		return Stream.empty();

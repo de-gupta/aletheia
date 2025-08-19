@@ -93,6 +93,8 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	Unfolding<T> resurrect(Supplier<Unfolding<T>> grace);
 
+	Unfolding<T> revive(final Supplier<T> grace);
+
 	Stream<T> stream();
 
 	Unfolding<T> unlace(Consumer<? super T> impregnator);
