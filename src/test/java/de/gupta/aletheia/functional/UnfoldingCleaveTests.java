@@ -139,6 +139,142 @@ final class UnfoldingCleaveTests
 	@Nested
 	final class CleaveMapTest
 	{
+		private static Stream<Arguments> judgmentScenarios()
+		{
+			final OrderedPredicate<String> isOdysseus = OrderedPredicate.of(0, s -> s.startsWith("Odysseus"));
+			final OrderedPredicate<String> isAchilles = OrderedPredicate.of(1, s -> s.startsWith("Achilles"));
+			final OrderedPredicate<String> anyNonEmpty = OrderedPredicate.of(0, s -> s != null && !s.isEmpty());
+			final OrderedPredicate<String> startsWithLowerA = OrderedPredicate.of(1, s -> s.startsWith("a"));
+			final OrderedPredicate<String> alwaysTrueLow = OrderedPredicate.of(99, _ -> true);
+
+			final OrderedPredicate<Integer> negative = OrderedPredicate.of(0, n -> n < 0);
+			final OrderedPredicate<Integer> divisibleBy5 = OrderedPredicate.of(1, n -> n % 5 == 0);
+
+			final OrderedPredicate<Boolean> oracleSpeaksTruth = OrderedPredicate.of(0, b -> b);
+			final OrderedPredicate<Boolean> oracleSpeaksFalsehood = OrderedPredicate.of(1, b -> !b);
+
+			final OrderedPredicate<String> never0 = OrderedPredicate.of(0, s -> false);
+			final OrderedPredicate<String> never1 = OrderedPredicate.of(1, s -> false);
+			final OrderedPredicate<String> never2 = OrderedPredicate.of(2, s -> false);
+			final OrderedPredicate<String> never3 = OrderedPredicate.of(3, s -> false);
+			final OrderedPredicate<String> never4 = OrderedPredicate.of(4, s -> false);
+			final OrderedPredicate<String> equalsZzz = OrderedPredicate.of(5, "zzz"::equals);
+
+			final OrderedPredicate<String> order5StartsWithA = OrderedPredicate.of(5, s -> s.startsWith("A"));
+			final OrderedPredicate<String> order5StartsWithB = OrderedPredicate.of(5, s -> s.startsWith("B"));
+
+			return Stream.of(
+					// Basic behavior remains covered (mythic)
+					TestCase.from("Odysseus finds Penelope when his name is spoken",
+							"Odysseus survives",
+							Map.of(isOdysseus, _ -> "Penelope", isAchilles, _ -> "Briseis"),
+							"Apollo", "Penelope"),
+					TestCase.from("Achilles is bound to Briseis when his deeds are sung",
+							"Achilles dies",
+							Map.of(isOdysseus, _ -> "Penelope", isAchilles, _ -> "Briseis"),
+							"Artemis", "Briseis"),
+					TestCase.from("When neither hero answers, the Fates return the punishment",
+							"Mortal",
+							Map.of(isOdysseus, _ -> "Penelope", isAchilles, _ -> "Briseis"),
+							"Zeus", "Zeus"),
+					TestCase.from("Even Athena abides the empty oracle: punishment remains",
+							"Athena",
+							Map.of(),
+							"Zeus", "Zeus"),
+
+					// Edge cases (mythic flavor)
+					TestCase.from("When many omens agree, the earliest order speaks first",
+							"alpha",
+							Map.of(anyNonEmpty, _ -> "Len>0", startsWithLowerA, _ -> "StartsWithA"),
+							"Punish", "Len>0"),
+//					TestCase.from("If omens share the same rank, the later inscription overwrites the former",
+//							"Alpha",
+//							Map.of(order5StartsWithA, _ -> "A", order5StartsWithB, _ -> "B"),
+//							"Zeus", "Zeus"),
+					TestCase.from("The ever-true prophecy at the tail end cannot overthrow the first sign",
+							"123",
+							Map.of(OrderedPredicate.of(0, s -> s.startsWith("1")), _ -> "StartsWith1", alwaysTrueLow,
+									_ -> "Always"),
+							"Apollo", "StartsWith1"),
+					TestCase.from("Generic type: Integer champion — divisible by five wins the laurel",
+							15,
+							Map.of(negative, _ -> "neg", divisibleBy5, _ -> "div5"),
+							"punish", "div5"),
+					TestCase.from("Generic type: Boolean oracle — truth is favored in the shrine",
+							true,
+							Map.of(oracleSpeaksTruth, _ -> "Apollo smiles", oracleSpeaksFalsehood, _ -> "Hades scowls"),
+							"Nemesis", "Apollo smiles"),
+					TestCase.from("Across many false signs, only the final rune awakens the answer",
+							"zzz",
+							Map.of(never0, _ -> "x0", never1, _ -> "x1", never2, _ -> "x2", never3, _ -> "x3", never4,
+									_ -> "x4", equalsZzz, _ -> "Zed"),
+							"punish", "Zed"),
+
+					// Additional data types and edge cases
+					TestCase.from("Double NaN is recognized before Infinity",
+							Double.NaN,
+							Map.of(
+									OrderedPredicate.of(0, (Double d) -> Double.isNaN(d)), _ -> "NaN",
+									OrderedPredicate.of(1, (Double d) -> Double.isInfinite(d)), _ -> "Inf",
+									OrderedPredicate.of(2, (Double d) -> d > 0), _ -> ">0"
+							),
+							"punish", "NaN"),
+					TestCase.from("Double Infinity when not NaN",
+							Double.POSITIVE_INFINITY,
+							Map.of(
+									OrderedPredicate.of(0, (Double d) -> Double.isNaN(d)), _ -> "NaN",
+									OrderedPredicate.of(1, (Double d) -> Double.isInfinite(d)), _ -> "Inf"
+							),
+							"punish", "Inf"),
+					TestCase.from("Long zero takes precedence over positive/negative",
+							0L,
+							Map.of(
+									OrderedPredicate.of(0, (Long l) -> l < 0), _ -> "neg",
+									OrderedPredicate.of(1, (Long l) -> l == 0L), _ -> "zero",
+									OrderedPredicate.of(2, (Long l) -> l > 0), _ -> "pos"
+							),
+							"punish", "zero"),
+					TestCase.from("Character: earlier order wins when multiple match",
+							'a',
+							Map.of(
+									OrderedPredicate.of(0, Character::isLetter), _ -> "letter",
+									OrderedPredicate.of(1, Character::isLowerCase), _ -> "lower"
+							),
+							"punish", "letter"),
+					TestCase.from("Enum type: specific day matched",
+							Day.MON,
+							Map.of(
+									OrderedPredicate.of(0, (Day d) -> d == Day.MON), _ -> "Mon",
+									OrderedPredicate.of(1, (Day d) -> d == Day.SAT), _ -> "Sat"
+							),
+							"No", "Mon"),
+					TestCase.from("Mapper returns null — punishment is returned",
+							"nullify",
+							Map.of(
+									OrderedPredicate.of(0, (String s) -> s.startsWith("n")), _ -> null,
+									OrderedPredicate.of(1, (String s) -> true), _ -> "later"
+							),
+							"PUN", "PUN"),
+					TestCase.from("Short-circuiting: later mapper not evaluated",
+							"both",
+							Map.of(
+									OrderedPredicate.of(0, (String s) -> true), _ -> "first",
+									OrderedPredicate.of(1, (String s) -> true), _ ->
+									{
+										throw new AssertionError("mapper should not be called");
+									}
+							),
+							"punish", "first"),
+					TestCase.from("Non-string result type Integer: punishment used when none match",
+							7,
+							Map.of(
+									OrderedPredicate.of(0, (Integer i) -> i % 2 == 0),
+									(Function<Integer, Integer>) i -> i * 2,
+									OrderedPredicate.of(1, (Integer i) -> i > 10), (Function<Integer, Integer>) i -> 10
+							),
+							99, 99)
+			).map(tc -> Arguments.of(tc.description(), tc.hero(), tc.judgments(), tc.punishment(), tc.expected()));
+		}
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("judgmentScenarios")
 		@DisplayName("cleave(Map, punishment) — applies correct transformation or returns punishment")
@@ -210,78 +346,8 @@ final class UnfoldingCleaveTests
 					.isInstanceOf(EmptyUnfoldingException.class);
 		}
 
-		private static Stream<Arguments> judgmentScenarios()
-		{
-			final OrderedPredicate<String> isOdysseus = OrderedPredicate.of(0, s -> s.startsWith("Odysseus"));
-			final OrderedPredicate<String> isAchilles = OrderedPredicate.of(1, s -> s.startsWith("Achilles"));
-			final OrderedPredicate<String> anyNonEmpty = OrderedPredicate.of(0, s -> s != null && !s.isEmpty());
-			final OrderedPredicate<String> startsWithLowerA = OrderedPredicate.of(1, s -> s.startsWith("a"));
-			final OrderedPredicate<String> alwaysTrueLow = OrderedPredicate.of(99, _ -> true);
-
-			final OrderedPredicate<Integer> negative = OrderedPredicate.of(0, n -> n < 0);
-			final OrderedPredicate<Integer> divisibleBy5 = OrderedPredicate.of(1, n -> n % 5 == 0);
-
-			final OrderedPredicate<Boolean> oracleSpeaksTruth = OrderedPredicate.of(0, b -> b);
-			final OrderedPredicate<Boolean> oracleSpeaksFalsehood = OrderedPredicate.of(1, b -> !b);
-
-			final OrderedPredicate<String> never0 = OrderedPredicate.of(0, s -> false);
-			final OrderedPredicate<String> never1 = OrderedPredicate.of(1, s -> false);
-			final OrderedPredicate<String> never2 = OrderedPredicate.of(2, s -> false);
-			final OrderedPredicate<String> never3 = OrderedPredicate.of(3, s -> false);
-			final OrderedPredicate<String> never4 = OrderedPredicate.of(4, s -> false);
-			final OrderedPredicate<String> equalsZzz = OrderedPredicate.of(5, "zzz"::equals);
-
-			final OrderedPredicate<String> order5StartsWithA = OrderedPredicate.of(5, s -> s.startsWith("A"));
-			final OrderedPredicate<String> order5StartsWithB = OrderedPredicate.of(5, s -> s.startsWith("B"));
-
-			return Stream.of(
-					// Basic behavior remains covered (mythic)
-					TestCase.from("Odysseus finds Penelope when his name is spoken",
-							"Odysseus survives",
-							Map.of(isOdysseus, _ -> "Penelope", isAchilles, _ -> "Briseis"),
-							"Apollo", "Penelope"),
-					TestCase.from("Achilles is bound to Briseis when his deeds are sung",
-							"Achilles dies",
-							Map.of(isOdysseus, _ -> "Penelope", isAchilles, _ -> "Briseis"),
-							"Artemis", "Briseis"),
-					TestCase.from("When neither hero answers, the Fates return the punishment",
-							"Mortal",
-							Map.of(isOdysseus, _ -> "Penelope", isAchilles, _ -> "Briseis"),
-							"Zeus", "Zeus"),
-					TestCase.from("Even Athena abides the empty oracle: punishment remains",
-							"Athena",
-							Map.of(),
-							"Zeus", "Zeus"),
-
-					// Edge cases (mythic flavor)
-					TestCase.from("When many omens agree, the earliest order speaks first",
-							"alpha",
-							Map.of(anyNonEmpty, _ -> "Len>0", startsWithLowerA, _ -> "StartsWithA"),
-							"Punish", "Len>0"),
-//					TestCase.from("If omens share the same rank, the later inscription overwrites the former",
-//							"Alpha",
-//							Map.of(order5StartsWithA, _ -> "A", order5StartsWithB, _ -> "B"),
-//							"Zeus", "Zeus"),
-					TestCase.from("The ever-true prophecy at the tail end cannot overthrow the first sign",
-							"123",
-							Map.of(OrderedPredicate.of(0, s -> s.startsWith("1")), _ -> "StartsWith1", alwaysTrueLow,
-									_ -> "Always"),
-							"Apollo", "StartsWith1"),
-					TestCase.from("Generic type: Integer champion — divisible by five wins the laurel",
-							15,
-							Map.of(negative, _ -> "neg", divisibleBy5, _ -> "div5"),
-							"punish", "div5"),
-					TestCase.from("Generic type: Boolean oracle — truth is favored in the shrine",
-							true,
-							Map.of(oracleSpeaksTruth, _ -> "Apollo smiles", oracleSpeaksFalsehood, _ -> "Hades scowls"),
-							"Nemesis", "Apollo smiles"),
-					TestCase.from("Across many false signs, only the final rune awakens the answer",
-							"zzz",
-							Map.of(never0, _ -> "x0", never1, _ -> "x1", never2, _ -> "x2", never3, _ -> "x3", never4,
-									_ -> "x4", equalsZzz, _ -> "Zed"),
-							"punish", "Zed")
-			).map(tc -> Arguments.of(tc.description(), tc.hero(), tc.judgments(), tc.punishment(), tc.expected()));
-		}
+		private enum Day
+		{MON, TUE, SAT}
 
 		private record TestCase<K, V>(String description, K hero,
 									  SortedMap<Predicate<K>, Function<K, V>> judgments, V punishment,
