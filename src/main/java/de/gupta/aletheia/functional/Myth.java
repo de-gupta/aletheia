@@ -2,6 +2,7 @@ package de.gupta.aletheia.functional;
 
 import de.gupta.aletheia.collection.Pair;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.*;
@@ -89,6 +90,20 @@ final class Myth<T> implements Unfolding<T>
 		Objects.requireNonNull(punishment, "punishment may not be null");
 
 		return judgement.test(hero) ? reward : punishment;
+	}
+
+	@Override
+	public <R> R cleave(final Map<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment)
+	{
+		Objects.requireNonNull(judgments, "judgments may not be null");
+		Objects.requireNonNull(punishment, "punishment may not be null");
+
+		return judgments.entrySet()
+						.stream()
+						.filter(entry -> entry.getKey().test(hero))
+						.findFirst()
+						.map(entry -> entry.getValue().apply(hero))
+						.orElse(punishment);
 	}
 
 	@Override
