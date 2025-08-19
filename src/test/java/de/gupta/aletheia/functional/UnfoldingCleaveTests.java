@@ -1,5 +1,6 @@
 package de.gupta.aletheia.functional;
 
+import de.gupta.aletheia.forge.OrderedPredicate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -7,8 +8,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -136,17 +138,16 @@ final class UnfoldingCleaveTests
 	@Nested
 	final class CleaveMapTest
 	{
-		private final Unfolding<String> myth = Unfolding.beckon("Odysseus");
-
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("judgmentScenarios")
 		@DisplayName("cleave(Map, punishment) — applies correct transformation or returns punishment")
-		void cleavesCorrectly(final String description,
-							  final Map<Predicate<? super String>, Function<? super String, String>> judgments,
-							  final String punishment,
-							  final String expected)
+		<T, R> void cleavesCorrectly(final String description,
+									 final T hero,
+									 final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments,
+									 final R punishment,
+									 final R expected)
 		{
-			assertThat(myth.cleave(judgments, punishment))
+			assertThat(Unfolding.beckon(hero).cleave(judgments, punishment))
 					.as("cleave(judgments, punishment) should return expected result")
 					.isEqualTo(expected);
 		}
@@ -155,7 +156,7 @@ final class UnfoldingCleaveTests
 		@DisplayName("cleave(Map, punishment) — throws when judgments map is null")
 		void throwsIfJudgmentsIsNull()
 		{
-			assertThatThrownBy(() -> myth.cleave(null, "Fate"))
+			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(null, "Fate"))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessage("judgments may not be null");
 		}
@@ -164,42 +165,31 @@ final class UnfoldingCleaveTests
 		@DisplayName("cleave(Map, punishment) — throws when punishment is null")
 		void throwsIfPunishmentIsNull()
 		{
-			Map<Predicate<? super String>, Function<? super String, String>> judgments = map(
-					entry(_ -> true, _ -> "Any")
-			);
+			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>();
 
-			assertThatThrownBy(() -> myth.cleave(judgments, null))
+			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(judgments, null))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessage("punishment may not be null");
 		}
 
-		@SafeVarargs
-		private static <K, V> LinkedHashMap<K, V> map(Map.Entry<K, V>... entries)
-		{
-//			Arrays.stream(entries).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-			LinkedHashMap<K, V> map = new LinkedHashMap<>();
-			for (Map.Entry<K, V> entry : entries)
-			{
-				map.put(entry.getKey(), entry.getValue());
-			}
-			return map;
-		}
-
-		private static <K, V> Map.Entry<K, V> entry(K key, V value)
-		{
-			return Map.entry(key, value);
-		}
-
-		// Helper methods for concise map creation
-
 		private static Stream<Arguments> judgmentScenarios()
 		{
-			final Predicate<String> startsWith0 = s -> s.startsWith("0");
+			final OrderedPredicate<String> startsWith0 = OrderedPredicate.of(0, s -> s.startsWith("0"));
+			final OrderedPredicate<String> startsWith1 = OrderedPredicate.of(1, s -> s.startsWith("1"));
 			return Stream.of(
-					TestCase.of("Starting with 0 as first condition should be satisfied",
-							Map.of(startsWith0, _ -> "Zero"),
-							"Zero", "Zero")
-			).map(tc -> Arguments.of(tc.description(), tc.judgments(), tc.punishment(), tc.expected()));
+					TestCase.from("First condition satisfied",
+							"01",
+							Map.of(startsWith0, _ -> "Zero", startsWith1, _ -> "One"),
+							"Default", "Zero"),
+					TestCase.from("Second condition satisfied",
+							"10",
+							Map.of(startsWith0, _ -> "Zero", startsWith1, _ -> "One"),
+							"Default", "One"),
+					TestCase.from("No condition satisfied",
+							"20",
+							Map.of(startsWith0, _ -> "Zero", startsWith1, _ -> "One"),
+							"Default", "Default")
+			).map(tc -> Arguments.of(tc.description(), tc.hero(), tc.judgments(), tc.punishment(), tc.expected()));
 
 //			return Stream.of(
 //					Arguments.of(
@@ -231,14 +221,18 @@ final class UnfoldingCleaveTests
 //			);
 		}
 
-		private record TestCase<K, V>(String description,
-									  Map<Predicate<K>, Function<K, V>> judgments, V punishment, V expected)
+		private record TestCase<K, V>(String description, K hero,
+									  SortedMap<Predicate<K>, Function<K, V>> judgments, V punishment,
+									  V expected)
 		{
-			static <K, V> TestCase<K, V> of(final String description,
-											final Map<Predicate<K>, Function<K, V>> judgments, final V punishment,
-											final V expected)
+			static <K, V> TestCase<K, V> from(final String description,
+											  final K hero,
+											  final Map<OrderedPredicate<K>, Function<K, V>> judgments,
+											  final V punishment,
+											  final V expected)
 			{
-				return new TestCase<>(description, judgments, punishment, expected);
+				SortedMap<Predicate<K>, Function<K, V>> sortedJudgments = new TreeMap<>(judgments);
+				return new TestCase<>(description, hero, sortedJudgments, punishment, expected);
 			}
 		}
 	}

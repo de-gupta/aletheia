@@ -2,8 +2,8 @@ package de.gupta.aletheia.functional;
 
 import de.gupta.aletheia.collection.Pair;
 
-import java.util.Map;
 import java.util.Optional;
+import java.util.SortedMap;
 import java.util.function.*;
 import java.util.stream.Stream;
 
@@ -70,7 +70,7 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R> R cleave(Predicate<? super T> judgement, R reward, R punishment);
 
-	<R> R cleave(final Map<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment);
+	<R> R cleave(final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment);
 
 	<R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot);
 
