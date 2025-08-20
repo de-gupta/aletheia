@@ -2,6 +2,7 @@ package de.gupta.aletheia.functional;
 
 import de.gupta.aletheia.collection.Pair;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedMap;
@@ -93,7 +94,7 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R> R cleave(final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment)
+	public <R> R cleave(final Map<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment)
 	{
 		Objects.requireNonNull(judgments, "judgments may not be null");
 		Objects.requireNonNull(punishment, "punishment may not be null");
@@ -110,6 +111,12 @@ final class Myth<T> implements Unfolding<T>
 						.findFirst()
 						.map(entry -> entry.getValue().apply(hero))
 						.orElse(punishment);
+	}
+
+	@Override
+	public <R> R cleave(final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment)
+	{
+		return cleave((Map<Predicate<? super T>, Function<? super T, R>>) judgments, punishment);
 	}
 
 	@Override
