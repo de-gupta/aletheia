@@ -16,6 +16,7 @@ final class Myth<T> implements Unfolding<T>
 	static <T> Unfolding<T> beckon(final T value)
 	{
 		Objects.requireNonNull(value, "value may not be null");
+
 		return new Myth<>(value);
 	}
 
@@ -81,7 +82,6 @@ final class Myth<T> implements Unfolding<T>
 		}
 		return this;
 	}
-
 
 	@Override
 	public <R> R cleave(final Predicate<? super T> judgement, final R reward, final R punishment)
@@ -152,7 +152,6 @@ final class Myth<T> implements Unfolding<T>
 
 		return judgement.test(hero) ? Unfolding.beckon(evolution.apply(hero)) : Unfolding.chaos();
 	}
-
 
 	@Override
 	public <R> Unfolding<R> cleave(final Predicate<? super T> judgement, final Function<? super T, ? extends R> reward,
