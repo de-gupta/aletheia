@@ -20,11 +20,10 @@ public sealed interface Unfolding<T> permits Shell, Myth
 		return omen.map(Unfolding::beckon).orElseGet(Unfolding::chaos);
 	}
 
-	static <T> Unfolding<T> beckon(T apparition)
+	@Deprecated(since = "0.0.6", forRemoval = true)
+	static <T> Unfolding<T> of(final T apparition)
 	{
-		return Optional.ofNullable(apparition)
-					   .map(Myth::beckon)
-					   .orElseGet(Unfolding::chaos);
+		return beckon(apparition);
 	}
 
 	static <T> Unfolding<T> chaos()
@@ -32,44 +31,45 @@ public sealed interface Unfolding<T> permits Shell, Myth
 		return Shell.instance();
 	}
 
-	@Deprecated(since = "0.0.6", forRemoval = true)
-	static <T> Unfolding<T> of(T apparition)
+	static <T> Unfolding<T> beckon(final T apparition)
 	{
-		return beckon(apparition);
+		return Optional.ofNullable(apparition)
+					   .map(Myth::beckon)
+					   .orElseGet(Unfolding::chaos);
 	}
 
 	T summon();
 
-	T decree(Supplier<? extends RuntimeException> wrath);
+	T decree(final Supplier<? extends RuntimeException> wrath);
 
-	void interdict(Supplier<? extends RuntimeException> wrath);
+	void interdict(final Supplier<? extends RuntimeException> wrath);
 
 	boolean sterile();
 
 	boolean supple();
 
-	Unfolding<T> discern(Predicate<? super T> judgement);
+	Unfolding<T> discern(final Predicate<? super T> judgement);
 
 	Unfolding<T> discern(final Predicate<? super T> judgement,
 						 final Supplier<? extends RuntimeException> wrath);
 
-	Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development);
+	Unfolding<T> develop(final Predicate<? super T> judgement, Function<? super T, ? extends T> development);
 
 	@Deprecated(since = "0.0.3", forRemoval = true)
-	default <R> Unfolding<R> refold(Function<? super T, ? extends R> folding)
+	default <R> Unfolding<R> refold(final Function<? super T, ? extends R> folding)
 	{
 		return metamorphose(folding);
 	}
 
 	<R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis);
 
-	<R> Unfolding<R> evolve(Predicate<? super T> judgement, Function<? super T, ? extends R> evolution);
+	<R> Unfolding<R> evolve(final Predicate<? super T> judgement, Function<? super T, ? extends R> evolution);
 
-	<R> Unfolding<R> cleave(Predicate<? super T> judgement,
-							Function<? super T, ? extends R> reward,
-							Function<? super T, ? extends R> punishment);
+	<R> Unfolding<R> cleave(final Predicate<? super T> judgement,
+							final Function<? super T, ? extends R> reward,
+							final Function<? super T, ? extends R> punishment);
 
-	<R> R cleave(Predicate<? super T> judgement, R reward, R punishment);
+	<R> R cleave(final Predicate<? super T> judgement, R reward, R punishment);
 
 	<R> R cleave(final Map<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment);
 
@@ -77,33 +77,33 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot);
 
-	<R> Unfolding<Pair<T, R>> interlace(Function<? super T, ? extends R> interlacing);
+	<R> Unfolding<Pair<T, R>> interlace(final Function<? super T, ? extends R> interlacing);
 
-	<U, R> Unfolding<R> conjoin(U consort, BiFunction<? super T, ? super U, ? extends R> conjugation);
+	<U, R> Unfolding<R> conjoin(final U consort, final BiFunction<? super T, ? super U, ? extends R> conjugation);
 
-	<U, R> Unfolding<R> emanate(Function<? super T, U> marriage,
-								BiFunction<? super T, ? super U, R> conjugation);
+	<U, R> Unfolding<R> emanate(final Function<? super T, U> marriage,
+								final BiFunction<? super T, ? super U, R> conjugation);
 
 	<U, R> Unfolding<R> sanctify(final Function<? super T, U> marriage,
 								 final BiFunction<? super T, ? super U, R> conjugation,
 								 final Predicate<? super R> judgment,
 								 final Supplier<? extends RuntimeException> wrath);
 
-	<R, U> Unfolding<U> braid(Unfolding<R> consort, BiFunction<? super T, ? super R, ? extends U> weaver);
+	<R, U> Unfolding<U> braid(final Unfolding<R> consort, final BiFunction<? super T, ? super R, ? extends U> weaver);
 
-	<R> R coronate(Function<? super T, ? extends R> conclusion);
+	<R> R coronate(final Function<? super T, ? extends R> conclusion);
 
-	T rescue(Supplier<? extends T> revelation);
+	T rescue(final Supplier<? extends T> revelation);
 
-	T rescue(T manifestation);
+	T rescue(final T manifestation);
 
-	Unfolding<T> resurrect(Supplier<Unfolding<T>> grace);
+	Unfolding<T> resurrect(final Supplier<Unfolding<T>> grace);
 
 	Unfolding<T> revive(final Supplier<T> grace);
 
 	Stream<T> stream();
 
-	Unfolding<T> unlace(Consumer<? super T> impregnator);
+	Unfolding<T> unlace(final Consumer<? super T> impregnator);
 
 	Optional<T> optional();
 }

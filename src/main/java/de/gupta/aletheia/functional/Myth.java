@@ -127,7 +127,8 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public Unfolding<T> develop(Predicate<? super T> judgement, Function<? super T, ? extends T> development)
+	public Unfolding<T> develop(final Predicate<? super T> judgement,
+								final Function<? super T, ? extends T> development)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
 		Objects.requireNonNull(development, "development may not be null");
@@ -143,7 +144,8 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R> Unfolding<R> evolve(Predicate<? super T> judgement, Function<? super T, ? extends R> evolution)
+	public <R> Unfolding<R> evolve(final Predicate<? super T> judgement,
+								   final Function<? super T, ? extends R> evolution)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");
 		Objects.requireNonNull(evolution, "evolution may not be null");
