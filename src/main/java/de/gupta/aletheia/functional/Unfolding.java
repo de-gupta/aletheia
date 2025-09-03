@@ -63,6 +63,8 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis);
 
+	<R> Unfolding<R> alchemize(final Function<? super T, Optional<? extends R>> potion);
+
 	<R> Unfolding<R> evolve(final Predicate<? super T> judgement, Function<? super T, ? extends R> evolution);
 
 	<R> Unfolding<R> cleave(final Predicate<? super T> judgement,

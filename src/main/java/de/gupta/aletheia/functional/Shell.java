@@ -70,6 +70,12 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> Unfolding<R> alchemize(final Function<? super T, Optional<? extends R>> potion)
+	{
+		return instance();
+	}
+
+	@Override
 	public <R> Unfolding<R> evolve(final Predicate<? super T> judgement,
 								   final Function<? super T, ? extends R> evolution)
 	{

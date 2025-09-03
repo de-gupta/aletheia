@@ -139,6 +139,56 @@ final class UnfoldingCleaveTests
 	@Nested
 	final class CleaveMapTest
 	{
+		@Test
+		@DisplayName("cleave(Map, punishment) — throws when a predicate inside map is null")
+		void throwsIfAnyPredicateIsNull()
+		{
+			// Build via HashMap to avoid Map.of()'s null prohibition, then wrap with TreeMap
+			final OrderedPredicate<String> nullPredicate = OrderedPredicate.of(0, null);
+			final Map<Predicate<? super String>, Function<? super String, String>> helper = new HashMap<>();
+
+			helper.put(nullPredicate, _ -> "X");
+			final SortedMap<Predicate<? super String>, Function<? super String, String>> judgments =
+					new TreeMap<>(helper);
+
+			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(judgments, "punish"))
+					.isInstanceOf(NullPointerException.class);
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("judgmentScenarios")
+		@DisplayName("cleave(Map, punishment) — applies correct transformation or returns punishment")
+		<T, R> void cleavesCorrectly(final String description,
+									 final T hero,
+									 final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments,
+									 final R punishment,
+									 final R expected)
+		{
+			assertThat(Unfolding.beckon(hero).cleave(judgments, punishment))
+					.as("cleave(judgments, punishment) should return expected result")
+					.isEqualTo(expected);
+		}
+
+		@Test
+		@DisplayName("cleave(Map, punishment) — throws when judgments map is null")
+		void throwsIfJudgmentsIsNull()
+		{
+			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(null, "Fate"))
+					.isInstanceOf(NullPointerException.class)
+					.hasMessage("judgments may not be null");
+		}
+
+		@Test
+		@DisplayName("cleave(Map, punishment) — throws when punishment is null")
+		void throwsIfPunishmentIsNull()
+		{
+			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>();
+
+			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(judgments, null))
+					.isInstanceOf(NullPointerException.class)
+					.hasMessage("punishment may not be null");
+		}
+
 		private static Stream<Arguments> judgmentScenarios()
 		{
 			final OrderedPredicate<String> isOdysseus = OrderedPredicate.of(0, s -> s.startsWith("Odysseus"));
@@ -258,8 +308,8 @@ final class UnfoldingCleaveTests
 					TestCase.from("Short-circuiting: later mapper not evaluated",
 							"both",
 							Map.of(
-									OrderedPredicate.of(0, (String s) -> true), _ -> "first",
-									OrderedPredicate.of(1, (String s) -> true), _ ->
+									OrderedPredicate.of(0, (String _) -> true), _ -> "first",
+									OrderedPredicate.of(1, (String _) -> true), _ ->
 									{
 										throw new AssertionError("mapper should not be called");
 									}
@@ -269,58 +319,11 @@ final class UnfoldingCleaveTests
 							7,
 							Map.of(
 									OrderedPredicate.of(0, (Integer i) -> i % 2 == 0),
-									(Function<Integer, Integer>) i -> i * 2,
-									OrderedPredicate.of(1, (Integer i) -> i > 10), (Function<Integer, Integer>) i -> 10
+									i -> i * 2,
+									OrderedPredicate.of(1, (Integer i) -> i > 10), _ -> 10
 							),
 							99, 99)
 			).map(tc -> Arguments.of(tc.description(), tc.hero(), tc.judgments(), tc.punishment(), tc.expected()));
-		}
-		@ParameterizedTest(name = "{0}")
-		@MethodSource("judgmentScenarios")
-		@DisplayName("cleave(Map, punishment) — applies correct transformation or returns punishment")
-		<T, R> void cleavesCorrectly(final String description,
-									 final T hero,
-									 final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments,
-									 final R punishment,
-									 final R expected)
-		{
-			assertThat(Unfolding.beckon(hero).cleave(judgments, punishment))
-					.as("cleave(judgments, punishment) should return expected result")
-					.isEqualTo(expected);
-		}
-
-		@Test
-		@DisplayName("cleave(Map, punishment) — throws when judgments map is null")
-		void throwsIfJudgmentsIsNull()
-		{
-			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(null, "Fate"))
-					.isInstanceOf(NullPointerException.class)
-					.hasMessage("judgments may not be null");
-		}
-
-		@Test
-		@DisplayName("cleave(Map, punishment) — throws when punishment is null")
-		void throwsIfPunishmentIsNull()
-		{
-			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>();
-
-			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(judgments, null))
-					.isInstanceOf(NullPointerException.class)
-					.hasMessage("punishment may not be null");
-		}
-
-		@Test
-		@DisplayName("cleave(Map, punishment) — throws when a predicate inside map is null")
-		void throwsIfAnyPredicateIsNull()
-		{
-			// Build via HashMap to avoid Map.of()'s null prohibition, then wrap with TreeMap
-			OrderedPredicate<String> nullPred = OrderedPredicate.of(0, null);
-			Map<Predicate<? super String>, Function<? super String, String>> helper = new HashMap<>();
-			helper.put(nullPred, _ -> "X");
-			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>(helper);
-
-			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(judgments, "punish"))
-					.isInstanceOf(NullPointerException.class);
 		}
 
 		@Test

@@ -144,6 +144,16 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> Unfolding<R> alchemize(final Function<? super T, Optional<? extends R>> potion)
+	{
+		Objects.requireNonNull(potion, "potion may not be null");
+
+		var transmutation = potion.apply(hero);
+
+		return transmutation.isPresent() ? Unfolding.beckon(transmutation.get()) : Unfolding.chaos();
+	}
+
+	@Override
 	public <R> Unfolding<R> evolve(final Predicate<? super T> judgement,
 								   final Function<? super T, ? extends R> evolution)
 	{
