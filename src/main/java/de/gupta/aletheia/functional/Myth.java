@@ -144,6 +144,23 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis,
+										 final Supplier<? extends RuntimeException> wrath)
+	{
+		Objects.requireNonNull(metamorphosis, "metamorphosis may not be null");
+		Objects.requireNonNull(wrath, "wrath may not be null");
+
+		try
+		{
+			return Unfolding.beckon(metamorphosis.apply(hero));
+		}
+		catch (Exception e)
+		{
+			throw wrath.get();
+		}
+	}
+
+	@Override
 	public <R> Unfolding<R> alchemize(final Function<? super T, Optional<? extends R>> potion)
 	{
 		Objects.requireNonNull(potion, "potion may not be null");
