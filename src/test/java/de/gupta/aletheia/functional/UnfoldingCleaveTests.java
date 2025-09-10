@@ -203,11 +203,11 @@ final class UnfoldingCleaveTests
 			final OrderedPredicate<Boolean> oracleSpeaksTruth = OrderedPredicate.of(0, b -> b);
 			final OrderedPredicate<Boolean> oracleSpeaksFalsehood = OrderedPredicate.of(1, b -> !b);
 
-			final OrderedPredicate<String> never0 = OrderedPredicate.of(0, s -> false);
-			final OrderedPredicate<String> never1 = OrderedPredicate.of(1, s -> false);
-			final OrderedPredicate<String> never2 = OrderedPredicate.of(2, s -> false);
-			final OrderedPredicate<String> never3 = OrderedPredicate.of(3, s -> false);
-			final OrderedPredicate<String> never4 = OrderedPredicate.of(4, s -> false);
+			final OrderedPredicate<String> never0 = OrderedPredicate.of(0, _ -> false);
+			final OrderedPredicate<String> never1 = OrderedPredicate.of(1, _ -> false);
+			final OrderedPredicate<String> never2 = OrderedPredicate.of(2, _ -> false);
+			final OrderedPredicate<String> never3 = OrderedPredicate.of(3, _ -> false);
+			final OrderedPredicate<String> never4 = OrderedPredicate.of(4, _ -> false);
 			final OrderedPredicate<String> equalsZzz = OrderedPredicate.of(5, "zzz"::equals);
 
 			final OrderedPredicate<String> order5StartsWithA = OrderedPredicate.of(5, s -> s.startsWith("A"));
@@ -302,7 +302,7 @@ final class UnfoldingCleaveTests
 							"nullify",
 							Map.of(
 									OrderedPredicate.of(0, (String s) -> s.startsWith("n")), _ -> null,
-									OrderedPredicate.of(1, (String s) -> true), _ -> "later"
+									OrderedPredicate.of(1, (String _) -> true), _ -> "later"
 							),
 							"PUN", "PUN"),
 					TestCase.from("Short-circuiting: later mapper not evaluated",
@@ -365,6 +365,248 @@ final class UnfoldingCleaveTests
 				SortedMap<Predicate<K>, Function<K, V>> sortedJudgments = new TreeMap<>(judgments);
 				return new TestCase<>(description, hero, sortedJudgments, punishment, expected);
 			}
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for smite() method — the divine judgment that demands satisfaction")
+	class SmiteTest
+	{
+		@Test
+		@DisplayName("smite(Map, wrath) — Heracles gains immortality when his name is spoken")
+		void heraclesGainsImmortalityWhenNameIsSpoken()
+		{
+			Map<Predicate<? super String>, Function<? super String, String>> judgments = new HashMap<>();
+			judgments.put(OrderedPredicate.of(0, s -> s.startsWith("Heracles")), _ -> "Immortality");
+			judgments.put(OrderedPredicate.of(1, s -> s.startsWith("Theseus")), _ -> "Glory");
+
+			String result = Unfolding.beckon("Heracles the Mighty")
+									 .smite(judgments, () -> new RuntimeException("Divine silence"));
+			assertThat(result).isEqualTo("Immortality");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — Theseus receives glory when his deeds are sung")
+		void theseusReceivesGloryWhenDeedsAreSung()
+		{
+			Map<Predicate<? super String>, Function<? super String, String>> judgments = new HashMap<>();
+			judgments.put(OrderedPredicate.of(0, s -> s.startsWith("Heracles")), _ -> "Immortality");
+			judgments.put(OrderedPredicate.of(1, s -> s.startsWith("Theseus")), _ -> "Glory");
+
+			String result = Unfolding.beckon("Theseus slayer")
+									 .smite(judgments, () -> new IllegalStateException("No hero answers"));
+			assertThat(result).isEqualTo("Glory");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — Divine wrath strikes when no hero matches")
+		void divineWrathStrikesWhenNoHeroMatches()
+		{
+			Map<Predicate<? super String>, Function<? super String, String>> judgments = new HashMap<>();
+			judgments.put(OrderedPredicate.of(0, s -> s.startsWith("Heracles")), _ -> "Immortality");
+			judgments.put(OrderedPredicate.of(1, s -> s.startsWith("Achilles")), _ -> "Glory");
+
+			assertThatThrownBy(() -> Unfolding.beckon("Mortal peasant")
+											  .smite(judgments, () -> new RuntimeException("Zeus's lightning")))
+					.isInstanceOf(RuntimeException.class)
+					.hasMessage("Zeus's lightning");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — Empty judgment map triggers wrath")
+		void emptyJudgmentMapTriggersWrath()
+		{
+			Map<Predicate<? super String>, Function<? super String, String>> judgments = new HashMap<>();
+
+			assertThatThrownBy(
+					() -> Unfolding.beckon("Perseus").smite(judgments, () -> new RuntimeException("No gods listening")))
+					.isInstanceOf(RuntimeException.class)
+					.hasMessage("No gods listening");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — When multiple omens agree, earliest order speaks first")
+		void earliestOrderSpeaksFirst()
+		{
+			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>();
+			judgments.put(OrderedPredicate.of(0, s -> s != null && !s.isEmpty()), _ -> "Warrior blessing");
+			judgments.put(OrderedPredicate.of(1, s -> s.startsWith("a")), _ -> "Alpha blessing");
+
+			String result = Unfolding.beckon("alpha warrior")
+									 .smite(judgments, () -> new RuntimeException("Divine indifference"));
+			assertThat(result).isEqualTo("Warrior blessing");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — Integer receives divine favor when positive")
+		void integerReceivesDivineFavor()
+		{
+			SortedMap<Predicate<? super Integer>, Function<? super Integer, String>> judgments = new TreeMap<>();
+			judgments.put(OrderedPredicate.of(0, n -> n > 0), _ -> "Divine favor");
+			judgments.put(OrderedPredicate.of(1, n -> n % 3 == 0), _ -> "Sacred number");
+
+			String result =
+					Unfolding.beckon(42).smite(judgments, () -> new ArithmeticException("Numbers hold no meaning"));
+			assertThat(result).isEqualTo("Divine favor");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — Boolean oracle truth brings Apollo's light")
+		void booleanOracleTruthBringsLight()
+		{
+			Map<Predicate<? super Boolean>, Function<? super Boolean, String>> judgments = new HashMap<>();
+			judgments.put(OrderedPredicate.of(0, b -> b), _ -> "Apollo's light");
+			judgments.put(OrderedPredicate.of(1, b -> !b), _ -> "Hades' shadow");
+
+			String result = Unfolding.beckon(true).smite(judgments, () -> new RuntimeException("Oracle is silent"));
+			assertThat(result).isEqualTo("Apollo's light");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — Function returning null triggers wrath")
+		void functionReturningNullTriggersWrath()
+		{
+			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>();
+			judgments.put(OrderedPredicate.of(0, s -> s.startsWith("n")), _ -> null);
+			judgments.put(OrderedPredicate.of(1, _ -> true), _ -> "later blessing");
+
+			assertThatThrownBy(() -> Unfolding.beckon("nullbringer")
+											  .smite(judgments, () -> new RuntimeException("Null offering rejected")))
+					.isInstanceOf(RuntimeException.class)
+					.hasMessage("Null offering rejected");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — throws when judgments are null")
+		void throwsIfJudgmentsAreNull()
+		{
+			assertThatThrownBy(() -> Unfolding.beckon("hero").smite(null, () -> new RuntimeException("wrath")))
+					.isInstanceOf(NullPointerException.class)
+					.hasMessage("judgments may not be null");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — throws when wrath is null")
+		void throwsIfWrathIsNull()
+		{
+			Map<Predicate<? super String>, Function<? super String, String>> judgments = new HashMap<>();
+
+			assertThatThrownBy(() -> Unfolding.beckon("hero").smite(judgments, null))
+					.isInstanceOf(NullPointerException.class)
+					.hasMessage("wrath may not be null");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — throws when a judgment predicate is null")
+		void throwsIfJudgmentPredicateIsNull()
+		{
+			Map<Predicate<? super String>, Function<? super String, String>> helper = new HashMap<>();
+			helper.put(null, _ -> "result");
+
+			assertThatThrownBy(() -> Unfolding.beckon("hero").smite(helper, RuntimeException::new))
+					.isInstanceOf(NullPointerException.class)
+					.hasMessage("judgement may not be null");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — throws when a reward function is null")
+		void throwsIfRewardFunctionIsNull()
+		{
+			Map<Predicate<? super String>, Function<? super String, String>> helper = new HashMap<>();
+			helper.put(_ -> true, null);
+
+			assertThatThrownBy(() -> Unfolding.beckon("hero").smite(helper, RuntimeException::new))
+					.isInstanceOf(NullPointerException.class)
+					.hasMessage("reward may not be null");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — empty unfolding throws")
+		void emptyUnfoldingThrowsOnSmiteWithMap()
+		{
+			Map<Predicate<? super String>, Function<? super String, String>> judgments = new HashMap<>();
+			judgments.put(_ -> true, _ -> "result");
+			assertThatThrownBy(
+					() -> Unfolding.<String>chaos().smite(judgments, () -> new RuntimeException("divine wrath")))
+					.isInstanceOf(EmptyUnfoldingException.class);
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — Double NaN receives Chaos blessing")
+		void doubleNaNReceivesChaosBlessing()
+		{
+			Map<Predicate<? super Double>, Function<? super Double, String>> judgments = new HashMap<>();
+			judgments.put(OrderedPredicate.of(0, d -> Double.isNaN(d)), _ -> "Chaos blessing");
+			judgments.put(OrderedPredicate.of(1, d -> Double.isInfinite(d)), _ -> "Infinity gift");
+
+			String result =
+					Unfolding.beckon(Double.NaN).smite(judgments, () -> new RuntimeException("Mathematical void"));
+			assertThat(result).isEqualTo("Chaos blessing");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — Long zero finds perfect balance")
+		void longZeroFindsBalance()
+		{
+			Map<Predicate<? super Long>, Function<? super Long, String>> judgments = new HashMap<>();
+			judgments.put(OrderedPredicate.of(0, l -> l < 0), _ -> "Underworld");
+			judgments.put(OrderedPredicate.of(1, l -> l == 0L), _ -> "Perfect balance");
+			judgments.put(OrderedPredicate.of(2, l -> l > 0), _ -> "Heavenly realm");
+
+			String result = Unfolding.beckon(0L).smite(judgments, () -> new RuntimeException("Numerical chaos"));
+			assertThat(result).isEqualTo("Perfect balance");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — Character letter recognition takes precedence")
+		void characterLetterTakesPrecedence()
+		{
+			SortedMap<Predicate<? super Character>, Function<? super Character, String>> judgments = new TreeMap<>();
+			judgments.put(OrderedPredicate.of(0, Character::isLetter), _ -> "Divine letter");
+			judgments.put(OrderedPredicate.of(1, Character::isLowerCase), _ -> "Humble script");
+
+			String result = Unfolding.beckon('α').smite(judgments, () -> new RuntimeException("Script unrecognized"));
+			assertThat(result).isEqualTo("Divine letter");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — Integer fails divine tests triggers Hades claim")
+		void integerFailsTriggersHadesClaim()
+		{
+			Map<Predicate<? super Integer>, Function<? super Integer, String>> judgments = new HashMap<>();
+			judgments.put(OrderedPredicate.of(0, i -> i % 2 == 0), _ -> "Even blessing");
+			judgments.put(OrderedPredicate.of(1, i -> i > 10), _ -> "Great number");
+
+			assertThatThrownBy(() -> Unfolding.beckon(7).smite(judgments,
+					() -> new ArithmeticException("Hades claims this number")))
+					.isInstanceOf(ArithmeticException.class)
+					.hasMessage("Hades claims this number");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — Boolean false fails truth test triggers oracle silence")
+		void booleanFalseTriggersOracleSilence()
+		{
+			Map<Predicate<? super Boolean>, Function<? super Boolean, String>> judgments = new HashMap<>();
+			judgments.put(OrderedPredicate.of(0, b -> b), _ -> "Truth revealed");
+
+			assertThatThrownBy(() -> Unfolding.beckon(false).smite(judgments,
+					() -> new IllegalStateException("Oracle speaks no more")))
+					.isInstanceOf(IllegalStateException.class)
+					.hasMessage("Oracle speaks no more");
+		}
+
+		@Test
+		@DisplayName("smite(Map, wrath) — Character digit fails letter test")
+		void characterDigitFailsLetterTest()
+		{
+			Map<Predicate<? super Character>, Function<? super Character, String>> judgments = new HashMap<>();
+			judgments.put(OrderedPredicate.of(0, Character::isLetter), _ -> "Sacred letter");
+
+			assertThatThrownBy(() -> Unfolding.beckon('9').smite(judgments,
+					() -> new RuntimeException("Script unreadable to gods")))
+					.isInstanceOf(RuntimeException.class)
+					.hasMessage("Script unreadable to gods");
 		}
 	}
 }

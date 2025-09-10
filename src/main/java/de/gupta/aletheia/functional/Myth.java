@@ -114,6 +114,27 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> R smite(final Map<Predicate<? super T>, Function<? super T, R>> judgments,
+					   final Supplier<? extends RuntimeException> wrath)
+	{
+		Objects.requireNonNull(judgments, "judgments may not be null");
+		Objects.requireNonNull(wrath, "wrath may not be null");
+
+		judgments.forEach((judgement, reward) ->
+		{
+			Objects.requireNonNull(judgement, "judgement may not be null");
+			Objects.requireNonNull(reward, "reward may not be null");
+		});
+
+		return judgments.entrySet()
+						.stream()
+						.filter(entry -> entry.getKey().test(hero))
+						.findFirst()
+						.map(entry -> entry.getValue().apply(hero))
+						.orElseThrow(wrath);
+	}
+
+	@Override
 	public <R> R cleave(final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment)
 	{
 		return cleave((Map<Predicate<? super T>, Function<? super T, R>>) judgments, punishment);
@@ -307,5 +328,19 @@ final class Myth<T> implements Unfolding<T>
 	public boolean supple()
 	{
 		return !sterile();
+	}
+
+	@Override
+	public Unfolding<T> ascend(final UnaryOperator<T> ascension, final int levels)
+	{
+		return metamorphose(value ->
+		{
+			T current = value;
+			for (int i = 0; i < levels; i++)
+			{
+				current = ascension.apply(current);
+			}
+			return current;
+		});
 	}
 }

@@ -78,6 +78,9 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R> R cleave(final Map<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment);
 
+	<R> R smite(final Map<Predicate<? super T>, Function<? super T, R>> judgments,
+				final Supplier<? extends RuntimeException> wrath);
+
 	<R> R cleave(final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment);
 
 	<R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot);
@@ -111,4 +114,6 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	Unfolding<T> unlace(final Consumer<? super T> impregnator);
 
 	Optional<T> optional();
+
+	Unfolding<T> ascend(final UnaryOperator<T> ascension, final int levels);
 }

@@ -109,6 +109,13 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> R smite(final Map<Predicate<? super T>, Function<? super T, R>> judgments,
+					   final Supplier<? extends RuntimeException> wrath)
+	{
+		throw EmptyUnfoldingException.instance();
+	}
+
+	@Override
 	public <R> R cleave(final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment)
 	{
 		throw EmptyUnfoldingException.instance();
@@ -216,6 +223,12 @@ final class Shell<T> implements Unfolding<T>
 	public String toString()
 	{
 		return "Unfolding{}";
+	}
+
+	@Override
+	public Unfolding<T> ascend(final UnaryOperator<T> ascension, final int levels)
+	{
+		return instance();
 	}
 
 	private Shell()
