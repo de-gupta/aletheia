@@ -44,6 +44,8 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	void interdict(final Supplier<? extends RuntimeException> wrath);
 
+	void interdict(final Function<? super T, Supplier<? extends RuntimeException>> wrath);
+
 	boolean sterile();
 
 	boolean supple();

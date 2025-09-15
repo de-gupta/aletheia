@@ -32,6 +32,12 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public void interdict(final Function<? super T, Supplier<? extends RuntimeException>> wrath)
+	{
+		// do nothing
+	}
+
+	@Override
 	public boolean sterile()
 	{
 		return true;

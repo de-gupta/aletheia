@@ -1296,7 +1296,7 @@ final class UnfoldingTest
 		{
 			Unfolding<String> journey = Unfolding.beckon("test");
 			Unfolding<String> consort = Unfolding.beckon("partner");
-			BiFunction<String, String, String> nullResultWeaver = (a, b) -> null;
+			BiFunction<String, String, String> nullResultWeaver = (_, _) -> null;
 
 			Unfolding<String> result = journey.braid(consort, nullResultWeaver);
 
@@ -1537,6 +1537,89 @@ final class UnfoldingTest
 			assertThatThrownBy(() -> unfolding.interdict(() -> null)).as(
 																			 "interdict() with supplier returning null should throw NullPointerException")
 																	 .isInstanceOf(NullPointerException.class);
+		}
+
+		@DisplayName("should throw exception for present value with function")
+		@Test
+		void shouldThrowExceptionForPresentValueWithFunction()
+		{
+			Unfolding<String> unfolding = Unfolding.beckon("test");
+			Function<? super String, Supplier<? extends RuntimeException>> wrathFunction =
+					value -> () -> new RuntimeException("Test exception for: " + value);
+
+			assertThatThrownBy(() -> unfolding.interdict(wrathFunction)).as(
+																				"interdict() with function for present value should throw the exception from function result")
+																		.isInstanceOf(RuntimeException.class)
+																		.hasMessage("Test exception for: test");
+		}
+
+		@DisplayName("should not throw exception for empty unfolding with function")
+		@Test
+		void shouldNotThrowExceptionForEmptyUnfoldingWithFunction()
+		{
+			Unfolding<String> unfolding = Unfolding.chaos();
+			Function<String, Supplier<? extends RuntimeException>> wrathFunction = _ -> () -> new RuntimeException(
+					"Should not be called");
+
+			assertThatCode(() -> unfolding.interdict(wrathFunction)).as(
+																			"interdict() with function for empty unfolding should not throw exception")
+																	.doesNotThrowAnyException();
+		}
+
+		@DisplayName("should throw exception for null function")
+		@Test
+		void shouldThrowExceptionForNullFunction()
+		{
+			Unfolding<String> unfolding = Unfolding.beckon("test");
+			Function<String, Supplier<? extends RuntimeException>> nullFunction = null;
+
+			assertThatThrownBy(() -> unfolding.interdict(nullFunction)).as(
+																			   "interdict() with null function should throw NullPointerException")
+																	   .isInstanceOf(NullPointerException.class);
+		}
+
+		@DisplayName("should throw exception when function returns null")
+		@Test
+		void shouldThrowExceptionWhenFunctionReturnsNull()
+		{
+			Unfolding<String> unfolding = Unfolding.beckon("test");
+			Function<String, Supplier<? extends RuntimeException>> nullReturningFunction = _ -> null;
+
+			assertThatThrownBy(() -> unfolding.interdict(nullReturningFunction)).as(
+																						"interdict() with function returning null should throw NullPointerException")
+																				.isInstanceOf(
+																						NullPointerException.class);
+		}
+
+		@DisplayName("should throw exception when function's supplier returns null")
+		@Test
+		void shouldThrowExceptionWhenFunctionSupplierReturnsNull()
+		{
+			Unfolding<String> unfolding = Unfolding.beckon("test");
+			Function<String, Supplier<? extends RuntimeException>> nullSupplierFunction = _ -> () -> null;
+
+			assertThatThrownBy(() -> unfolding.interdict(nullSupplierFunction)).as(
+																					   "interdict() with function whose supplier returns null should throw NullPointerException")
+																			   .isInstanceOf(
+																					   NullPointerException.class);
+		}
+
+		@DisplayName("should pass correct value to function")
+		@Test
+		void shouldPassCorrectValueToFunction()
+		{
+			String testValue = "test-value";
+			Unfolding<String> unfolding = Unfolding.beckon(testValue);
+
+			Function<String, Supplier<? extends RuntimeException>> wrathFunction = value ->
+			{
+				assertThat(value).as("Function should receive the correct value").isEqualTo(testValue);
+				return () -> new RuntimeException("Expected exception");
+			};
+
+			assertThatThrownBy(() -> unfolding.interdict(wrathFunction))
+					.isInstanceOf(RuntimeException.class)
+					.hasMessage("Expected exception");
 		}
 	}
 

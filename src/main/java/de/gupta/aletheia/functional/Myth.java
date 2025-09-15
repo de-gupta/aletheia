@@ -39,6 +39,12 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public void interdict(final Function<? super T, Supplier<? extends RuntimeException>> wrath)
+	{
+		throw wrath.apply(hero).get();
+	}
+
+	@Override
 	public int hashCode()
 	{
 		return Objects.hashCode(hero);
