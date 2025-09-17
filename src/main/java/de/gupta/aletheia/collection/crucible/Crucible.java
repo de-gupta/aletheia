@@ -1,4 +1,4 @@
-package de.gupta.aletheia.collection;
+package de.gupta.aletheia.collection.crucible;
 
 import java.util.Collection;
 
