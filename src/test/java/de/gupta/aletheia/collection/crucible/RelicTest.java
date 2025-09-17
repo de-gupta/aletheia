@@ -217,8 +217,8 @@ final class RelicTest
 		@DisplayName("should convert Relic to Forge")
 		<E> void shouldConvertRelicToForge(String description, Collection<E> collection)
 		{
-			Relic<E> relic = Relic.consecrate(collection);
-			Forge<E> result = relic.awaken();
+			Crucible<E> relic = Relic.consecrate(collection);
+			Crucible<E> result = relic.awaken();
 
 			assertThat(result).as("awaken() for %s should create a Forge", description)
 							  .isInstanceOf(Forge.class)
@@ -368,6 +368,242 @@ final class RelicTest
 					.hasMessageContaining("relic does not banish elements")
 					.hasMessageContaining("relic")
 					.hasMessageContaining("banish");
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for manifest() method")
+	final class ManifestTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("collectionTypeTestCases")
+		@DisplayName("should return unmodifiable collection from different input types")
+		<E> void shouldReturnUnmodifiableCollectionFromDifferentTypes(String description, Collection<E> inputCollection,
+																	  Collection<E> expectedElements)
+		{
+			Relic<E> relic = Relic.consecrate(inputCollection);
+			Collection<E> result = relic.manifest();
+
+			assertThat(result).as("manifest() for %s should return collection with expected elements", description)
+							  .containsExactlyInAnyOrderElementsOf(expectedElements);
+
+			assertThatThrownBy(
+					() -> result.add(inputCollection.iterator().hasNext() ? inputCollection.iterator().next() : null))
+					.as("manifest() should return unmodifiable collection")
+					.isInstanceOf(UnsupportedOperationException.class);
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("edgeCaseTestCases")
+		@DisplayName("should handle edge cases correctly")
+		<E> void shouldHandleEdgeCasesCorrectly(String description, Collection<E> inputCollection,
+												Collection<E> expectedElements)
+		{
+			Relic<E> relic = Relic.consecrate(inputCollection);
+			Collection<E> result = relic.manifest();
+
+			assertThat(result).as("manifest() for %s should handle edge case", description)
+							  .containsExactlyElementsOf(expectedElements);
+		}
+
+		@Test
+		@DisplayName("should return unmodifiable collection - all modification attempts should fail")
+		void shouldReturnUnmodifiableCollection()
+		{
+			List<String> original = new ArrayList<>(List.of("a", "b", "c"));
+			Relic<String> relic = Relic.consecrate(original);
+			Collection<String> manifested = relic.manifest();
+
+			// Verify returned collection is unmodifiable
+			assertThatThrownBy(manifested::clear)
+					.as("manifest() should return unmodifiable collection")
+					.isInstanceOf(UnsupportedOperationException.class);
+
+			assertThatThrownBy(() -> manifested.remove("a"))
+					.as("manifest() should return unmodifiable collection")
+					.isInstanceOf(UnsupportedOperationException.class);
+
+			assertThatThrownBy(() -> manifested.add("d"))
+					.as("manifest() should return unmodifiable collection")
+					.isInstanceOf(UnsupportedOperationException.class);
+
+			if (manifested instanceof List<String> list)
+			{
+				assertThatThrownBy(() -> list.set(0, "new"))
+						.as("manifest() should return unmodifiable list")
+						.isInstanceOf(UnsupportedOperationException.class);
+			}
+		}
+
+		@Test
+		@DisplayName("should reflect changes to underlying collection when using mutable input")
+		void shouldReflectChangesToUnderlyingCollectionWhenUsingMutableInput()
+		{
+			List<String> original = new ArrayList<>(List.of("a", "b"));
+			Relic<String> relic = Relic.consecrate(original);
+
+			Collection<String> manifestBefore = relic.manifest();
+			assertThat(manifestBefore).containsExactly("a", "b");
+
+			// Modify the original collection that Relic holds reference to
+			original.add("c");
+
+			Collection<String> manifestAfter = relic.manifest();
+			assertThat(manifestAfter).as("manifest() should reflect changes to underlying collection")
+									 .containsExactly("a", "b", "c");
+		}
+
+		@Test
+		@DisplayName("should not reflect changes to underlying collection when using immutable input")
+		void shouldNotReflectChangesToUnderlyingCollectionWhenUsingImmutableInput()
+		{
+			List<String> immutableList = List.of("a", "b");
+			Relic<String> relic = Relic.consecrate(immutableList);
+
+			Collection<String> manifested = relic.manifest();
+			assertThat(manifested).as("manifest() with immutable input should work")
+								  .containsExactly("a", "b");
+
+			// Cannot modify immutable list, so this test verifies the behavior is consistent
+			assertThat(manifested).as("manifest() should remain consistent")
+								  .containsExactly("a", "b");
+		}
+
+		@Test
+		@DisplayName("should handle modifications to mutable underlying collection correctly")
+		void shouldHandleModificationsToMutableUnderlyingCollectionCorrectly()
+		{
+			List<String> mutableList = new ArrayList<>(List.of("x", "y", "z"));
+			Relic<String> relic = Relic.consecrate(mutableList);
+
+			Collection<String> manifest1 = relic.manifest();
+			assertThat(manifest1).containsExactly("x", "y", "z");
+
+			// Modify underlying collection
+			mutableList.remove("y");
+			mutableList.add("w");
+
+			Collection<String> manifest2 = relic.manifest();
+			assertThat(manifest2).as("New manifest() call should reflect underlying changes")
+								 .containsExactly("x", "z", "w");
+
+			// But the first manifest should still be unmodifiable
+			assertThatThrownBy(() -> manifest1.add("should fail"))
+					.as("Previous manifest should remain unmodifiable")
+					.isInstanceOf(UnsupportedOperationException.class);
+		}
+
+		@Test
+		@DisplayName("should handle large collections efficiently")
+		void shouldHandleLargeCollectionsEfficiently()
+		{
+			List<Integer> largeList = new ArrayList<>();
+			for (int i = 0; i < 10000; i++)
+			{
+				largeList.add(i);
+			}
+
+			Relic<Integer> relic = Relic.consecrate(largeList);
+			Collection<Integer> manifested = relic.manifest();
+
+			assertThat(manifested).as("manifest() should handle large collections")
+								  .hasSize(10000)
+								  .containsExactlyElementsOf(largeList);
+
+			assertThatThrownBy(manifested::clear)
+					.as("Large manifested collection should be unmodifiable")
+					.isInstanceOf(UnsupportedOperationException.class);
+		}
+
+		@Test
+		@DisplayName("should return List type specifically")
+		void shouldReturnListTypeSpecifically()
+		{
+			Relic<String> relic = Relic.consecrate(List.of("a", "b", "c"));
+			Collection<String> manifested = relic.manifest();
+
+			assertThat(manifested).as("manifest() should return List type")
+								  .isInstanceOf(List.class);
+		}
+
+		@Test
+		@DisplayName("should maintain consistency across multiple manifest calls with stable input")
+		void shouldMaintainConsistencyAcrossMultipleManifestCallsWithStableInput()
+		{
+			List<String> immutableInput = List.of("stable", "elements");
+			Relic<String> relic = Relic.consecrate(immutableInput);
+
+			Collection<String> manifest1 = relic.manifest();
+			Collection<String> manifest2 = relic.manifest();
+			Collection<String> manifest3 = relic.manifest();
+
+			assertThat(manifest1).as("All manifest calls should be consistent")
+								 .containsExactlyElementsOf(manifest2)
+								 .containsExactlyElementsOf(manifest3);
+		}
+
+		@Test
+		@DisplayName("should handle null collection input")
+		void shouldHandleNullCollectionInput()
+		{
+			Relic<String> relic = Relic.consecrate(null);
+
+			assertThatThrownBy(relic::manifest)
+					.as("manifest() with null input should throw exception")
+					.isInstanceOf(NullPointerException.class);
+		}
+
+		private static Stream<Arguments> collectionTypeTestCases()
+		{
+			return Stream.of(
+					new CollectionTypeTestCase<>("ArrayList with strings",
+							new ArrayList<>(List.of("apple", "banana", "cherry")),
+							List.of("apple", "banana", "cherry")),
+					new CollectionTypeTestCase<>("LinkedList with integers",
+							new LinkedList<>(List.of(1, 2, 3, 4)),
+							List.of(1, 2, 3, 4)),
+					new CollectionTypeTestCase<>("HashSet with strings",
+							new HashSet<>(Set.of("x", "y", "z")),
+							Set.of("x", "y", "z")),
+					new CollectionTypeTestCase<>("TreeSet with integers",
+							new TreeSet<>(List.of(3, 1, 4, 1, 5)),
+							Set.of(1, 3, 4, 5)), // TreeSet removes duplicates and sorts
+					new CollectionTypeTestCase<>("Vector with doubles",
+							new Vector<>(List.of(1.1, 2.2, 3.3)),
+							List.of(1.1, 2.2, 3.3)),
+					new CollectionTypeTestCase<>("Immutable List with strings",
+							List.of("immutable", "list"),
+							List.of("immutable", "list"))
+			).map(tc -> Arguments.of(tc.description, tc.inputCollection, tc.expectedElements));
+		}
+
+		private static Stream<Arguments> edgeCaseTestCases()
+		{
+			return Stream.of(
+					new EdgeCaseTestCase<>("empty ArrayList", new ArrayList<>(), Collections.emptyList()),
+					new EdgeCaseTestCase<>("empty HashSet", new HashSet<>(), Collections.emptyList()),
+					new EdgeCaseTestCase<>("single null element", Collections.singletonList(null),
+							Collections.singletonList(null)),
+					new EdgeCaseTestCase<>("multiple null elements", Arrays.asList(null, null, null),
+							Arrays.asList(null, null, null)),
+					new EdgeCaseTestCase<>("mixed null and non-null", Arrays.asList("a", null, "b", null),
+							Arrays.asList("a", null, "b", null)),
+					new EdgeCaseTestCase<>("collection with duplicates", Arrays.asList("dup", "dup", "other", "dup"),
+							Arrays.asList("dup", "dup", "other", "dup")),
+					new EdgeCaseTestCase<>("single element collection", Collections.singletonList("single"),
+							Collections.singletonList("single")),
+					new EdgeCaseTestCase<>("empty immutable list", Collections.emptyList(), Collections.emptyList())
+			).map(tc -> Arguments.of(tc.description, tc.inputCollection, tc.expectedElements));
+		}
+
+		private record CollectionTypeTestCase<E>(String description, Collection<E> inputCollection,
+												 Collection<E> expectedElements)
+		{
+		}
+
+		private record EdgeCaseTestCase<E>(String description, Collection<E> inputCollection,
+										   Collection<E> expectedElements)
+		{
 		}
 	}
 }

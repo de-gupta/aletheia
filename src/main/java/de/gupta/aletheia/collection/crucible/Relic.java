@@ -1,6 +1,8 @@
 package de.gupta.aletheia.collection.crucible;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public final class Relic<E> implements Crucible<E>
 {
@@ -33,6 +35,12 @@ public final class Relic<E> implements Crucible<E>
 	public Forge<E> awaken()
 	{
 		return Forge.kindle(this.elements);
+	}
+
+	@Override
+	public Collection<E> manifest()
+	{
+		return Collections.unmodifiableList(new ArrayList<>(this.elements));
 	}
 
 	private Relic(final Collection<E> elements)

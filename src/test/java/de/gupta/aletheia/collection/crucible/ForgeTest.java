@@ -37,13 +37,13 @@ final class ForgeTest
 		void shouldCreateIndependentCopyOfCollection()
 		{
 			List<String> original = new ArrayList<>(List.of("original"));
-			Forge<String> forge = Forge.kindle(original);
+			Crucible<String> forge = Forge.kindle(original);
 
 			original.add("modified");
 
 			// The forge should not be affected by modifications to the original collection
-			assertThat(forge.enshrine()).as("Forge should maintain independent copy")
-										.isNotSameAs(original);
+			assertThat(forge.manifest()).as("Forge should maintain independent copy").isNotSameAs(original)
+										.containsExactly("original");
 		}
 
 		@Test
@@ -333,6 +333,170 @@ final class ForgeTest
 
 			assertThat(original).as("Original collection should not be modified")
 								.containsExactly("original", "target");
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for manifest() method")
+	final class ManifestTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("collectionTypeTestCases")
+		@DisplayName("should return unmodifiable collection from different input types")
+		<E> void shouldReturnUnmodifiableCollectionFromDifferentTypes(String description, Collection<E> inputCollection,
+																	  Collection<E> expectedElements)
+		{
+			Forge<E> forge = Forge.kindle(inputCollection);
+			Collection<E> result = forge.manifest();
+
+			assertThat(result).as("manifest() for %s should return collection with expected elements", description)
+							  .containsExactlyInAnyOrderElementsOf(expectedElements);
+
+			assertThatThrownBy(() -> result.add(
+					inputCollection.iterator().hasNext() ? inputCollection.iterator().next() : null)).as(
+					"manifest() should return unmodifiable collection").isInstanceOf(
+					UnsupportedOperationException.class);
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("edgeCaseTestCases")
+		@DisplayName("should handle edge cases correctly")
+		<E> void shouldHandleEdgeCasesCorrectly(String description, Collection<E> inputCollection,
+												Collection<E> expectedElements)
+		{
+			Forge<E> forge = Forge.kindle(inputCollection);
+			Collection<E> result = forge.manifest();
+
+			assertThat(result).as("manifest() for %s should handle edge case", description)
+							  .containsExactlyElementsOf(expectedElements);
+		}
+
+		@Test
+		@DisplayName("should return independent copy - modifications to returned collection should not affect forge")
+		void shouldReturnIndependentCopy()
+		{
+			List<String> original = new ArrayList<>(List.of("a", "b", "c"));
+			Forge<String> forge = Forge.kindle(original);
+			Collection<String> manifested = forge.manifest();
+
+			// Verify returned collection is unmodifiable
+			assertThatThrownBy(manifested::clear).as("manifest() should return unmodifiable collection")
+												 .isInstanceOf(UnsupportedOperationException.class);
+
+			assertThatThrownBy(() -> manifested.remove("a")).as("manifest() should return unmodifiable collection")
+															.isInstanceOf(UnsupportedOperationException.class);
+
+			assertThatThrownBy(() -> manifested.add("d")).as("manifest() should return unmodifiable collection")
+														 .isInstanceOf(UnsupportedOperationException.class);
+		}
+
+		@Test
+		@DisplayName("should reflect changes when forge is modified")
+		void shouldReflectChangesWhenForgeIsModified()
+		{
+			List<String> original = new ArrayList<>(List.of("a", "b"));
+			Forge<String> forge = Forge.kindle(original);
+
+			Collection<String> manifestBefore = forge.manifest();
+			assertThat(manifestBefore).containsExactly("a", "b");
+
+			Forge<String> modifiedForge = (Forge<String>) forge.embrace("c");
+			Collection<String> manifestAfter = modifiedForge.manifest();
+
+			assertThat(manifestAfter).as("manifest() should reflect forge modifications")
+									 .containsExactly("a", "b", "c");
+
+			// Original manifest should be unchanged (different forge instance)
+			assertThat(manifestBefore).as("Original manifest should remain unchanged").containsExactly("a", "b");
+		}
+
+		@Test
+		@DisplayName("should not be affected by modifications to original input collection")
+		void shouldNotBeAffectedByModificationsToOriginalInputCollection()
+		{
+			List<String> original = new ArrayList<>(List.of("a", "b"));
+			Forge<String> forge = Forge.kindle(original);
+			Collection<String> manifested = forge.manifest();
+
+			// Modify original collection
+			original.add("c");
+			original.remove("a");
+
+			// Manifest should not be affected
+			assertThat(manifested).as("manifest() should not be affected by original collection changes")
+								  .containsExactly("a", "b");
+		}
+
+		@Test
+		@DisplayName("should handle large collections efficiently")
+		void shouldHandleLargeCollectionsEfficiently()
+		{
+			List<Integer> largeList = new ArrayList<>();
+			for (int i = 0; i < 10000; i++)
+			{
+				largeList.add(i);
+			}
+
+			Forge<Integer> forge = Forge.kindle(largeList);
+			Collection<Integer> manifested = forge.manifest();
+
+			assertThat(manifested).as("manifest() should handle large collections").hasSize(10000)
+								  .containsExactlyElementsOf(largeList);
+
+			assertThatThrownBy(manifested::clear).as("Large manifested collection should be unmodifiable")
+												 .isInstanceOf(UnsupportedOperationException.class);
+		}
+
+		@Test
+		@DisplayName("should return List type specifically")
+		void shouldReturnListTypeSpecifically()
+		{
+			Forge<String> forge = Forge.kindle(List.of("a", "b", "c"));
+			Collection<String> manifested = forge.manifest();
+
+			assertThat(manifested).as("manifest() should return List type").isInstanceOf(List.class);
+		}
+
+		private static Stream<Arguments> collectionTypeTestCases()
+		{
+			return Stream.of(new CollectionTypeTestCase<>("ArrayList with strings",
+										 new ArrayList<>(List.of("apple", "banana", "cherry")), List.of("apple", "banana", "cherry")),
+								 new CollectionTypeTestCase<>("LinkedList with integers", new LinkedList<>(List.of(1, 2, 3, 4)),
+										 List.of(1, 2, 3, 4)),
+								 new CollectionTypeTestCase<>("HashSet with strings", new HashSet<>(Set.of("x", "y", "z")),
+										 Set.of("x", "y", "z")),
+								 new CollectionTypeTestCase<>("TreeSet with integers", new TreeSet<>(List.of(3, 1, 4, 1, 5)),
+										 Set.of(1, 3, 4, 5)), // TreeSet removes duplicates and sorts
+								 new CollectionTypeTestCase<>("Vector with doubles", new Vector<>(List.of(1.1, 2.2, 3.3)),
+										 List.of(1.1, 2.2, 3.3)))
+						 .map(tc -> Arguments.of(tc.description, tc.inputCollection, tc.expectedElements));
+		}
+
+		private static Stream<Arguments> edgeCaseTestCases()
+		{
+			return Stream.of(new EdgeCaseTestCase<>("empty ArrayList", new ArrayList<>(), Collections.emptyList()),
+								 new EdgeCaseTestCase<>("empty HashSet", new HashSet<>(), Collections.emptyList()),
+								 new EdgeCaseTestCase<>("single null element", Collections.singletonList(null),
+										 Collections.singletonList(null)),
+								 new EdgeCaseTestCase<>("multiple null elements", Arrays.asList(null, null, null),
+										 Arrays.asList(null, null, null)),
+								 new EdgeCaseTestCase<>("mixed null and non-null", Arrays.asList("a", null, "b", null),
+										 Arrays.asList("a", null, "b", null)),
+								 new EdgeCaseTestCase<>("collection with duplicates", Arrays.asList("dup", "dup", "other", "dup"),
+										 Arrays.asList("dup", "dup", "other", "dup")),
+								 new EdgeCaseTestCase<>("single element collection", Collections.singletonList("single"),
+										 Collections.singletonList("single")))
+						 .map(tc -> Arguments.of(tc.description, tc.inputCollection, tc.expectedElements));
+		}
+
+		private record CollectionTypeTestCase<E>(String description, Collection<E> inputCollection,
+												 Collection<E> expectedElements)
+		{
+		}
+
+		private record EdgeCaseTestCase<E>(String description, Collection<E> inputCollection,
+										   Collection<E> expectedElements)
+		{
 		}
 	}
 }

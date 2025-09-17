@@ -21,4 +21,6 @@ public sealed interface Crucible<E> permits Forge, Relic
 	Relic<E> enshrine();
 
 	Forge<E> awaken();
+
+	Collection<E> manifest();
 }
