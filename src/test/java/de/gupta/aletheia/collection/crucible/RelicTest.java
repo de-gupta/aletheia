@@ -49,14 +49,10 @@ final class RelicTest
 		@DisplayName("should handle null collection gracefully")
 		void shouldHandleNullCollectionGracefully()
 		{
-			Collection<String> nullCollection = null;
-
-			// Relic.consecrate() accepts null collections without validation
-			Relic<String> result = Relic.consecrate(nullCollection);
-
-			assertThat(result).as("consecrate() with null collection should create Relic")
-							  .isInstanceOf(Relic.class)
-							  .isNotNull();
+			assertThatThrownBy(() -> Relic.consecrate(null))
+					.as("consecrate() with null collection should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("elements may not be null");
 		}
 
 		private static Stream<Arguments> testCases()
@@ -436,7 +432,7 @@ final class RelicTest
 		}
 
 		@Test
-		@DisplayName("should reflect changes to underlying collection when using mutable input")
+		@DisplayName("should not reflect changes to underlying collection when using mutable input")
 		void shouldReflectChangesToUnderlyingCollectionWhenUsingMutableInput()
 		{
 			List<String> original = new ArrayList<>(List.of("a", "b"));
@@ -449,8 +445,8 @@ final class RelicTest
 			original.add("c");
 
 			Collection<String> manifestAfter = relic.manifest();
-			assertThat(manifestAfter).as("manifest() should reflect changes to underlying collection")
-									 .containsExactly("a", "b", "c");
+			assertThat(manifestAfter).as("manifest() should be independent changes to underlying collection")
+									 .containsExactly("a", "b");
 		}
 
 		@Test
@@ -470,7 +466,7 @@ final class RelicTest
 		}
 
 		@Test
-		@DisplayName("should handle modifications to mutable underlying collection correctly")
+		@DisplayName("should be independent of modifications to mutable underlying collection")
 		void shouldHandleModificationsToMutableUnderlyingCollectionCorrectly()
 		{
 			List<String> mutableList = new ArrayList<>(List.of("x", "y", "z"));
@@ -484,8 +480,8 @@ final class RelicTest
 			mutableList.add("w");
 
 			Collection<String> manifest2 = relic.manifest();
-			assertThat(manifest2).as("New manifest() call should reflect underlying changes")
-								 .containsExactly("x", "z", "w");
+			assertThat(manifest2).as("New manifest() call should be independent of underlying changes")
+								 .containsExactly("x", "y", "z");
 
 			// But the first manifest should still be unmodifiable
 			assertThatThrownBy(() -> manifest1.add("should fail"))
@@ -540,17 +536,6 @@ final class RelicTest
 			assertThat(manifest1).as("All manifest calls should be consistent")
 								 .containsExactlyElementsOf(manifest2)
 								 .containsExactlyElementsOf(manifest3);
-		}
-
-		@Test
-		@DisplayName("should handle null collection input")
-		void shouldHandleNullCollectionInput()
-		{
-			Relic<String> relic = Relic.consecrate(null);
-
-			assertThatThrownBy(relic::manifest)
-					.as("manifest() with null input should throw exception")
-					.isInstanceOf(NullPointerException.class);
 		}
 
 		private static Stream<Arguments> collectionTypeTestCases()

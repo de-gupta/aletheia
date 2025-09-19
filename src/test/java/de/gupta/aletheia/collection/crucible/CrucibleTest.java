@@ -36,14 +36,10 @@ final class CrucibleTest
 		@DisplayName("should handle null collection gracefully")
 		void shouldHandleNullCollectionGracefully()
 		{
-			Collection<String> nullCollection = null;
-
-			// Relic.consecrate() accepts null collections without validation
-			Relic<String> result = Crucible.consecrate(nullCollection);
-
-			assertThat(result).as("consecrate() with null collection should create Relic")
-							  .isInstanceOf(Relic.class)
-							  .isNotNull();
+			assertThatThrownBy(() -> Crucible.consecrate(null))
+					.as("consecrate() with null collection should throw an exception")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessage("elements may not be null");
 		}
 
 		private static Stream<Arguments> testCases()

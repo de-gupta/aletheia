@@ -1,6 +1,7 @@
 package de.gupta.aletheia.collection.crucible;
 
 import java.util.Collection;
+import java.util.function.Function;
 
 public sealed interface Crucible<E> permits Forge, Relic
 {
@@ -17,6 +18,8 @@ public sealed interface Crucible<E> permits Forge, Relic
 	Crucible<E> embrace(E element);
 
 	Crucible<E> banish(E element);
+
+	<F> Crucible<F> metamorphose(final Function<? super E, ? extends F> metamorphosis);
 
 	Relic<E> enshrine();
 
