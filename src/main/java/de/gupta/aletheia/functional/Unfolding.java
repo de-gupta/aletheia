@@ -38,6 +38,11 @@ public sealed interface Unfolding<T> permits Shell, Myth
 					   .orElseGet(Unfolding::chaos);
 	}
 
+	static <T> Unfolding<T> adjudicate(final T apparition, final boolean judgement)
+	{
+		return judgement ? beckon(apparition) : chaos();
+	}
+
 	T summon();
 
 	T decree(final Supplier<? extends RuntimeException> wrath);
