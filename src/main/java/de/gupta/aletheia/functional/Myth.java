@@ -171,6 +171,15 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <U, R> Unfolding<Pair<U, R>> metamorphose(final Function<? super T, ? extends U> fate,
+													 final Function<? super T, ? extends R> destiny)
+	{
+		Objects.requireNonNull(fate, "fate may not be null");
+		Objects.requireNonNull(destiny, "destiny may not be null");
+		return Unfolding.beckon(Pair.of(fate.apply(hero), destiny.apply(hero)));
+	}
+
+	@Override
 	public <R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis,
 										 final Supplier<? extends RuntimeException> wrath)
 	{

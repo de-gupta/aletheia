@@ -76,6 +76,13 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <U, R> Unfolding<Pair<U, R>> metamorphose(final Function<? super T, ? extends U> fate,
+													 final Function<? super T, ? extends R> destiny)
+	{
+		return instance();
+	}
+
+	@Override
 	public <R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis,
 										 final Supplier<? extends RuntimeException> wrath)
 	{

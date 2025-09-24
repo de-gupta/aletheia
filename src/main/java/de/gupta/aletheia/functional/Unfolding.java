@@ -70,6 +70,9 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis);
 
+	<U, R> Unfolding<Pair<U, R>> metamorphose(final Function<? super T, ? extends U> fate,
+											  final Function<? super T, ? extends R> destiny);
+
 	<R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis,
 								  final Supplier<? extends RuntimeException> wrath);
 

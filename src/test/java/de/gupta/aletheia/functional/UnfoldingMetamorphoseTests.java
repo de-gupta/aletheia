@@ -1,5 +1,6 @@
 package de.gupta.aletheia.functional;
 
+import de.gupta.aletheia.collection.Pair;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -168,7 +169,7 @@ class UnfoldingMetamorphoseTests
 			var source = Unfolding.beckon("test");
 			Function<String, Integer> metamorphosis = String::length;
 
-			assertThatThrownBy(() -> source.metamorphose(metamorphosis, null))
+			assertThatThrownBy(() -> source.metamorphose(metamorphosis, (Supplier<RuntimeException>) null))
 					.as("metamorphose() with null wrath should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
 					.hasMessage("wrath may not be null");
@@ -180,7 +181,8 @@ class UnfoldingMetamorphoseTests
 		{
 			var source = Unfolding.beckon("test");
 
-			assertThatThrownBy(() -> source.metamorphose(null, null))
+			assertThatThrownBy(
+					() -> source.metamorphose((Function<String, Integer>) null, (Supplier<RuntimeException>) null))
 					.as("metamorphose() with both null arguments should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class)
 					.hasMessage("metamorphosis may not be null");
@@ -321,6 +323,69 @@ class UnfoldingMetamorphoseTests
 			assertThatThrownBy(() -> source.metamorphose(throwingFunction, nullReturningWrath))
 					.as("metamorphose() with exception supplier returning null should throw NullPointerException")
 					.isInstanceOf(NullPointerException.class);
+		}
+	}
+
+	@Nested
+	@DisplayName("Dual metamorphose tests")
+	class DualMetamorphoseTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("dualMetamorphoseTestCases")
+		@DisplayName("Should transform value with two functions correctly")
+		<T, U, R> void testDualMetamorphose(final String description, final Unfolding<T> source,
+											final Function<T, U> fate, final Function<T, R> destiny,
+											final Unfolding<Pair<U, R>> expectedResult)
+		{
+			var actual = source.metamorphose(fate, destiny);
+			assertThat(actual)
+					.as("dual metamorphose() for %s should result in %s", source, expectedResult)
+					.usingRecursiveComparison()
+					.isEqualTo(expectedResult);
+		}
+
+		@Test
+		@DisplayName("Should throw NullPointerException when fate is null")
+		void testDualMetamorphoseWithNullFate()
+		{
+			var source = Unfolding.beckon("test");
+
+			assertThatThrownBy(() -> source.metamorphose(null, String::length))
+					.as("dual metamorphose() with null fate should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessage("fate may not be null");
+		}
+
+		@Test
+		@DisplayName("Should throw NullPointerException when destiny is null")
+		void testDualMetamorphoseWithNullDestiny()
+		{
+			var source = Unfolding.beckon("test");
+
+			assertThatThrownBy(() -> source.metamorphose(String::length, (Function<String, Integer>) null))
+					.as("dual metamorphose() with null destiny should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessage("destiny may not be null");
+		}
+
+		private static Stream<Arguments> dualMetamorphoseTestCases()
+		{
+			return Stream.of(
+					Arguments.of(
+							"String to length and uppercase transformation",
+							Unfolding.beckon("hello"),
+							(Function<String, Integer>) String::length,
+							(Function<String, String>) String::toUpperCase,
+							Unfolding.beckon(Pair.of(5, "HELLO"))
+					),
+					Arguments.of(
+							"Integer to string and double transformation",
+							Unfolding.beckon(42),
+							(Function<Integer, String>) Object::toString,
+							(Function<Integer, Integer>) i -> i * 2,
+							Unfolding.beckon(Pair.of("42", 84))
+					)
+			);
 		}
 	}
 }
