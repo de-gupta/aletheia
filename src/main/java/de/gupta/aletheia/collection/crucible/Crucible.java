@@ -26,4 +26,9 @@ public sealed interface Crucible<E> permits Forge, Relic
 	Forge<E> awaken();
 
 	Collection<E> manifest();
+
+	default boolean harbors(final E essence)
+	{
+		return manifest().contains(essence);
+	}
 }
