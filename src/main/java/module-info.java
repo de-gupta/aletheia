@@ -1,4 +1,4 @@
-module aletheia
+module de.gupta.aletheia
 {
 	exports de.gupta.aletheia.functional;
 	exports de.gupta.aletheia.forge;
