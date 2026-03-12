@@ -1402,6 +1402,56 @@ final class UnfoldingTest
 	}
 
 	@Nested
+	@DisplayName("Tests for resurrectWithValue() method")
+	class ResurrectWithValueTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("successTestCases")
+		@DisplayName("should return expected unfolding when using resurrectWithValue")
+		<T> void shouldReturnExpectedUnfolding(final String description, final Unfolding<T> unfolding,
+											   final Supplier<T> grace, final Unfolding<T> expectedResult)
+		{
+			final Unfolding<T> result = unfolding.resurrectWithValue(grace);
+
+			assertThat(result).as("resurrectWithValue() for %s should result in expected unfolding: %s", description,
+									  expectedResult)
+							  .isEqualTo(expectedResult);
+		}
+
+		@DisplayName("should throw exception for null grace supplier")
+		@Test
+		void shouldThrowExceptionForNullGraceSupplier()
+		{
+			final Unfolding<String> unfolding = Unfolding.chaos();
+			final Supplier<String> nullGrace = null;
+
+			assertThatThrownBy(() -> unfolding.resurrectWithValue(nullGrace)).as(
+																					 "resurrectWithValue() with null grace supplier should throw NullPointerException")
+																			 .isInstanceOf(NullPointerException.class)
+																			 .hasMessageContaining(
+																					 "grace may not be null");
+		}
+
+		private static Stream<Arguments> successTestCases()
+		{
+			return Stream.of(new SuccessTestCase<>("Myth unfolding should return itself regardless of grace",
+										 Unfolding.beckon("test"), () -> "grace", Unfolding.beckon("test")),
+								 new SuccessTestCase<>("Shell unfolding should return beckoned grace value",
+										 Unfolding.chaos(), () -> "grace", Unfolding.beckon("grace")),
+								 new SuccessTestCase<>("Shell unfolding with null grace value should return Shell",
+										 Unfolding.chaos(), () -> null, Unfolding.chaos()),
+								 new SuccessTestCase<>("Shell unfolding with integer grace", Unfolding.chaos(), () -> 42,
+										 Unfolding.beckon(42)))
+						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.grace, tc.expectedResult));
+		}
+
+		private record SuccessTestCase<T>(String description, Unfolding<T> unfolding, Supplier<T> grace,
+										  Unfolding<T> expectedResult)
+		{
+		}
+	}
+
+	@Nested
 	@DisplayName("Tests for conjoin() method")
 	class ConjoinTests
 	{

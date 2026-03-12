@@ -117,6 +117,8 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	Unfolding<T> resurrect(final Supplier<Unfolding<T>> grace);
 
+	Unfolding<T> resurrectWithValue(final Supplier<T> grace);
+
 	Unfolding<T> revive(final Supplier<T> grace);
 
 	Stream<T> stream();
