@@ -196,9 +196,14 @@ final class Myth<T> implements Unfolding<T>
 		{
 			return Unfolding.beckon(metamorphosis.apply(hero));
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
-			throw wrath.get();
+			RuntimeException wrapped = Objects.requireNonNull(wrath.get(), "wrath may not return null");
+			if (wrapped != e && wrapped.getCause() == null)
+			{
+				wrapped.initCause(e);
+			}
+			throw wrapped;
 		}
 	}
 

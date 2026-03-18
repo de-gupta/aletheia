@@ -3,11 +3,10 @@ package de.gupta.aletheia.functional;
 public final class EmptyUnfoldingException extends RuntimeException
 {
 	private static final String DEFAULT_MESSAGE = "An empty vessel cannot pour forth wisdom";
-	private static final EmptyUnfoldingException DEFAULT_INSTANCE = new EmptyUnfoldingException(DEFAULT_MESSAGE);
 
 	public static EmptyUnfoldingException instance()
 	{
-		return DEFAULT_INSTANCE;
+		return new EmptyUnfoldingException(DEFAULT_MESSAGE);
 	}
 
 	public static EmptyUnfoldingException withMessage(final String message)

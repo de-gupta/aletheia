@@ -115,6 +115,20 @@ final class ForgeTest
 							  .isInstanceOf(Forge.class);
 		}
 
+		@Test
+		@DisplayName("should not modify the original forge when embracing")
+		void shouldNotModifyTheOriginalForgeWhenEmbracing()
+		{
+			Forge<String> original = Forge.kindle(new ArrayList<>(List.of("first", "second")));
+
+			Crucible<String> embraced = original.embrace("third");
+
+			assertThat(original.manifest()).as("The original forge should remain unchanged after embrace()")
+										   .containsExactly("first", "second");
+			assertThat(embraced.manifest()).as("The returned forge should contain the embraced element")
+										   .containsExactly("first", "second", "third");
+		}
+
 		private static Stream<Arguments> testCases()
 		{
 			return Stream.of(
@@ -169,6 +183,20 @@ final class ForgeTest
 
 			assertThat(result).as("banish() should handle null element")
 							  .isInstanceOf(Forge.class);
+		}
+
+		@Test
+		@DisplayName("should not modify the original forge when banishing")
+		void shouldNotModifyTheOriginalForgeWhenBanishing()
+		{
+			Forge<String> original = Forge.kindle(new ArrayList<>(List.of("first", "second", "third")));
+
+			Crucible<String> banished = original.banish("second");
+
+			assertThat(original.manifest()).as("The original forge should remain unchanged after banish()")
+										   .containsExactly("first", "second", "third");
+			assertThat(banished.manifest()).as("The returned forge should exclude the banished element")
+										   .containsExactly("first", "third");
 		}
 
 		private static Stream<Arguments> testCases()

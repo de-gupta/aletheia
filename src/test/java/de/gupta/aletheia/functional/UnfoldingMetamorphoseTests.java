@@ -135,6 +135,37 @@ class UnfoldingMetamorphoseTests
 		}
 
 		@Test
+		@DisplayName("Should preserve the original failure as the cause")
+		void testMetamorphoseWithExceptionPreservesCause()
+		{
+			var source = Unfolding.beckon("invalid");
+			Function<String, BigDecimal> metamorphosis = BigDecimal::new;
+			Supplier<RuntimeException> wrath = () -> new IllegalArgumentException("Custom exception");
+
+			assertThatThrownBy(() -> source.metamorphose(metamorphosis, wrath))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("Custom exception")
+					.cause()
+					.isInstanceOf(NumberFormatException.class)
+					.hasMessageContaining("Character");
+		}
+
+		@Test
+		@DisplayName("Should keep an existing cause on the supplied wrath exception")
+		void testMetamorphoseWithExceptionKeepsExistingCause()
+		{
+			var source = Unfolding.beckon("invalid");
+			Function<String, BigDecimal> metamorphosis = BigDecimal::new;
+			IllegalStateException existing =
+					new IllegalStateException("Wrapped already", new IllegalArgumentException("existing"));
+
+			assertThatThrownBy(() -> source.metamorphose(metamorphosis, () -> existing))
+					.isSameAs(existing)
+					.hasCauseInstanceOf(IllegalArgumentException.class)
+					.hasRootCauseMessage("existing");
+		}
+
+		@Test
 		@DisplayName("Should return empty when applied to empty Unfolding")
 		void testMetamorphoseWithExceptionOnEmptySource()
 		{
@@ -322,7 +353,8 @@ class UnfoldingMetamorphoseTests
 
 			assertThatThrownBy(() -> source.metamorphose(throwingFunction, nullReturningWrath))
 					.as("metamorphose() with exception supplier returning null should throw NullPointerException")
-					.isInstanceOf(NullPointerException.class);
+					.isInstanceOf(NullPointerException.class)
+					.hasMessage("wrath may not return null");
 		}
 	}
 

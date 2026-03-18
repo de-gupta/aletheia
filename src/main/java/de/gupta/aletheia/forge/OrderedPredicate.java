@@ -1,10 +1,14 @@
 package de.gupta.aletheia.forge;
 
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 
 public final class OrderedPredicate<T> implements Predicate<T>, Comparable<OrderedPredicate<T>>
 {
+	private static final AtomicLong SEQUENCER = new AtomicLong();
+
 	private final int order;
+	private final long sequence;
 	private final Predicate<T> predicate;
 
 	public static <T> OrderedPredicate<T> of(final int order, final Predicate<T> predicate)
@@ -15,7 +19,13 @@ public final class OrderedPredicate<T> implements Predicate<T>, Comparable<Order
 	@Override
 	public int compareTo(final OrderedPredicate<T> o)
 	{
-		return Integer.compare(this.order, o.order);
+		int orderComparison = Integer.compare(this.order, o.order);
+		if (orderComparison != 0)
+		{
+			return orderComparison;
+		}
+
+		return Long.compare(this.sequence, o.sequence);
 	}
 
 	@Override
@@ -27,6 +37,7 @@ public final class OrderedPredicate<T> implements Predicate<T>, Comparable<Order
 	private OrderedPredicate(final int order, final Predicate<T> predicate)
 	{
 		this.order = order;
+		this.sequence = SEQUENCER.getAndIncrement();
 		this.predicate = predicate;
 	}
 }
