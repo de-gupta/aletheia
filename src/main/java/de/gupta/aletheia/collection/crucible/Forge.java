@@ -19,15 +19,17 @@ public final class Forge<E> implements Crucible<E>
 	@Override
 	public Crucible<E> embrace(final E element)
 	{
-		elements.add(element);
-		return kindle(this.elements);
+		Collection<E> embraced = new ArrayList<>(this.elements);
+		embraced.add(element);
+		return kindle(embraced);
 	}
 
 	@Override
 	public Crucible<E> banish(final E element)
 	{
-		elements.remove(element);
-		return kindle(this.elements);
+		Collection<E> banished = new ArrayList<>(this.elements);
+		banished.remove(element);
+		return kindle(banished);
 	}
 
 	@Override
