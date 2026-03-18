@@ -204,9 +204,7 @@ final class Shell<T> implements Unfolding<T>
 	@Override
 	public Unfolding<T> resurrectWithValue(final Supplier<T> grace)
 	{
-		Objects.requireNonNull(grace, "grace may not be null");
-
-		return Unfolding.beckon(grace.get());
+		return revive(grace);
 	}
 
 	@Override
@@ -214,7 +212,7 @@ final class Shell<T> implements Unfolding<T>
 	{
 		Objects.requireNonNull(grace, "grace may not be null");
 
-		return Optional.ofNullable(grace.get()).map(Unfolding::beckon).orElseGet(Shell::instance);
+		return Unfolding.beckon(grace.get());
 	}
 
 	@Override
