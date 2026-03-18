@@ -86,13 +86,13 @@ final class LoomTest
 		}
 
 		@Test
-		@DisplayName("Should work with BinaryOperator of supertype")
-		void shouldWorkWithSupertypeOperator()
+		@DisplayName("Should work with BiFunction of supertype inputs and subtype output")
+		void shouldWorkWithFlexibleBiFunction()
 		{
 			List<Integer> elements = Arrays.asList(1, 2, 3);
 			Loom<Integer> loom = Loom.harness(elements);
 
-			BinaryOperator<Number> sumOperator = (n1, n2) -> n1.intValue() + n2.intValue();
+			BiFunction<Number, Number, Integer> sumOperator = (n1, n2) -> n1.intValue() + n2.intValue();
 			Unfolding<Integer> result = loom.forge(sumOperator);
 
 			assertThat(result.summon()).isEqualTo(6);

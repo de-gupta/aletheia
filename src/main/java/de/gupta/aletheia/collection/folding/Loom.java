@@ -4,7 +4,6 @@ import de.gupta.aletheia.functional.Unfolding;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
 
 @FunctionalInterface
 public interface Loom<E>
@@ -15,7 +14,7 @@ public interface Loom<E>
 		return new Loom<>()
 		{
 			@Override
-			public <R> R weave(R initial, BiFunction<R, ? super E, R> f)
+			public <R> R weave(R initial, BiFunction<? super R, ? super E, ? extends R> f)
 			{
 				R result = initial;
 				for (E e : iterable)
@@ -27,10 +26,9 @@ public interface Loom<E>
 		};
 	}
 
-	<R> R weave(R initial, BiFunction<R, ? super E, R> f);
+	<R> R weave(R initial, BiFunction<? super R, ? super E, ? extends R> f);
 
-	@SuppressWarnings("unchecked")
-	default Unfolding<E> forge(BinaryOperator<? super E> op)
+	default Unfolding<E> forge(BiFunction<? super E, ? super E, ? extends E> op)
 	{
 		final Holder<E> holder = new Holder<>();
 		weave(null, (_, e) ->
@@ -42,9 +40,9 @@ public interface Loom<E>
 			}
 			else
 			{
-				holder.value = ((BinaryOperator<E>) op).apply(holder.value, e);
+				holder.value = op.apply(holder.value, e);
 			}
-			return null;
+			return holder.value;
 		});
 
 		return holder.isSet ? Unfolding.beckon(holder.value) : Unfolding.chaos();
