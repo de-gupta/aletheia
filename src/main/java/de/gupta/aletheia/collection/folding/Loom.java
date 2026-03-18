@@ -5,15 +5,15 @@ import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 
 @FunctionalInterface
-public interface Foldable<E>
+public interface Loom<E>
 {
-	static <E> Foldable<E> fromIterable(Iterable<? extends E> iterable)
+	static <E> Loom<E> harness(Iterable<? extends E> iterable)
 	{
 		Objects.requireNonNull(iterable);
-		return new Foldable<>()
+		return new Loom<>()
 		{
 			@Override
-			public <R> R foldLeft(R initial, BiFunction<R, ? super E, R> f)
+			public <R> R weave(R initial, BiFunction<R, ? super E, R> f)
 			{
 				R result = initial;
 				for (E e : iterable)
@@ -25,12 +25,12 @@ public interface Foldable<E>
 		};
 	}
 
-	<R> R foldLeft(R initial, BiFunction<R, ? super E, R> f);
+	<R> R weave(R initial, BiFunction<R, ? super E, R> f);
 
-	default E reduceLeft(BinaryOperator<E> op)
+	default E forge(BinaryOperator<E> op)
 	{
 		final Holder<E> holder = new Holder<>();
-		foldLeft(null, (acc, e) ->
+		weave(null, (_, e) ->
 		{
 			if (!holder.isSet)
 			{
@@ -46,7 +46,7 @@ public interface Foldable<E>
 
 		if (!holder.isSet)
 		{
-			throw new IllegalArgumentException("Empty foldable");
+			throw new IllegalArgumentException("Empty loom");
 		}
 
 		return holder.value;
