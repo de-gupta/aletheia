@@ -1,5 +1,7 @@
 package de.gupta.aletheia.collection.folding;
 
+import de.gupta.aletheia.functional.Unfolding;
+
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
@@ -27,7 +29,8 @@ public interface Loom<E>
 
 	<R> R weave(R initial, BiFunction<R, ? super E, R> f);
 
-	default E forge(BinaryOperator<E> op)
+	@SuppressWarnings("unchecked")
+	default Unfolding<E> forge(BinaryOperator<? super E> op)
 	{
 		final Holder<E> holder = new Holder<>();
 		weave(null, (_, e) ->
@@ -39,17 +42,12 @@ public interface Loom<E>
 			}
 			else
 			{
-				holder.value = op.apply(holder.value, e);
+				holder.value = ((BinaryOperator<E>) op).apply(holder.value, e);
 			}
 			return null;
 		});
 
-		if (!holder.isSet)
-		{
-			throw new IllegalArgumentException("Empty loom");
-		}
-
-		return holder.value;
+		return holder.isSet ? Unfolding.beckon(holder.value) : Unfolding.chaos();
 	}
 
 	final class Holder<E>
