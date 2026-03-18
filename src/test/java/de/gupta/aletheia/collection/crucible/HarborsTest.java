@@ -130,10 +130,8 @@ final class HarborsTest
 		}
 	}
 
-	private static final class CaseInsensitiveString
+	private record CaseInsensitiveString(String value)
 	{
-		private final String value;
-
 		@Override
 		public int hashCode()
 		{
@@ -155,7 +153,7 @@ final class HarborsTest
 			return value;
 		}
 
-		CaseInsensitiveString(final String value)
+		private CaseInsensitiveString(final String value)
 		{
 			this.value = Objects.requireNonNull(value);
 		}
