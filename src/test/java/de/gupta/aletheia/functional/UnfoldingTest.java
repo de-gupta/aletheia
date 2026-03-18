@@ -96,8 +96,8 @@ final class UnfoldingTest
 	}
 
 	@Nested
-	@DisplayName("Tests for alternatively() method")
-	class AlternativelyTests
+	@DisplayName("Tests for rescue() method")
+	final class RescueTests
 	{
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("testCases")
