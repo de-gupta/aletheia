@@ -14,43 +14,23 @@ public interface Loom<E>
 		return new Loom<>()
 		{
 			@Override
-			public <R> R weave(R initial, BiFunction<? super R, ? super E, ? extends R> f)
+			public <R> R weave(R initial, BiFunction<? super R, ? super E, ? extends R> operation)
 			{
 				R result = initial;
 				for (E e : iterable)
 				{
-					result = f.apply(result, e);
+					result = operation.apply(result, e);
 				}
 				return result;
 			}
 		};
 	}
 
-	<R> R weave(R initial, BiFunction<? super R, ? super E, ? extends R> f);
+	<R> R weave(R initial, BiFunction<? super R, ? super E, ? extends R> operation);
 
-	default Unfolding<E> forge(BiFunction<? super E, ? super E, ? extends E> op)
+	default Unfolding<E> forge(BiFunction<? super E, ? super E, ? extends E> operation)
 	{
-		final Holder<E> holder = new Holder<>();
-		weave(null, (_, e) ->
-		{
-			if (!holder.isSet)
-			{
-				holder.value = e;
-				holder.isSet = true;
-			}
-			else
-			{
-				holder.value = op.apply(holder.value, e);
-			}
-			return holder.value;
-		});
-
-		return holder.isSet ? Unfolding.beckon(holder.value) : Unfolding.chaos();
-	}
-
-	final class Holder<E>
-	{
-		E value;
-		boolean isSet = false;
+		return weave(Unfolding.chaos(), (acc, e) ->
+				acc.sterile() ? Unfolding.beckon(e) : acc.conjoin(e, operation));
 	}
 }
