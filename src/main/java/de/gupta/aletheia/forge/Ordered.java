@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class OrderWrapper<T> implements Supplier<T>, Comparable<OrderWrapper<T>>
+public final class Ordered<T> implements Supplier<T>, Comparable<Ordered<T>>
 {
 	private static final AtomicLong SEQUENCER = new AtomicLong();
 
@@ -15,9 +15,9 @@ public class OrderWrapper<T> implements Supplier<T>, Comparable<OrderWrapper<T>>
 	private final long sequence;
 	private final T element;
 
-	public static <T> OrderWrapper<T> of(final int order, final T element)
+	public static <T> Ordered<T> of(final int order, final T element)
 	{
-		return new OrderWrapper<>(order, element);
+		return new Ordered<>(order, element);
 	}
 
 	@Override
@@ -27,7 +27,7 @@ public class OrderWrapper<T> implements Supplier<T>, Comparable<OrderWrapper<T>>
 	}
 
 	@Override
-	public int compareTo(final OrderWrapper<T> o)
+	public int compareTo(final Ordered<T> o)
 	{
 		return Unfolding.beckon(Integer.compare(this.order, o.order))
 						.coronate(c -> c != 0, Function.identity(), _ -> Long.compare(this.sequence, o.sequence));
@@ -50,14 +50,14 @@ public class OrderWrapper<T> implements Supplier<T>, Comparable<OrderWrapper<T>>
 						.supple()
 				|| Unfolding.beckon(o)
 							.discern(obj -> obj != null && this.getClass() == obj.getClass())
-							.metamorphose(obj -> (OrderWrapper<?>) obj)
+							.metamorphose(obj -> (Ordered<?>) obj)
 							.discern(that -> this.order == that.order &&
 									this.sequence == that.sequence &&
 									Objects.equals(this.element, that.element))
 							.supple();
 	}
 
-	protected OrderWrapper(final int order, final T element)
+	private Ordered(final int order, final T element)
 	{
 		this.order = order;
 		this.sequence = SEQUENCER.getAndIncrement();
