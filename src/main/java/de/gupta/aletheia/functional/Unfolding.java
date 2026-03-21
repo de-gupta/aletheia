@@ -60,6 +60,10 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R> R coronate(final Function<? super T, ? extends R> conclusion);
 
+	<R> R coronate(final Predicate<? super T> judgement,
+				   final Function<? super T, ? extends R> reward,
+				   final Function<? super T, ? extends R> punishment);
+
 	/** Transformation and transmutation. */
 	Unfolding<T> develop(final Predicate<? super T> judgement, Function<? super T, ? extends T> development);
 
@@ -99,10 +103,10 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R> R cleave(final Map<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment);
 
+	<R> R cleave(final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment);
+
 	<R> R smite(final Map<Predicate<? super T>, Function<? super T, R>> judgments,
 				final Supplier<? extends RuntimeException> wrath);
-
-	<R> R cleave(final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment);
 
 	<U, R> Unfolding<R> sanctify(final Function<? super T, U> marriage,
 								 final BiFunction<? super T, ? super U, R> conjugation,

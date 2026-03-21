@@ -182,6 +182,13 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> R coronate(final Predicate<? super T> judgement, final Function<? super T, ? extends R> reward,
+						  final Function<? super T, ? extends R> punishment)
+	{
+		throw EmptyUnfoldingException.instance();
+	}
+
+	@Override
 	public T rescue(final Supplier<? extends T> revelation)
 	{
 		return revelation.get();

@@ -320,6 +320,17 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> R coronate(final Predicate<? super T> judgement, final Function<? super T, ? extends R> reward,
+						  final Function<? super T, ? extends R> punishment)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		Objects.requireNonNull(reward, "reward may not be null");
+		Objects.requireNonNull(punishment, "punishment may not be null");
+
+		return judgement.test(hero) ? reward.apply(hero) : punishment.apply(hero);
+	}
+
+	@Override
 	public T rescue(final T manifestation)
 	{
 		return hero;

@@ -22,6 +22,50 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 final class UnfoldingCleaveTests
 {
 	@Nested
+	@DisplayName("Tests for coronate() method with branching")
+	class CoronateBranchingTests
+	{
+		@Test
+		@DisplayName("should return reward when predicate matches")
+		void shouldReturnRewardWhenPredicateMatches()
+		{
+			String result = Unfolding.beckon("hero")
+									 .coronate(s -> s.startsWith("h"), String::toUpperCase, String::toLowerCase);
+			assertThat(result).isEqualTo("HERO");
+		}
+
+		@Test
+		@DisplayName("should return punishment when predicate does not match")
+		void shouldReturnPunishmentWhenPredicateDoesNotMatch()
+		{
+			String result = Unfolding.beckon("villain")
+									 .coronate(s -> s.startsWith("h"), String::toUpperCase, String::toLowerCase);
+			assertThat(result).isEqualTo("villain");
+		}
+
+		@Test
+		@DisplayName("should throw when empty")
+		void shouldThrowWhenEmpty()
+		{
+			assertThatThrownBy(() -> Unfolding.<String>chaos().coronate(_ -> true, _ -> "a", _ -> "b"))
+					.isInstanceOf(EmptyUnfoldingException.class);
+		}
+
+		@Test
+		@DisplayName("should throw when any argument is null")
+		void shouldThrowWhenAnyArgumentIsNull()
+		{
+			Unfolding<String> unfolding = Unfolding.beckon("test");
+			assertThatThrownBy(() -> unfolding.coronate(null, s -> s, s -> s))
+					.isInstanceOf(NullPointerException.class);
+			assertThatThrownBy(() -> unfolding.coronate(_ -> true, null, s -> s))
+					.isInstanceOf(NullPointerException.class);
+			assertThatThrownBy(() -> unfolding.coronate(_ -> true, s -> s, null))
+					.isInstanceOf(NullPointerException.class);
+		}
+	}
+
+	@Nested
 	@DisplayName("Tests for cleave() method with direct return arguments instead of functions")
 	class CleaveDirectReturnArgumentsTests
 	{

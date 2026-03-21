@@ -1,6 +1,9 @@
 package de.gupta.aletheia.forge;
 
+import de.gupta.aletheia.functional.Unfolding;
+
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public final class OrderedPredicate<T> implements Predicate<T>, Comparable<OrderedPredicate<T>>
@@ -19,13 +22,8 @@ public final class OrderedPredicate<T> implements Predicate<T>, Comparable<Order
 	@Override
 	public int compareTo(final OrderedPredicate<T> o)
 	{
-		int orderComparison = Integer.compare(this.order, o.order);
-		if (orderComparison != 0)
-		{
-			return orderComparison;
-		}
-
-		return Long.compare(this.sequence, o.sequence);
+		return Unfolding.beckon(Integer.compare(this.order, o.order))
+						.coronate(c -> c != 0, Function.identity(), _ -> Long.compare(this.sequence, o.sequence));
 	}
 
 	@Override
