@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.de-gupta</groupId>
     <artifactId>aletheia</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.2.2-SNAPSHOT</version>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>A library with functional classes for java</description>
     <url>https://github.com/de-gupta/aletheia.git</url>
 
     <properties>
-        <maven.compiler.source>24</maven.compiler.source>
-        <maven.compiler.target>24</maven.compiler.target>
+        <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <junit.jupiter.version>5.13.1</junit.jupiter.version>
@@ -26,7 +23,6 @@
         <maven.source.plugin.version>3.3.1</maven.source.plugin.version>
         <maven.javadoc.plugin.version>3.11.2</maven.javadoc.plugin.version>
     </properties>
-
 
     <dependencies>
         <dependency>
@@ -57,7 +53,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>${maven.release.plugin.version}</version>
                 <configuration>
-                    <goals>install</goals>
+                    <goals>deploy</goals>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
