@@ -362,6 +362,19 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public Unfolding<T> unlace(final Predicate<? super T> judgement, final Consumer<? super T> impregnator)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		Objects.requireNonNull(impregnator, "impregnator may not be null");
+
+		if (judgement.test(hero))
+		{
+			impregnator.accept(hero);
+		}
+		return this;
+	}
+
+	@Override
 	public boolean supple()
 	{
 		return !sterile();

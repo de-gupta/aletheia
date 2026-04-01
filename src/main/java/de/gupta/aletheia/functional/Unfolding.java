@@ -140,6 +140,8 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	/** Effects and interruption. */
 	Unfolding<T> unlace(final Consumer<? super T> impregnator);
 
+	Unfolding<T> unlace(final Predicate<? super T> judgement, final Consumer<? super T> impregnator);
+
 	void interdict(final Supplier<? extends RuntimeException> wrath);
 
 	void interdict(final Function<? super T, Supplier<? extends RuntimeException>> wrath);

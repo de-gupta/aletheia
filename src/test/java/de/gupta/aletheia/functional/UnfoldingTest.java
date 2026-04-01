@@ -752,6 +752,179 @@ final class UnfoldingTest
 	}
 
 	@Nested
+	@DisplayName("Tests for unlace(Predicate, Consumer) method")
+	class ConditionalUnlaceTests
+	{
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("presentValueTestCases")
+		@DisplayName("should conditionally apply consumer to present unfolding")
+		<T> void shouldConditionallyApplyConsumerToPresentValue(String description, Unfolding<T> unfolding,
+		                                                        Predicate<T> predicate, List<T> expectedCapturedValues)
+		{
+			List<T> capturedValues = new ArrayList<>();
+
+			Unfolding<T> result = unfolding.unlace(predicate, capturedValues::add);
+
+			assertThat(result).as("unlace(Predicate, Consumer) should return the same unfolding").isSameAs(unfolding);
+			assertThat(capturedValues).as("Consumer should only be applied when predicate matches")
+			                          .containsExactlyElementsOf(expectedCapturedValues);
+		}
+
+		@DisplayName("should preserve value in chain regardless of predicate outcome")
+		@Test
+		void shouldPreserveValueInChainRegardlessOfPredicateOutcome()
+		{
+			Unfolding<Integer> unfolding = Unfolding.beckon(42);
+			List<Integer> capturedValues = new ArrayList<>();
+
+			Integer result = unfolding.unlace(n -> n > 100, capturedValues::add)
+			                          .metamorphose(n -> n * 2)
+			                          .summon();
+
+			assertThat(result).as("Value should be preserved and transformed after conditional unlace").isEqualTo(84);
+			assertThat(capturedValues).as("Consumer should not have been applied since 42 is not > 100").isEmpty();
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("emptyUnlaceTestCases")
+		@DisplayName("should preserve empty unfolding without evaluating predicate")
+		<T> void shouldPreserveEmptyUnfolding(String description, Unfolding<T> unfolding, Predicate<T> predicate)
+		{
+			List<T> capturedValues = new ArrayList<>();
+			boolean[] predicateEvaluated = {false};
+
+			Unfolding<T> result = unfolding.unlace(value ->
+			{
+				predicateEvaluated[0] = true;
+				return predicate.test(value);
+			}, capturedValues::add);
+
+			assertThat(result).as("unlace(Predicate, Consumer) on empty should return same empty instance")
+			                  .isSameAs(unfolding);
+			assertThat(result.sterile()).as("Empty unfolding should remain empty").isTrue();
+			assertThat(predicateEvaluated[0]).as("Predicate should not be evaluated on empty unfolding").isFalse();
+			assertThat(capturedValues).as("Consumer should not be applied to empty unfolding").isEmpty();
+		}
+
+		@DisplayName("should throw exception for null predicate on present unfolding")
+		@Test
+		void shouldThrowExceptionForNullPredicateOnPresent()
+		{
+			Unfolding<String> unfolding = Unfolding.beckon("test");
+			Predicate<String> nullPredicate = null;
+			Consumer<String> consumer = _ ->
+			{
+			};
+
+			assertThatThrownBy(() -> unfolding.unlace(nullPredicate, consumer))
+					.as("unlace() with null predicate should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("judgement may not be null");
+		}
+
+		@DisplayName("should throw exception for null consumer on present unfolding")
+		@Test
+		void shouldThrowExceptionForNullConsumerOnPresent()
+		{
+			Unfolding<String> unfolding = Unfolding.beckon("test");
+			Predicate<String> predicate = s -> s.length() > 3;
+			Consumer<String> nullConsumer = null;
+
+			assertThatThrownBy(() -> unfolding.unlace(predicate, nullConsumer))
+					.as("unlace() with null consumer should throw NullPointerException")
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("impregnator may not be null");
+		}
+
+		@DisplayName("should support chaining multiple conditional unlace operations")
+		@Test
+		void shouldSupportChainingMultipleConditionalUnlace()
+		{
+			Unfolding<Integer> unfolding = Unfolding.beckon(42);
+			List<String> evenLog = new ArrayList<>();
+			List<String> largeLog = new ArrayList<>();
+
+			Unfolding<Integer> result = unfolding
+					.unlace(n -> n % 2 == 0, n -> evenLog.add("even: " + n))
+					.unlace(n -> n > 100, n -> largeLog.add("large: " + n));
+
+			assertThat(result).as("Chained unlace should return the same unfolding").isSameAs(unfolding);
+			assertThat(evenLog).as("First conditional unlace should fire").containsExactly("even: 42");
+			assertThat(largeLog).as("Second conditional unlace should not fire").isEmpty();
+		}
+
+		@DisplayName("should integrate with other chained operations")
+		@Test
+		void shouldIntegrateWithOtherChainedOperations()
+		{
+			Unfolding<String> unfolding = Unfolding.beckon("hello world");
+			List<String> longStringLog = new ArrayList<>();
+
+			String result = unfolding
+					.metamorphose(String::toUpperCase)
+					.unlace(s -> s.contains("WORLD"), longStringLog::add)
+					.metamorphose(s -> s.substring(0, 5))
+					.summon();
+
+			assertThat(result).as("Chain should produce expected result").isEqualTo("HELLO");
+			assertThat(longStringLog).as("Conditional unlace should have captured the value")
+			                         .containsExactly("HELLO WORLD");
+		}
+
+		@DisplayName("should not apply consumer when prior operation makes unfolding empty")
+		@Test
+		void shouldNotApplyConsumerWhenPriorOperationMakesEmpty()
+		{
+			Unfolding<Integer> unfolding = Unfolding.beckon(42);
+			List<Integer> capturedValues = new ArrayList<>();
+
+			unfolding
+					.discern(n -> n > 100)
+					.unlace(n -> n > 0, capturedValues::add)
+					.rescue(99)
+					.toString();
+
+			assertThat(capturedValues).as("Conditional unlace should not be called after discern makes unfolding empty")
+			                          .isEmpty();
+		}
+
+		private static Stream<Arguments> presentValueTestCases()
+		{
+			return Stream.of(
+								 new PresentValueTestCase<>("Matching string predicate should apply consumer",
+							             Unfolding.beckon("hello"),
+										 s -> s.length() > 3, List.of("hello")),
+								 new PresentValueTestCase<>("Non-matching string predicate should not apply consumer",
+										 Unfolding.beckon("hi"), s -> s.length() > 3, List.of()),
+								 new PresentValueTestCase<>("Matching integer predicate should apply consumer", Unfolding.beckon(42),
+										 n -> n % 2 == 0, List.of(42)),
+								 new PresentValueTestCase<>("Non-matching integer predicate should not apply consumer",
+										 Unfolding.beckon(7), n -> n % 2 == 0, List.of()))
+			             .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate,
+					             tc.expectedCapturedValues));
+		}
+
+		private static Stream<Arguments> emptyUnlaceTestCases()
+		{
+			return Stream.of(
+								 new EmptyUnlaceTestCase<>("Empty string unfolding should skip predicate and consumer",
+										 Unfolding.<String>chaos(), s -> s.length() > 3),
+								 new EmptyUnlaceTestCase<>("Empty integer unfolding should skip predicate and consumer",
+										 Unfolding.<Integer>chaos(), n -> n % 2 == 0))
+			             .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.predicate));
+		}
+
+		private record PresentValueTestCase<T>(String description, Unfolding<T> unfolding, Predicate<T> predicate,
+		                                       List<T> expectedCapturedValues)
+		{
+		}
+
+		private record EmptyUnlaceTestCase<T>(String description, Unfolding<T> unfolding, Predicate<T> predicate)
+		{
+		}
+	}
+
+	@Nested
 	@DisplayName("Tests for summon() method")
 	class SummonTests
 	{

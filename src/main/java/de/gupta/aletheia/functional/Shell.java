@@ -235,6 +235,12 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public Unfolding<T> unlace(final Predicate<? super T> judgement, final Consumer<? super T> impregnator)
+	{
+		return instance();
+	}
+
+	@Override
 	public Optional<T> optional()
 	{
 		return Optional.empty();
