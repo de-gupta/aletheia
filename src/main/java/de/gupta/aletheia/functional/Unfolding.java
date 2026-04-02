@@ -20,12 +20,6 @@ public sealed interface Unfolding<T> permits Shell, Myth
 		return omen.map(Unfolding::beckon).orElseGet(Unfolding::chaos);
 	}
 
-	@Deprecated(since = "0.0.6", forRemoval = true)
-	static <T> Unfolding<T> of(final T apparition)
-	{
-		return beckon(apparition);
-	}
-
 	static <T> Unfolding<T> chaos()
 	{
 		return Shell.instance();
@@ -66,12 +60,6 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	/** Transformation and transmutation. */
 	Unfolding<T> develop(final Predicate<? super T> judgement, Function<? super T, ? extends T> development);
-
-	@Deprecated(since = "0.0.3", forRemoval = true)
-	default <R> Unfolding<R> refold(final Function<? super T, ? extends R> folding)
-	{
-		return metamorphose(folding);
-	}
 
 	<R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis);
 
@@ -131,9 +119,6 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	T rescue(final T manifestation);
 
 	Unfolding<T> resurrect(final Supplier<Unfolding<T>> grace);
-
-	@Deprecated(since = "0.2.0", forRemoval = true)
-	Unfolding<T> resurrectWithValue(final Supplier<T> grace);
 
 	Unfolding<T> revive(final Supplier<T> grace);
 

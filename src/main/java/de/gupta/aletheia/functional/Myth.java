@@ -76,12 +76,6 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public Unfolding<T> resurrectWithValue(final Supplier<T> grace)
-	{
-		return this;
-	}
-
-	@Override
 	public Unfolding<T> discern(final Predicate<? super T> judgement,
 								final Supplier<? extends RuntimeException> wrath)
 	{
