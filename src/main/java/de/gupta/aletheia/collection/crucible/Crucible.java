@@ -1,5 +1,7 @@
 package de.gupta.aletheia.collection.crucible;
 
+import de.gupta.aletheia.collection.cascade.Cascade;
+
 import java.util.Collection;
 import java.util.function.Function;
 
@@ -30,5 +32,10 @@ public sealed interface Crucible<E> permits Forge, Relic
 	default boolean harbors(final E essence)
 	{
 		return manifest().contains(essence);
+	}
+
+	default Cascade<E> cascade()
+	{
+		return Cascade.distill(this);
 	}
 }
