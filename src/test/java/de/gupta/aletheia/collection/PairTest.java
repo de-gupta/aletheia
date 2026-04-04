@@ -22,7 +22,7 @@ final class PairTest
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("pairCases")
 		@DisplayName("of() should preserve both values")
-		void ofShouldPreserveBothValues(final String as, final PairCase tc)
+		<A, B> void ofShouldPreserveBothValues(final String as, final PairCase<A, B> tc)
 		{
 			var pair = Pair.of(tc.first(), tc.second());
 
@@ -36,15 +36,16 @@ final class PairTest
 		{
 			return Stream.of(
 					PairCase.shape("numeric and text values", 7, "oracle"),
-					PairCase.shape("nullable left value", null, "ember")
+					PairCase.shape("nullable left value", null, "ember"),
+					PairCase.shape("enum and list values", Thread.State.WAITING, java.util.List.of("north", "south"))
 			).map(tc -> Arguments.of(tc.as(), tc));
 		}
 
-		private record PairCase(String as, Integer first, String second)
+		private record PairCase<A, B>(String as, A first, B second)
 		{
-			private static PairCase shape(final String as, final Integer first, final String second)
+			private static <A, B> PairCase<A, B> shape(final String as, final A first, final B second)
 			{
-				return new PairCase(as, first, second);
+				return new PairCase<>(as, first, second);
 			}
 		}
 	}

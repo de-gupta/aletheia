@@ -42,6 +42,26 @@ final class TripletTest
 			assertThat(triplet).as("expanded values should match for %s", as).isEqualTo(tc.expected());
 		}
 
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("pairPrefixFactoryCases")
+		@DisplayName("of(pair, c) should expand pair into first and second")
+		<A, B, C> void ofWithPairPrefixShouldExpandPair(final String as, final PairPrefixFactoryCase<A, B, C> tc)
+		{
+			var triplet = Triplet.of(tc.pair(), tc.third());
+
+			assertThat(triplet).as("pair-prefix expansion should match for %s", as).isEqualTo(tc.expected());
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("nestedPairFactoryCases")
+		@DisplayName("of(nested pair) should expand into all three values")
+		<A, B, C> void ofWithNestedPairShouldExpandValues(final String as, final NestedPairFactoryCase<A, B, C> tc)
+		{
+			var triplet = Triplet.of(tc.pair());
+
+			assertThat(triplet).as("nested-pair expansion should match for %s", as).isEqualTo(tc.expected());
+		}
+
 		private static Stream<Arguments> directFactoryCases()
 		{
 			return Stream.of(
@@ -67,6 +87,39 @@ final class TripletTest
 			).map(tc -> Arguments.of(tc.as(), tc));
 		}
 
+		private static Stream<Arguments> pairPrefixFactoryCases()
+		{
+			return Stream.of(
+					PairPrefixFactoryCase.shape("string-integer with boolean third",
+							Pair.of("dawn", 21),
+							true,
+							Triplet.of("dawn", 21, true)),
+					PairPrefixFactoryCase.shape("nullable second in pair",
+							Pair.of("ember", null),
+							"tail",
+							Triplet.of("ember", null, "tail")),
+					PairPrefixFactoryCase.shape("enum and list with decimal",
+							Pair.of(Thread.State.BLOCKED, java.util.List.of("x", "y")),
+							2.5,
+							Triplet.of(Thread.State.BLOCKED, java.util.List.of("x", "y"), 2.5))
+			).map(tc -> Arguments.of(tc.as(), tc));
+		}
+
+		private static Stream<Arguments> nestedPairFactoryCases()
+		{
+			return Stream.of(
+					NestedPairFactoryCase.shape("string with nested integer-boolean",
+							Pair.of("dawn", Pair.of(21, true)),
+							Triplet.of("dawn", 21, true)),
+					NestedPairFactoryCase.shape("nullable inner first value",
+							Pair.of("ember", Pair.of(null, 9L)),
+							Triplet.of("ember", null, 9L)),
+					NestedPairFactoryCase.shape("numeric with nested enum-string",
+							Pair.of(5, Pair.of(Thread.State.NEW, "rune")),
+							Triplet.of(5, Thread.State.NEW, "rune"))
+			).map(tc -> Arguments.of(tc.as(), tc));
+		}
+
 		private record DirectFactoryCase<A, B, C>(String as, A first, B second, C third)
 		{
 			private static <A, B, C> DirectFactoryCase<A, B, C> shape(final String as, final A first, final B second,
@@ -83,6 +136,26 @@ final class TripletTest
 			                                                        final Triplet<A, B, C> expected)
 			{
 				return new PairFactoryCase<>(as, first, pair, expected);
+			}
+		}
+
+		private record PairPrefixFactoryCase<A, B, C>(String as, Pair<A, B> pair, C third, Triplet<A, B, C> expected)
+		{
+			private static <A, B, C> PairPrefixFactoryCase<A, B, C> shape(final String as, final Pair<A, B> pair,
+			                                                              final C third,
+			                                                              final Triplet<A, B, C> expected)
+			{
+				return new PairPrefixFactoryCase<>(as, pair, third, expected);
+			}
+		}
+
+		private record NestedPairFactoryCase<A, B, C>(String as, Pair<A, Pair<B, C>> pair, Triplet<A, B, C> expected)
+		{
+			private static <A, B, C> NestedPairFactoryCase<A, B, C> shape(final String as,
+			                                                              final Pair<A, Pair<B, C>> pair,
+			                                                              final Triplet<A, B, C> expected)
+			{
+				return new NestedPairFactoryCase<>(as, pair, expected);
 			}
 		}
 	}
