@@ -20,7 +20,7 @@ final class UnfoldingConvokeTests
 {
 	@Nested
 	@DisplayName("Tests for convoke() method")
-	class ConvokeTests
+	final class ConvokeTests
 	{
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("presentConvokeTestCases")
@@ -89,7 +89,7 @@ final class UnfoldingConvokeTests
 		{
 			return Stream.of(
 								 new PresentConvokeTestCase<>(
-										 "String omens should preserve order before the oracle speaks",
+										 "When the omens speak in sequence, the oracle should hear them in that same order",
 										 Unfolding.beckon("orpheus"),
 										 List.<Function<? super String, ? extends String>>of(
 												 String::toUpperCase,
@@ -98,7 +98,7 @@ final class UnfoldingConvokeTests
 										 parts -> String.join(" | ", parts),
 										 Unfolding.beckon("ORPHEUS | orp | 7")),
 								 new PresentConvokeTestCase<>(
-										 "Numeric omens should allow the oracle to build a structured summary",
+										 "When the omens are arithmetical, the oracle should still pronounce over their gathered signs",
 										 Unfolding.beckon(6),
 										 List.<Function<? super Integer, ? extends Integer>>of(
 												 value -> value * 2,
@@ -107,13 +107,13 @@ final class UnfoldingConvokeTests
 										 parts -> parts.stream().map(Object::toString).toList().toString(),
 										 Unfolding.beckon("[12, 36, 5]")),
 								 new PresentConvokeTestCase<>(
-										 "Empty omens should still allow the oracle to pronounce over an empty gathering",
+										 "When no omens are summoned, the oracle should still be able to pronounce over the silence",
 										 Unfolding.beckon("echo"),
 										 List.<Function<? super String, ? extends String>>of(),
 										 parts -> "voices=" + parts.size(),
 										 Unfolding.beckon("voices=0")),
 								 new PresentConvokeTestCase<>(
-										 "Null omen results should remain available for the oracle to interpret",
+										 "When one omen falls silent, the oracle should still receive that silence among the signs",
 										 Unfolding.beckon("echo"),
 										 List.<Function<? super String, ? extends String>>of(
 												 String::toUpperCase,
@@ -122,7 +122,25 @@ final class UnfoldingConvokeTests
 										 parts -> parts.stream().map(part -> part == null ? "silence" : part).toList().toString(),
 										 Unfolding.beckon("[ECHO, silence, echo!]")),
 								 new PresentConvokeTestCase<>(
-										 "Null oracle pronouncement should dissolve into chaos",
+										 "When many omens fall silent, each silence should remain in the gathered prophecy",
+										 Unfolding.beckon("echo"),
+										 List.<Function<? super String, ? extends String>>of(
+												 _ -> null,
+												 String::toUpperCase,
+												 _ -> null),
+										 parts -> parts.stream().map(part -> part == null ? "silence" : part).toList().toString(),
+										 Unfolding.beckon("[silence, ECHO, silence]")),
+								 new PresentConvokeTestCase<>(
+										 "When twin omens foretell the same sign, the oracle should receive both without purification",
+										 Unfolding.beckon("echo"),
+										 List.<Function<? super String, ? extends String>>of(
+												 String::toUpperCase,
+												 String::toUpperCase,
+												 value -> value + "!"),
+										 Object::toString,
+										 Unfolding.beckon("[ECHO, ECHO, echo!]")),
+								 new PresentConvokeTestCase<>(
+										 "When the oracle returns no final prophecy, the convocation should dissolve into chaos",
 										 Unfolding.beckon("eurydice"),
 										 List.<Function<? super String, ? extends String>>of(String::toUpperCase),
 										 _ -> null,
@@ -216,7 +234,7 @@ final class UnfoldingConvokeTests
 		@FunctionalInterface
 		private interface Invocation
 		{
-			Object invoke();
+			void invoke();
 		}
 
 		private record PresentConvokeTestCase<T, R, A>(String description,
