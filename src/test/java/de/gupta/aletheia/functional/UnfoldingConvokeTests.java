@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.SequencedCollection;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -27,8 +28,8 @@ final class UnfoldingConvokeTests
 		@DisplayName("should convoke omens into a coherent unfolding")
 		<T, R, A> void shouldConvokeOmensIntoAConsistentUnfolding(final String description,
 		                                                          final Unfolding<T> source,
-		                                                          final Collection<Function<? super T, ? extends R>> omens,
-		                                                          final Function<? super Collection<? extends R>, ? extends A> oracle,
+		                                                          final SequencedCollection<Function<? super T, ? extends R>> omens,
+		                                                          final Function<? super SequencedCollection<? extends R>, ? extends A> oracle,
 		                                                          final Unfolding<A> expectedResult)
 		{
 			assertThat(source.convoke(omens, oracle))
@@ -53,8 +54,8 @@ final class UnfoldingConvokeTests
 		@MethodSource("shellIdentityTestCases")
 		@DisplayName("should preserve shell for all omen and oracle shapes")
 		void shouldPreserveShellForAllOmenAndOracleShapes(final String description,
-		                                                  final Collection<Function<? super String, ? extends String>> omens,
-		                                                  final Function<? super Collection<? extends String>, ? extends String> oracle)
+		                                                  final SequencedCollection<Function<? super String, ? extends String>> omens,
+		                                                  final Function<? super SequencedCollection<? extends String>, ? extends String> oracle)
 		{
 			final Unfolding<String> shell = Unfolding.chaos();
 
@@ -67,8 +68,8 @@ final class UnfoldingConvokeTests
 		@MethodSource("shellLazinessTestCases")
 		@DisplayName("should not evaluate omens or oracle for shell")
 		void shouldNotEvaluateOmensOrOracleForShell(final String description,
-		                                            final Collection<Function<? super String, ? extends String>> omens,
-		                                            final Function<? super Collection<? extends String>, ? extends String> oracle,
+		                                            final SequencedCollection<Function<? super String, ? extends String>> omens,
+		                                            final Function<? super SequencedCollection<? extends String>, ? extends String> oracle,
 		                                            final AtomicBoolean omenInvoked,
 		                                            final AtomicBoolean oracleInvoked)
 		{
@@ -90,13 +91,13 @@ final class UnfoldingConvokeTests
 			return Stream.of(
 								 new PresentConvokeTestCase<>(
 										 "When the omens speak in sequence, the oracle should hear them in that same order",
-										 Unfolding.beckon("orpheus"),
+										 Unfolding.beckon("Orpheus"),
 										 List.<Function<? super String, ? extends String>>of(
 												 String::toUpperCase,
 												 value -> value.substring(0, 3),
 												 value -> Integer.toString(value.length())),
 										 parts -> String.join(" | ", parts),
-										 Unfolding.beckon("ORPHEUS | orp | 7")),
+										 Unfolding.beckon("ORPHEUS | Orp | 7")),
 								 new PresentConvokeTestCase<>(
 										 "When the omens are arithmetical, the oracle should still pronounce over their gathered signs",
 										 Unfolding.beckon(6),
@@ -141,7 +142,7 @@ final class UnfoldingConvokeTests
 										 Unfolding.beckon("[ECHO, ECHO, echo!]")),
 								 new PresentConvokeTestCase<>(
 										 "When the oracle returns no final prophecy, the convocation should dissolve into chaos",
-										 Unfolding.beckon("eurydice"),
+										 Unfolding.beckon("Eurydice"),
 										 List.<Function<? super String, ? extends String>>of(String::toUpperCase),
 										 _ -> null,
 										 Unfolding.chaos()))

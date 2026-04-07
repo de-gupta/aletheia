@@ -292,8 +292,8 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R, A> Unfolding<A> convoke(final Collection<Function<? super T, ? extends R>> omens,
-	                                   final Function<? super Collection<? extends R>, ? extends A> oracle)
+	public <R, A> Unfolding<A> convoke(final SequencedCollection<Function<? super T, ? extends R>> omens,
+	                                   final Function<? super SequencedCollection<? extends R>, ? extends A> oracle)
 	{
 		Objects.requireNonNull(omens, "omens may not be null");
 		Objects.requireNonNull(oracle, "oracle may not be null");

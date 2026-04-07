@@ -2,9 +2,9 @@ package de.gupta.aletheia.functional;
 
 import de.gupta.aletheia.collection.Pair;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedCollection;
 import java.util.SortedMap;
 import java.util.function.*;
 import java.util.stream.Stream;
@@ -121,8 +121,8 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	/**
 	 * Composition and gathering
 	 */
-	<R, A> Unfolding<A> convoke(final Collection<Function<? super T, ? extends R>> omens,
-	                            final Function<? super Collection<? extends R>, ? extends A> oracle);
+	<R, A> Unfolding<A> convoke(final SequencedCollection<Function<? super T, ? extends R>> omens,
+	                            final Function<? super SequencedCollection<? extends R>, ? extends A> oracle);
 
 	/**
 	 * Recovery and renewal.
