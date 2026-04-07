@@ -2,6 +2,7 @@ package de.gupta.aletheia.functional;
 
 import de.gupta.aletheia.collection.Pair;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SortedMap;
@@ -116,6 +117,12 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	                            final BiFunction<? super T, ? super U, R> conjugation);
 
 	<R, U> Unfolding<U> braid(final Unfolding<R> consort, final BiFunction<? super T, ? super R, ? extends U> weaver);
+
+	/**
+	 * Composition and gathering
+	 */
+	<R, A> Unfolding<A> convoke(final Collection<Function<? super T, ? extends R>> omens,
+	                            final Function<? super Collection<? extends R>, ? extends A> oracle);
 
 	/**
 	 * Recovery and renewal.

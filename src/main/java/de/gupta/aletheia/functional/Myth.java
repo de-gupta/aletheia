@@ -2,10 +2,7 @@ package de.gupta.aletheia.functional;
 
 import de.gupta.aletheia.collection.Pair;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.SortedMap;
+import java.util.*;
 import java.util.function.*;
 import java.util.stream.Stream;
 
@@ -292,6 +289,19 @@ final class Myth<T> implements Unfolding<T>
 		Objects.requireNonNull(weaver, "weaver may not be null");
 
 		return consort.entwine(r -> Unfolding.beckon(weaver.apply(hero, r)));
+	}
+
+	@Override
+	public <R, A> Unfolding<A> convoke(final Collection<Function<? super T, ? extends R>> omens,
+	                                   final Function<? super Collection<? extends R>, ? extends A> oracle)
+	{
+		Objects.requireNonNull(omens, "omens may not be null");
+		Objects.requireNonNull(oracle, "oracle may not be null");
+		omens.forEach(omen -> Objects.requireNonNull(omen, "omen may not be null"));
+
+		return Unfolding.beckon(oracle.apply(omens.stream()
+		                                          .map(omen -> omen.apply(hero))
+		                                          .toList()));
 	}
 
 	@Override

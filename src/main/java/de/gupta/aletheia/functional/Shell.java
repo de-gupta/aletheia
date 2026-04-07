@@ -2,10 +2,7 @@ package de.gupta.aletheia.functional;
 
 import de.gupta.aletheia.collection.Pair;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.SortedMap;
+import java.util.*;
 import java.util.function.*;
 import java.util.stream.Stream;
 
@@ -179,6 +176,13 @@ final class Shell<T> implements Unfolding<T>
 	public <R> R coronate(final Function<? super T, ? extends R> conclusion)
 	{
 		throw EmptyUnfoldingException.instance();
+	}
+
+	@Override
+	public <R, A> Unfolding<A> convoke(final Collection<Function<? super T, ? extends R>> omens,
+	                                   final Function<? super Collection<? extends R>, ? extends A> oracle)
+	{
+		return instance();
 	}
 
 	@Override
