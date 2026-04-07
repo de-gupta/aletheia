@@ -1,6 +1,7 @@
 module de.gupta.aletheia
 {
 	exports de.gupta.aletheia.functional;
+	exports de.gupta.aletheia.trials;
 	exports de.gupta.aletheia.forge;
 
 	exports de.gupta.aletheia.collection;
