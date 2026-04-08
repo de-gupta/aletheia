@@ -5,7 +5,7 @@ import de.gupta.aletheia.collection.Pair;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedCollection;
-import java.util.SortedMap;
+import java.util.SequencedMap;
 import java.util.function.*;
 import java.util.stream.Stream;
 
@@ -92,9 +92,7 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R> R cleave(final Predicate<? super T> judgement, R reward, R punishment);
 
-	<R> R cleave(final Map<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment);
-
-	<R> R cleave(final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment);
+	<R> R cleave(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment);
 
 	<R> R smite(final Map<Predicate<? super T>, Function<? super T, R>> judgments,
 	            final Supplier<? extends RuntimeException> wrath);

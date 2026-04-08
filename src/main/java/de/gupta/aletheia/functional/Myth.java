@@ -97,7 +97,7 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R> R cleave(final Map<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment)
+	public <R> R cleave(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment)
 	{
 		Objects.requireNonNull(judgments, "judgments may not be null");
 		Objects.requireNonNull(punishment, "punishment may not be null");
@@ -108,7 +108,7 @@ final class Myth<T> implements Unfolding<T>
 			Objects.requireNonNull(reward, "reward may not be null");
 		});
 
-		return judgments.entrySet()
+		return judgments.sequencedEntrySet()
 						.stream()
 						.filter(entry -> entry.getKey().test(hero))
 						.findFirst()
@@ -135,12 +135,6 @@ final class Myth<T> implements Unfolding<T>
 						.findFirst()
 						.map(entry -> entry.getValue().apply(hero))
 						.orElseThrow(wrath);
-	}
-
-	@Override
-	public <R> R cleave(final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments, final R punishment)
-	{
-		return cleave((Map<Predicate<? super T>, Function<? super T, R>>) judgments, punishment);
 	}
 
 	@Override
