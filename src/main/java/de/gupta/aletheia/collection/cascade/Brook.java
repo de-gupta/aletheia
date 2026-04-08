@@ -98,7 +98,7 @@ final class Brook<E> implements Cascade<E>
 		Objects.requireNonNull(development, "development may not be null");
 		return channel(s -> s.map(e -> Unfolding.beckon(e)
 		                                        .develop(judgement, development)
-		                                        .rescue(e))
+		                                        .ordain(e))
 		                     .filter(Objects::nonNull));
 	}
 
@@ -121,7 +121,7 @@ final class Brook<E> implements Cascade<E>
 		Objects.requireNonNull(ascension, "ascension may not be null");
 		return channel(s -> s.map(e -> Unfolding.beckon(e)
 		                                        .ascend(ascension, levels)
-		                                        .rescue(e))
+		                                        .ordain(e))
 		                     .filter(Objects::nonNull));
 	}
 
@@ -192,7 +192,7 @@ final class Brook<E> implements Cascade<E>
 		Objects.requireNonNull(plot, "plot may not be null");
 		return transmute(s -> s.flatMap(e -> Unfolding.beckon(plot.apply(e))
 		                                              .metamorphose(Cascade::stream)
-		                                              .rescue(Stream::empty)));
+		                                              .ordain(Stream::empty)));
 	}
 
 	@Override

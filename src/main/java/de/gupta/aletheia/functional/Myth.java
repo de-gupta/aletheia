@@ -138,10 +138,10 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public T rescue(final Supplier<? extends T> revelation)
+	public <R> R coronate(final Function<? super T, ? extends R> proclamation)
 	{
-		Objects.requireNonNull(revelation, "revelation may not be null");
-		return hero;
+		Objects.requireNonNull(proclamation, "conclusion may not be null");
+		return proclamation.apply(hero);
 	}
 
 	@Override
@@ -311,10 +311,10 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R> R coronate(final Function<? super T, ? extends R> conclusion)
+	public T ordain(final Supplier<? extends T> revelation)
 	{
-		Objects.requireNonNull(conclusion, "conclusion may not be null");
-		return conclusion.apply(hero);
+		Objects.requireNonNull(revelation, "revelation may not be null");
+		return hero;
 	}
 
 	@Override
@@ -329,7 +329,7 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public T rescue(final T manifestation)
+	public T ordain(final T manifestation)
 	{
 		return hero;
 	}

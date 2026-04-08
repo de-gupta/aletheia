@@ -53,7 +53,7 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	Stream<T> stream();
 
-	<R> R coronate(final Function<? super T, ? extends R> conclusion);
+	<R> R coronate(final Function<? super T, ? extends R> proclamation);
 
 	<R> R coronate(final Predicate<? super T> judgement,
 	               final Function<? super T, ? extends R> reward,
@@ -125,9 +125,9 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	/**
 	 * Recovery and renewal.
 	 */
-	T rescue(final Supplier<? extends T> revelation);
+	T ordain(final Supplier<? extends T> revelation);
 
-	T rescue(final T manifestation);
+	T ordain(final T manifestation);
 
 	Unfolding<T> resurrect(final Supplier<Unfolding<T>> grace);
 

@@ -167,7 +167,7 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R> R coronate(final Function<? super T, ? extends R> conclusion)
+	public <R> R coronate(final Function<? super T, ? extends R> proclamation)
 	{
 		throw EmptyUnfoldingException.instance();
 	}
@@ -187,13 +187,13 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public T rescue(final Supplier<? extends T> revelation)
+	public T ordain(final Supplier<? extends T> revelation)
 	{
 		return revelation.get();
 	}
 
 	@Override
-	public T rescue(final T manifestation)
+	public T ordain(final T manifestation)
 	{
 		return manifestation;
 	}
