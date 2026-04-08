@@ -99,7 +99,7 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<U, R> Unfolding<R> sanctify(final Function<? super T, U> marriage,
 	                             final BiFunction<? super T, ? super U, R> conjugation,
-	                             final Predicate<? super R> judgment,
+	                             final Predicate<? super R> judgement,
 	                             final Supplier<? extends RuntimeException> wrath);
 
 	/**

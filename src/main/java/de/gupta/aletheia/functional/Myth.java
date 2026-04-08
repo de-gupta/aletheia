@@ -264,15 +264,15 @@ final class Myth<T> implements Unfolding<T>
 	@Override
 	public <U, R> Unfolding<R> sanctify(final Function<? super T, U> marriage,
 										final BiFunction<? super T, ? super U, R> conjugation,
-										final Predicate<? super R> judgment,
+										final Predicate<? super R> judgement,
 										final Supplier<? extends RuntimeException> wrath)
 	{
 		Objects.requireNonNull(marriage, "marriage may not be null");
 		Objects.requireNonNull(conjugation, "conjugation may not be null");
-		Objects.requireNonNull(judgment, "judgment may not be null");
+		Objects.requireNonNull(judgement, "judgment may not be null");
 		Objects.requireNonNull(wrath, "wrath may not be null");
 
-		return emanate(marriage, conjugation).discern(judgment, wrath);
+		return emanate(marriage, conjugation).discern(judgement, wrath);
 	}
 
 	@Override

@@ -153,7 +153,7 @@ final class Shell<T> implements Unfolding<T>
 	@Override
 	public <U, R> Unfolding<R> sanctify(final Function<? super T, U> marriage,
 										final BiFunction<? super T, ? super U, R> conjugation,
-										final Predicate<? super R> judgment,
+										final Predicate<? super R> judgement,
 										final Supplier<? extends RuntimeException> wrath)
 	{
 		throw wrath.get();
