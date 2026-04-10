@@ -21,6 +21,30 @@ final class Brook<E> implements Cascade<E>
 		return ignite(source);
 	}
 
+	static <E> Cascade<E> kindle(final Collection<? extends E> elements)
+	{
+		Objects.requireNonNull(elements, "elements may not be null");
+		return ignite(() -> confluent(elements.stream()));
+	}
+
+	static <E> Cascade<E> kindle(final E[] elements)
+	{
+		Objects.requireNonNull(elements, "elements may not be null");
+		return ignite(() -> Arrays.stream(elements));
+	}
+
+	static <E> Cascade<E> kindle(final Stream<? extends E> stream)
+	{
+		Objects.requireNonNull(stream, "stream may not be null");
+		return ignite(() -> confluent(stream));
+	}
+
+	static <E> Cascade<E> kindle(final Crucible<E> crucible)
+	{
+		Objects.requireNonNull(crucible, "crucible may not be null");
+		return ignite(() -> crucible.manifest().stream());
+	}
+
 	private static <E> Brook<E> ignite(final Supplier<Stream<E>> source)
 	{
 		return new Brook<>(source);

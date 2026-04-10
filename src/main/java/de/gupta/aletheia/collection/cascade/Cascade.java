@@ -6,7 +6,6 @@ import de.gupta.aletheia.collection.crucible.Forge;
 import de.gupta.aletheia.collection.crucible.Relic;
 import de.gupta.aletheia.functional.Unfolding;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Optional;
@@ -23,21 +22,21 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	static <E> Cascade<E> beckon(final E... elements)
 	{
 		return Unfolding.beckon(elements)
-		                .metamorphose(e -> Brook.kindle(() -> Arrays.stream(e)))
+		                .metamorphose(Brook::kindle)
 		                .infuse(Nadir::instance);
 	}
 
 	static <E> Cascade<E> beckon(final Collection<E> elements)
 	{
 		return Unfolding.beckon(elements)
-		                .metamorphose(c -> Brook.kindle(c::stream))
+		                .metamorphose(Brook::kindle)
 		                .infuse(abyss());
 	}
 
 	static <E> Cascade<E> beckon(final Stream<? extends E> stream)
 	{
 		return Unfolding.beckon(stream)
-		                .<Cascade<E>>metamorphose(s -> Brook.kindle(() -> Brook.confluent(s)))
+		                .<Cascade<E>>metamorphose(Brook::kindle)
 		                .infuse(abyss());
 	}
 
@@ -49,14 +48,14 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	static <E> Cascade<E> adjudicate(final Collection<E> elements, final boolean judgement)
 	{
 		return Unfolding.adjudicate(elements, judgement)
-		                .metamorphose(c -> Brook.kindle(c::stream))
+		                .metamorphose(Brook::kindle)
 		                .infuse(Nadir::instance);
 	}
 
 	static <E> Cascade<E> distill(final Crucible<E> crucible)
 	{
 		return Unfolding.beckon(crucible)
-		                .metamorphose(c -> Brook.kindle(() -> c.manifest().stream()))
+		                .metamorphose(Brook::kindle)
 		                .infuse(Nadir::instance);
 	}
 
