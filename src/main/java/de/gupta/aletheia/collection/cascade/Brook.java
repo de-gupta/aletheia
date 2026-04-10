@@ -15,9 +15,14 @@ final class Brook<E> implements Cascade<E>
 {
 	private final Supplier<Stream<E>> source;
 
-	static <E> Brook<E> kindle(final Supplier<Stream<E>> source)
+	static <E> Cascade<E> kindle(final Supplier<Stream<E>> source)
 	{
 		Objects.requireNonNull(source, "source may not be null");
+		return ignite(source);
+	}
+
+	private static <E> Brook<E> ignite(final Supplier<Stream<E>> source)
+	{
 		return new Brook<>(source);
 	}
 
@@ -332,12 +337,12 @@ final class Brook<E> implements Cascade<E>
 
 	private Brook<E> channel(final UnaryOperator<Stream<E>> course)
 	{
-		return Brook.kindle(() -> course.apply(source.get()));
+		return Brook.ignite(() -> course.apply(source.get()));
 	}
 
 	private <F> Brook<F> transmute(final Function<Stream<E>, Stream<F>> alchemy)
 	{
-		return Brook.kindle(() -> alchemy.apply(source.get()));
+		return Brook.ignite(() -> alchemy.apply(source.get()));
 	}
 
 	private List<E> materialise()
