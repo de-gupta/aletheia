@@ -31,14 +31,14 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	{
 		return Unfolding.beckon(elements)
 		                .<Cascade<E>>evolve(c -> !c.isEmpty(), c -> Brook.kindle(c::stream))
-		                .infuse(Nadir::instance);
+		                .infuse(abyss());
 	}
 
 	static <E> Cascade<E> beckon(final Stream<? extends E> stream)
 	{
 		return Unfolding.beckon(stream)
 		                .<Cascade<E>>metamorphose(s -> Brook.kindle(() -> Brook.confluent(s)))
-		                .infuse(Nadir::instance);
+		                .infuse(abyss());
 	}
 
 	static <E> Cascade<E> abyss()
@@ -79,6 +79,9 @@ public sealed interface Cascade<E> permits Brook, Nadir
 
 	<R> R coronate(final Function<? super Stream<E>, ? extends R> conclusion);
 
+	<R> R coronate(final Function<? super Stream<E>, ? extends R> conclusion,
+	               final Supplier<? extends R> grace);
+
 	// -------------------------------------------------------------------------
 	// Transformation and transmutation
 	// -------------------------------------------------------------------------
@@ -103,6 +106,8 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	Cascade<E> ordain(final Comparator<? super E> order);
 
 	Cascade<E> ordain();
+
+	<F> Cascade<F> transfigure(final Function<Collection<? extends E>, ? extends Collection<F>> transmutation);
 
 	// -------------------------------------------------------------------------
 	// Judgment and branching

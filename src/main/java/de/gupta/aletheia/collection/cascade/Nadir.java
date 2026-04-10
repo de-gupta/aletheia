@@ -68,6 +68,13 @@ final class Nadir<E> implements Cascade<E>
 	}
 
 	@Override
+	public <R> R coronate(final Function<? super Stream<E>, ? extends R> conclusion, final Supplier<? extends R> grace)
+	{
+		Objects.requireNonNull(grace, "grace may not be null");
+		return grace.get();
+	}
+
+	@Override
 	public <F> Cascade<F> metamorphose(final Function<? super E, ? extends F> metamorphosis)
 	{
 		return instance();
@@ -124,6 +131,12 @@ final class Nadir<E> implements Cascade<E>
 
 	@Override
 	public Cascade<E> ordain()
+	{
+		return instance();
+	}
+
+	@Override
+	public <F> Cascade<F> transfigure(final Function<Collection<? extends E>, ? extends Collection<F>> transmutation)
 	{
 		return instance();
 	}

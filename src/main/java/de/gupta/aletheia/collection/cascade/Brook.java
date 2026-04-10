@@ -75,6 +75,13 @@ final class Brook<E> implements Cascade<E>
 	}
 
 	@Override
+	public <R> R coronate(final Function<? super Stream<E>, ? extends R> conclusion, final Supplier<? extends R> grace)
+	{
+		Objects.requireNonNull(grace, "grace may not be null");
+		return coronate(conclusion);
+	}
+
+	@Override
 	public <F> Cascade<F> metamorphose(final Function<? super E, ? extends F> metamorphosis)
 	{
 		Objects.requireNonNull(metamorphosis, "metamorphosis may not be null");
@@ -150,6 +157,16 @@ final class Brook<E> implements Cascade<E>
 	public Cascade<E> ordain()
 	{
 		return channel(s -> s.sorted((a, b) -> ((Comparable<E>) a).compareTo(b)));
+	}
+
+	@Override
+	public <F> Cascade<F> transfigure(final Function<Collection<? extends E>, ? extends Collection<F>> transmutation)
+	{
+		Objects.requireNonNull(transmutation, "transmutation may not be null");
+
+		return Unfolding.beckon(transmutation.apply(source.get().toList()))
+		                .metamorphose(Cascade::beckon)
+		                .infuse(Cascade::abyss);
 	}
 
 	@Override
