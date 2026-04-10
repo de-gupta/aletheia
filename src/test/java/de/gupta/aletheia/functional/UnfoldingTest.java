@@ -96,8 +96,8 @@ final class UnfoldingTest
 	}
 
 	@Nested
-	@DisplayName("Tests for rescue() method")
-	final class RescueTests
+	@DisplayName("Tests for infuse() method")
+	final class InfuseTests
 	{
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("testCases")
@@ -105,7 +105,7 @@ final class UnfoldingTest
 		<T> void shouldReturnValueOrFallback(String description, Unfolding<T> unfolding, T fallbackValue,
 											 Supplier<T> fallbackSupplier, T expectedResult, boolean useSupplier)
 		{
-			T result = useSupplier ? unfolding.ordain(fallbackSupplier) : unfolding.ordain(fallbackValue);
+			T result = useSupplier ? unfolding.infuse(fallbackSupplier) : unfolding.infuse(fallbackValue);
 
 			String fallbackDescription =
 					useSupplier ? "supplier returning " + expectedResult : String.valueOf(fallbackValue);
@@ -121,8 +121,8 @@ final class UnfoldingTest
 			Unfolding<String> unfolding = Unfolding.chaos();
 			Supplier<String> nullSupplier = null;
 
-			assertThatThrownBy(() -> unfolding.ordain(nullSupplier)).as(
-																			"ordain() with null revelation should throw NullPointerException")
+			assertThatThrownBy(() -> unfolding.infuse(nullSupplier)).as(
+																			"infuse() with null revelation should throw NullPointerException")
 			                                                        .isInstanceOf(NullPointerException.class)
 			                                                        .hasMessageContaining("revelation may not be null");
 		}
@@ -881,7 +881,7 @@ final class UnfoldingTest
 			unfolding
 					.discern(n -> n > 100)
 					.unlace(n -> n > 0, capturedValues::add)
-					.ordain(99)
+					.infuse(99)
 					.toString();
 
 			assertThat(capturedValues).as("Conditional unlace should not be called after discern makes unfolding empty")
@@ -1948,7 +1948,7 @@ final class UnfoldingTest
 			Unfolding<Integer> unfolding = Unfolding.beckon(42);
 
 			String result = unfolding.metamorphose(n -> n * 2).discern(n -> n > 50).metamorphose(Object::toString)
-			                         .develop(s -> s.length() == 2, s -> "0" + s).ordain("Not found");
+			                         .develop(s -> s.length() == 2, s -> "0" + s).infuse("Not found");
 
 			assertThat(result).as("Complex chain should produce expected result").isEqualTo("084");
 		}
@@ -1961,7 +1961,7 @@ final class UnfoldingTest
 			List<String> capturedValues = new ArrayList<>();
 
 			String result = unfolding.metamorphose(n -> n * 2).discern(n -> n < 50).metamorphose(Object::toString)
-			                         .unlace(capturedValues::add).ordain("Not found");
+			                         .unlace(capturedValues::add).infuse("Not found");
 
 			assertThat(result).as("Chain with filter making unfolding empty should use fallback")
 							  .isEqualTo("Not found");
@@ -2362,7 +2362,7 @@ final class UnfoldingTest
 		void prometheus()
 		{
 			String result = Unfolding.beckon("flame").develop(f -> f.equals("flame"), _ -> "blaze")
-			                         .cleave(b -> b.startsWith("b"), _ -> "light", _ -> "smoke").ordain("ash");
+			                         .cleave(b -> b.startsWith("b"), _ -> "light", _ -> "smoke").infuse("ash");
 
 			assertThat(result).isEqualTo("light");
 		}
@@ -2372,7 +2372,7 @@ final class UnfoldingTest
 		void orpheus()
 		{
 			String result = Unfolding.<String>chaos().develop(s -> s.length() > 5, String::toUpperCase)
-			                         .evolve(s -> s.startsWith("A"), _ -> "HARMONY").ordain("silence");
+			                         .evolve(s -> s.startsWith("A"), _ -> "HARMONY").infuse("silence");
 
 			assertThat(result).isEqualTo("silence");
 		}

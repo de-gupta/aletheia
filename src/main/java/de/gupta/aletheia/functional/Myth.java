@@ -311,7 +311,7 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public T ordain(final Supplier<? extends T> revelation)
+	public T infuse(final Supplier<? extends T> revelation)
 	{
 		return hero;
 	}
@@ -328,7 +328,7 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public T ordain(final T manifestation)
+	public T infuse(final T manifestation)
 	{
 		return hero;
 	}

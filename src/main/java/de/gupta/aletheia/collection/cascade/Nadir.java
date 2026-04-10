@@ -206,7 +206,7 @@ final class Nadir<E> implements Cascade<E>
 	}
 
 	@Override
-	public Collection<E> rescue(final Supplier<? extends Collection<? extends E>> revelation)
+	public Collection<E> infuse(final Supplier<? extends Collection<? extends E>> revelation)
 	{
 		Objects.requireNonNull(revelation, "revelation may not be null");
 		@SuppressWarnings("unchecked")
@@ -219,7 +219,7 @@ final class Nadir<E> implements Cascade<E>
 	// -------------------------------------------------------------------------
 
 	@Override
-	public Collection<E> rescue(final Collection<? extends E> manifestation)
+	public Collection<E> infuse(final Collection<? extends E> manifestation)
 	{
 		Objects.requireNonNull(manifestation, "manifestation may not be null");
 		@SuppressWarnings("unchecked")

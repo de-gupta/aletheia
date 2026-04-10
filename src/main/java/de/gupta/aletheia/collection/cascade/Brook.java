@@ -98,7 +98,7 @@ final class Brook<E> implements Cascade<E>
 		Objects.requireNonNull(development, "development may not be null");
 		return channel(s -> s.map(e -> Unfolding.beckon(e)
 		                                        .develop(judgement, development)
-		                                        .ordain(e))
+		                                        .infuse(e))
 		                     .filter(Objects::nonNull));
 	}
 
@@ -121,7 +121,7 @@ final class Brook<E> implements Cascade<E>
 		Objects.requireNonNull(ascension, "ascension may not be null");
 		return channel(s -> s.map(e -> Unfolding.beckon(e)
 		                                        .ascend(ascension, levels)
-		                                        .ordain(e))
+		                                        .infuse(e))
 		                     .filter(Objects::nonNull));
 	}
 
@@ -192,7 +192,7 @@ final class Brook<E> implements Cascade<E>
 		Objects.requireNonNull(plot, "plot may not be null");
 		return transmute(s -> s.flatMap(e -> Unfolding.beckon(plot.apply(e))
 		                                              .metamorphose(Cascade::stream)
-		                                              .ordain(Stream::empty)));
+		                                              .infuse(Stream::empty)));
 	}
 
 	@Override
@@ -253,7 +253,7 @@ final class Brook<E> implements Cascade<E>
 	}
 
 	@Override
-	public Collection<E> rescue(final Supplier<? extends Collection<? extends E>> revelation)
+	public Collection<E> infuse(final Supplier<? extends Collection<? extends E>> revelation)
 	{
 		Objects.requireNonNull(revelation, "revelation may not be null");
 		return summon();
@@ -264,7 +264,7 @@ final class Brook<E> implements Cascade<E>
 	// -------------------------------------------------------------------------
 
 	@Override
-	public Collection<E> rescue(final Collection<? extends E> manifestation)
+	public Collection<E> infuse(final Collection<? extends E> manifestation)
 	{
 		Objects.requireNonNull(manifestation, "manifestation may not be null");
 		return summon();

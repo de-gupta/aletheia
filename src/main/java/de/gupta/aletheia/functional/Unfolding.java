@@ -125,9 +125,9 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	/**
 	 * Recovery and renewal.
 	 */
-	T ordain(final Supplier<? extends T> revelation);
+	T infuse(final Supplier<? extends T> revelation);
 
-	T ordain(final T manifestation);
+	T infuse(final T manifestation);
 
 	Unfolding<T> resurrect(final Supplier<Unfolding<T>> grace);
 

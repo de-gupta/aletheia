@@ -41,21 +41,21 @@ final class CascadeBraidTest
 							"Equal rivers weave paired runes",
 							Cascade.beckon(1, 2),
 							Cascade.beckon("A", "B"),
-							(l, r) -> l.ordain(-1) + ":" + r.ordain("?"),
+							(l, r) -> l.infuse(-1) + ":" + r.infuse("?"),
 							List.of("1:A", "2:B")
 					),
 					new BraidCase(
 							"Longer left river invokes chaos on right tail",
 							Cascade.beckon(7, 8, 9),
 							Cascade.beckon("X"),
-							(l, r) -> l.ordain(-1) + "|" + r.ordain("void"),
+							(l, r) -> l.infuse(-1) + "|" + r.infuse("void"),
 							List.of("7|X", "8|void", "9|void")
 					),
 					new BraidCase(
 							"Longer right river invokes chaos on left tail",
 							Cascade.beckon(4),
 							Cascade.beckon("M", "N"),
-							(l, r) -> l.ordain(-1) + "-" + r.ordain("void"),
+							(l, r) -> l.infuse(-1) + "-" + r.infuse("void"),
 							List.of("4-M", "-1-N")
 					)
 			).map(tc -> Arguments.of(tc.as(), tc));
@@ -79,7 +79,7 @@ final class CascadeBraidTest
 		{
 			var result = Cascade.<Integer>abyss().braid(
 					Cascade.beckon("alpha", "beta"),
-					(left, right) -> left.ordain(-1) + ":" + right.ordain("?")
+					(left, right) -> left.infuse(-1) + ":" + right.infuse("?")
 			);
 
 			assertThat(result.summon()).containsExactly("-1:alpha", "-1:beta");

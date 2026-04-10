@@ -187,7 +187,7 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public T ordain(final Supplier<? extends T> revelation)
+	public T infuse(final Supplier<? extends T> revelation)
 	{
 		Objects.requireNonNull(revelation, "revelation may not be null");
 
@@ -195,7 +195,7 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public T ordain(final T manifestation)
+	public T infuse(final T manifestation)
 	{
 		return manifestation;
 	}

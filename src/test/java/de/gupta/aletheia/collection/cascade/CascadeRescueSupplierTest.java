@@ -12,8 +12,8 @@ import java.util.function.Supplier;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@DisplayName("Cascade rescue(supplier) tests")
-final class CascadeRescueSupplierTest
+@DisplayName("Cascade infuse(supplier) tests")
+final class CascadeInfuseSupplierTest
 {
 	@Nested
 	@DisplayName("Aspects of revelation choice")
@@ -25,7 +25,7 @@ final class CascadeRescueSupplierTest
 		{
 			var called = new AtomicBoolean(false);
 
-			var result = Cascade.beckon("a", "b").rescue(() ->
+			var result = Cascade.beckon("a", "b").infuse(() ->
 			{
 				called.set(true);
 				return List.of("x");
@@ -40,7 +40,7 @@ final class CascadeRescueSupplierTest
 		void shouldInvokeRevelationForAbyssAndReturnItUnchanged()
 		{
 			var fallback = new ArrayList<>(List.of("x", "y"));
-			var result = Cascade.<String>abyss().rescue(() -> fallback);
+			var result = Cascade.<String>abyss().infuse(() -> fallback);
 
 			assertThat(result).isSameAs(fallback);
 		}
@@ -56,7 +56,7 @@ final class CascadeRescueSupplierTest
 		{
 			Supplier<? extends java.util.Collection<? extends Integer>> revelation = null;
 
-			assertThatThrownBy(() -> Cascade.beckon(1).rescue(revelation))
+			assertThatThrownBy(() -> Cascade.beckon(1).infuse(revelation))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessage("revelation may not be null");
 		}
@@ -67,7 +67,7 @@ final class CascadeRescueSupplierTest
 		{
 			Supplier<? extends java.util.Collection<? extends Integer>> revelation = null;
 
-			assertThatThrownBy(() -> Cascade.<Integer>abyss().rescue(revelation))
+			assertThatThrownBy(() -> Cascade.<Integer>abyss().infuse(revelation))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessage("revelation may not be null");
 		}

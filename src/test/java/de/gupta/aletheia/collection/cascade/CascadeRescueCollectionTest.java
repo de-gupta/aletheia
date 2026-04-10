@@ -10,8 +10,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@DisplayName("Cascade rescue(collection) tests")
-final class CascadeRescueCollectionTest
+@DisplayName("Cascade infuse(collection) tests")
+final class CascadeInfuseCollectionTest
 {
 	@Nested
 	@DisplayName("Aspects of manifestation choice")
@@ -21,7 +21,7 @@ final class CascadeRescueCollectionTest
 		@DisplayName("should ignore manifestation for brook and return summon")
 		void shouldIgnoreManifestationForBrookAndReturnSummon()
 		{
-			var result = Cascade.beckon("north", "south").rescue(List.of("x", "y"));
+			var result = Cascade.beckon("north", "south").infuse(List.of("x", "y"));
 
 			assertThat(result).containsExactly("north", "south");
 		}
@@ -31,7 +31,7 @@ final class CascadeRescueCollectionTest
 		void shouldReturnManifestationReferenceForAbyss()
 		{
 			var manifestation = new ArrayList<>(List.of("x", "y"));
-			var result = Cascade.<String>abyss().rescue(manifestation);
+			var result = Cascade.<String>abyss().infuse(manifestation);
 
 			assertThat(result).isSameAs(manifestation);
 		}
@@ -45,7 +45,7 @@ final class CascadeRescueCollectionTest
 		@DisplayName("should reject null manifestation for brook")
 		void shouldRejectNullManifestationForBrook()
 		{
-			assertThatThrownBy(() -> Cascade.beckon(1).rescue((List<Integer>) null))
+			assertThatThrownBy(() -> Cascade.beckon(1).infuse((List<Integer>) null))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessage("manifestation may not be null");
 		}
@@ -54,7 +54,7 @@ final class CascadeRescueCollectionTest
 		@DisplayName("should reject null manifestation for abyss")
 		void shouldRejectNullManifestationForAbyss()
 		{
-			assertThatThrownBy(() -> Cascade.<Integer>abyss().rescue((List<Integer>) null))
+			assertThatThrownBy(() -> Cascade.<Integer>abyss().infuse((List<Integer>) null))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessage("manifestation may not be null");
 		}
