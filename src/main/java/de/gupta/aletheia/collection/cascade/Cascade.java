@@ -23,21 +23,21 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	{
 		return Unfolding.beckon(elements)
 		                .metamorphose(Brook::kindle)
-		                .infuse(Nadir::instance);
+		                .infuse(Cascade::abyss);
 	}
 
 	static <E> Cascade<E> beckon(final Collection<E> elements)
 	{
 		return Unfolding.beckon(elements)
 		                .metamorphose(Brook::kindle)
-		                .infuse(abyss());
+		                .infuse(Cascade::abyss);
 	}
 
 	static <E> Cascade<E> beckon(final Stream<? extends E> stream)
 	{
 		return Unfolding.beckon(stream)
 		                .<Cascade<E>>metamorphose(Brook::kindle)
-		                .infuse(abyss());
+		                .infuse(Cascade::abyss);
 	}
 
 	static <E> Cascade<E> abyss()
@@ -49,14 +49,14 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	{
 		return Unfolding.adjudicate(elements, judgement)
 		                .metamorphose(Brook::kindle)
-		                .infuse(Nadir::instance);
+		                .infuse(Cascade::abyss);
 	}
 
 	static <E> Cascade<E> distill(final Crucible<E> crucible)
 	{
 		return Unfolding.beckon(crucible)
 		                .metamorphose(Brook::kindle)
-		                .infuse(Nadir::instance);
+		                .infuse(Cascade::abyss);
 	}
 
 	// -------------------------------------------------------------------------
