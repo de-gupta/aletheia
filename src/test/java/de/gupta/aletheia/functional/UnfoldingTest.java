@@ -118,11 +118,11 @@ final class UnfoldingTest
 		@Test
 		void shouldThrowExceptionForNullSupplier()
 		{
-			Unfolding<String> unfolding = Unfolding.beckon("test");
+			Unfolding<String> unfolding = Unfolding.chaos();
 			Supplier<String> nullSupplier = null;
 
 			assertThatThrownBy(() -> unfolding.ordain(nullSupplier)).as(
-																			"alternatively() with null revelation should throw NullPointerException")
+																			"ordain() with null revelation should throw NullPointerException")
 			                                                        .isInstanceOf(NullPointerException.class)
 			                                                        .hasMessageContaining("revelation may not be null");
 		}

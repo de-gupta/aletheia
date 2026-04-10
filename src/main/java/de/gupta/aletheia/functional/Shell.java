@@ -189,6 +189,8 @@ final class Shell<T> implements Unfolding<T>
 	@Override
 	public T ordain(final Supplier<? extends T> revelation)
 	{
+		Objects.requireNonNull(revelation, "revelation may not be null");
+
 		return revelation.get();
 	}
 

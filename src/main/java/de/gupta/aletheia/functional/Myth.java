@@ -313,7 +313,6 @@ final class Myth<T> implements Unfolding<T>
 	@Override
 	public T ordain(final Supplier<? extends T> revelation)
 	{
-		Objects.requireNonNull(revelation, "revelation may not be null");
 		return hero;
 	}
 
