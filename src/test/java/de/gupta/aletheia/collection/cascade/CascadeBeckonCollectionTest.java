@@ -48,8 +48,8 @@ final class CascadeBeckonCollectionTest
 		private static Stream<Arguments> collectionShapes()
 		{
 			return Stream.of(
-					new CollectionShapeCase("An empty amphora yields the abyss",
-							List.of(), List.of(), Nadir.class, false, true),
+					new CollectionShapeCase("An empty amphora yields a supple but empty brook",
+							List.of(), List.of(), Brook.class, true, false),
 					new CollectionShapeCase("A mutable list enters as flowing brook",
 							new ArrayList<>(List.of("a", "b", "c")), List.of("a", "b", "c"), Brook.class,
 							true, false),

@@ -23,14 +23,14 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	static <E> Cascade<E> beckon(final E... elements)
 	{
 		return Unfolding.beckon(elements)
-		                .evolve(e -> e.length > 0, e -> (Cascade<E>) Brook.kindle(() -> Arrays.stream(e)))
+		                .<Cascade<E>>metamorphose(e -> Brook.kindle(() -> Arrays.stream(e)))
 		                .infuse(Nadir::instance);
 	}
 
 	static <E> Cascade<E> beckon(final Collection<E> elements)
 	{
 		return Unfolding.beckon(elements)
-		                .<Cascade<E>>evolve(c -> !c.isEmpty(), c -> Brook.kindle(c::stream))
+		                .<Cascade<E>>metamorphose(c -> Brook.kindle(c::stream))
 		                .infuse(abyss());
 	}
 
@@ -49,15 +49,14 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	static <E> Cascade<E> adjudicate(final Collection<E> elements, final boolean judgement)
 	{
 		return Unfolding.adjudicate(elements, judgement)
-		                .<Cascade<E>>evolve(c -> !c.isEmpty(), c -> Brook.kindle(c::stream))
+		                .<Cascade<E>>metamorphose(c -> Brook.kindle(c::stream))
 		                .infuse(Nadir::instance);
 	}
 
 	static <E> Cascade<E> distill(final Crucible<E> crucible)
 	{
 		return Unfolding.beckon(crucible)
-		                .<Cascade<E>>evolve(c -> !c.manifest().isEmpty(),
-								c -> Brook.kindle(() -> c.manifest().stream()))
+		                .<Cascade<E>>metamorphose(c -> Brook.kindle(() -> c.manifest().stream()))
 		                .infuse(Nadir::instance);
 	}
 

@@ -172,14 +172,17 @@ final class CascadeTransfigureTest
 	final class EmptyResultTests
 	{
 		@Test
-		@DisplayName("should yield abyss when transmutation returns empty collection")
-		void shouldYieldAbyssWhenTransmutationReturnsEmptyCollection()
+		@DisplayName("should yield supple empty brook when transmutation returns empty collection")
+		void shouldYieldSuppleBrookWhenTransmutationReturnsEmptyCollection()
 		{
 			var result = Cascade.beckon("atlas", "ares").transfigure(_ -> List.of());
 
-			assertThat(result)
-					.as("empty collection result collapses to abyss, as beckon treats empty collections as nadir")
-					.isSameAs(Cascade.abyss());
+			assertThat(result.supple())
+					.as("empty transmutation result should remain a supple brook, not abyss")
+					.isTrue();
+			assertThat(result.summon())
+					.as("summon on empty transmutation result should return empty collection")
+					.isEmpty();
 		}
 	}
 }

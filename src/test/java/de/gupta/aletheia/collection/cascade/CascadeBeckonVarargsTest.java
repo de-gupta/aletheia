@@ -49,8 +49,8 @@ final class CascadeBeckonVarargsTest
 		private static Stream<Arguments> invocationShapes()
 		{
 			return Stream.of(
-					new BeckonVarargsCase("The river begins with no stones",
-							new Object[]{}, List.of(), Nadir.class, false, true),
+					new BeckonVarargsCase("The river begins with no stones yet still flows",
+							new Object[]{}, List.of(), Brook.class, true, false),
 					new BeckonVarargsCase("A single omen starts the stream",
 							new Object[]{"atlas"}, List.of("atlas"), Brook.class, true, false),
 					new BeckonVarargsCase("Many omens flow in sequence",

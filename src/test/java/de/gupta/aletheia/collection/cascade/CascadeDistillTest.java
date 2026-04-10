@@ -37,19 +37,13 @@ final class CascadeDistillTest
 						.as("distilled summon should preserve crucible manifestation for %s", as)
 						.containsExactlyElementsOf(tc.expectedElements());
 			}
-			else
-			{
-				assertThat(cascade.sterile())
-						.as("empty manifestation should distill to sterile cascade for %s", as)
-						.isTrue();
-			}
 		}
 
 		private static Stream<Arguments> distillationShapes()
 		{
 			return Stream.of(
-					new DistillationCase("An empty forge condenses to nadir",
-							Crucible.kindle(List.of()), List.of(), Nadir.class),
+					new DistillationCase("An empty forge distils to a supple but empty brook",
+							Crucible.kindle(List.of()), List.of(), Brook.class),
 					new DistillationCase("A forged sequence becomes brook",
 							Crucible.kindle(List.of("iron", "silver")), List.of("iron", "silver"), Brook.class),
 					new DistillationCase("A relic sequence also becomes brook",

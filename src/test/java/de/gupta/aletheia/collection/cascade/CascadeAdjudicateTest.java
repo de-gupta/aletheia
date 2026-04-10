@@ -55,8 +55,8 @@ final class CascadeAdjudicateTest
 					new AdjudicationCase("When judgement rejects, all returns to abyss",
 							List.of("helios", "selene"), false,
 							List.of(), Nadir.class, false, true),
-					new AdjudicationCase("Even blessed emptiness is still abyss",
-							List.of(), true, List.of(), Nadir.class, false, true),
+					new AdjudicationCase("Blessed emptiness yields a supple but empty brook",
+							List.of(), true, List.of(), Brook.class, true, false),
 					new AdjudicationCase("Null-bearing offerings can still pass judgement",
 							Arrays.asList("atlas", null), true,
 							Arrays.asList("atlas", null), Brook.class, true, false)
