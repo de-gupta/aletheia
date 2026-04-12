@@ -8,7 +8,7 @@ import java.util.function.BiFunction;
 @FunctionalInterface
 public interface Loom<E>
 {
-	static <E> Loom<E> harness(final Iterable<? extends E> iterable)
+	static <E> Loom<E> thread(final Iterable<? extends E> iterable)
 	{
 		Objects.requireNonNull(iterable);
 		return new Loom<>()

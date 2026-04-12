@@ -30,7 +30,7 @@ final class LoomTest
 		void shouldWeaveElements(final String description, final List<Integer> elements, final Integer initial,
 								 final BiFunction<Integer, Integer, Integer> weaver, final Integer expected)
 		{
-			Loom<Integer> loom = Loom.harness(elements);
+			Loom<Integer> loom = Loom.thread(elements);
 			Integer result = loom.weave(initial, weaver);
 			assertThat(result).isEqualTo(expected);
 		}
@@ -54,9 +54,9 @@ final class LoomTest
 		void shouldWorkWithSubtypes()
 		{
 			List<Double> doubles = Arrays.asList(1.1, 2.2, 3.3);
-			Loom<Number> loom = Loom.harness(doubles);
+			Loom<Number> loom = Loom.thread(doubles);
 
-			Number sum = loom.weave(0.0, (acc, n) -> acc.doubleValue() + n.doubleValue());
+			Number sum = loom.weave(0.0, (acc, n) -> acc + n.doubleValue());
 			assertThat(sum.doubleValue()).isEqualTo(6.6);
 		}
 	}
@@ -71,7 +71,7 @@ final class LoomTest
 		void shouldForgeElements(final String description, final List<Integer> elements,
 								 final BinaryOperator<Integer> operator, final Integer expected)
 		{
-			Loom<Integer> loom = Loom.harness(elements);
+			Loom<Integer> loom = Loom.thread(elements);
 			Unfolding<Integer> result = loom.forge(operator);
 			assertThat(result.summon()).isEqualTo(expected);
 		}
@@ -80,7 +80,7 @@ final class LoomTest
 		@DisplayName("Should return chaos when forging empty loom")
 		void shouldReturnChaosForEmptyLoom()
 		{
-			Loom<Integer> loom = Loom.harness(Collections.emptyList());
+			Loom<Integer> loom = Loom.thread(Collections.emptyList());
 			Unfolding<Integer> result = loom.forge(Integer::sum);
 			assertThat(result.sterile()).isTrue();
 		}
@@ -90,7 +90,7 @@ final class LoomTest
 		void shouldWorkWithFlexibleBiFunction()
 		{
 			List<Integer> elements = Arrays.asList(1, 2, 3);
-			Loom<Integer> loom = Loom.harness(elements);
+			Loom<Integer> loom = Loom.thread(elements);
 
 			BiFunction<Number, Number, Integer> sumOperator = (n1, n2) -> n1.intValue() + n2.intValue();
 			Unfolding<Integer> result = loom.forge(sumOperator);
@@ -120,7 +120,7 @@ final class LoomTest
 		void webOfFate()
 		{
 			List<String> threads = Arrays.asList("Clotho", "Lachesis", "Atropos");
-			Loom<String> loom = Loom.harness(threads);
+			Loom<String> loom = Loom.thread(threads);
 
 			String tapestry = loom.weave("The Fates: ", (acc, thread) -> acc + thread + ", ");
 			assertThat(tapestry).isEqualTo("The Fates: Clotho, Lachesis, Atropos, ");
@@ -131,7 +131,7 @@ final class LoomTest
 		void mjolnirForge()
 		{
 			List<Integer> metals = Arrays.asList(10, 20, 30, 40);
-			Loom<Integer> loom = Loom.harness(metals);
+			Loom<Integer> loom = Loom.thread(metals);
 
 			Unfolding<Integer> hammerPower = loom.forge(Integer::sum);
 			assertThat(hammerPower.summon()).isEqualTo(100);

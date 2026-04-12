@@ -74,9 +74,9 @@ final class Brook<E> implements Cascade<E>
 		return Collections.unmodifiableList(new ArrayList<>(materialise()));
 	}
 
-	// -------------------------------------------------------------------------
-	// Presence and extraction
-	// -------------------------------------------------------------------------
+	/**
+	 * Presence and extraction
+	 */
 
 	@Override
 	public Stream<E> stream()
@@ -138,9 +138,9 @@ final class Brook<E> implements Cascade<E>
 		                     .filter(Objects::nonNull));
 	}
 
-	// -------------------------------------------------------------------------
-	// Transformation and transmutation
-	// -------------------------------------------------------------------------
+	/**
+	 * Transformation and transmutation
+	 */
 
 	@Override
 	public <F> Cascade<F> evolve(final Predicate<? super E> judgement,
@@ -228,9 +228,9 @@ final class Brook<E> implements Cascade<E>
 		                                 .filter(Objects::nonNull)));
 	}
 
-	// -------------------------------------------------------------------------
-	// Judgment and branching
-	// -------------------------------------------------------------------------
+	/**
+	 * Judgements and branching
+	 */
 
 	@Override
 	public <F> Cascade<F> entwine(final Function<? super E, Cascade<F>> plot)
@@ -257,9 +257,9 @@ final class Brook<E> implements Cascade<E>
 		return transmute(s -> confluent(s.map(e -> conjugation.apply(e, consort)).filter(Objects::nonNull)));
 	}
 
-	// -------------------------------------------------------------------------
-	// Composition
-	// -------------------------------------------------------------------------
+	/**
+	 * Composition
+	 */
 
 	@Override
 	public <F, G> Cascade<G> braid(final Cascade<F> consort,
@@ -288,14 +288,14 @@ final class Brook<E> implements Cascade<E>
 	public <R> R weave(final R initial, final BiFunction<? super R, ? super E, ? extends R> operation)
 	{
 		Objects.requireNonNull(operation, "operation may not be null");
-		return Loom.harness(materialise()).weave(initial, operation);
+		return Loom.thread(materialise()).weave(initial, operation);
 	}
 
 	@Override
 	public Unfolding<E> smelt(final BiFunction<? super E, ? super E, ? extends E> operation)
 	{
 		Objects.requireNonNull(operation, "operation may not be null");
-		return Loom.harness(materialise()).forge(operation);
+		return Loom.thread(materialise()).forge(operation);
 	}
 
 	@Override
@@ -305,9 +305,9 @@ final class Brook<E> implements Cascade<E>
 		return summon();
 	}
 
-	// -------------------------------------------------------------------------
-	// Folding / reduction
-	// -------------------------------------------------------------------------
+	/**
+	 * Folding / reduction
+	 */
 
 	@Override
 	public Collection<E> infuse(final Collection<? extends E> manifestation)
@@ -323,9 +323,9 @@ final class Brook<E> implements Cascade<E>
 		return this;
 	}
 
-	// -------------------------------------------------------------------------
-	// Recovery and renewal
-	// -------------------------------------------------------------------------
+	/**
+	 * Recovery and renewal
+	 */
 
 	@Override
 	public Cascade<E> revive(final Supplier<? extends E> grace)
@@ -355,9 +355,9 @@ final class Brook<E> implements Cascade<E>
 		return "Cascade[...]";
 	}
 
-	// -------------------------------------------------------------------------
-	// Effects
-	// -------------------------------------------------------------------------
+	/**
+	 * Effects
+	 */
 
 	private Brook<E> channel(final UnaryOperator<Stream<E>> course)
 	{

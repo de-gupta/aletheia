@@ -215,7 +215,7 @@ final class Nadir<E> implements Cascade<E>
 	public Unfolding<E> smelt(final BiFunction<? super E, ? super E, ? extends E> operation)
 	{
 		Objects.requireNonNull(operation, "operation may not be null");
-		return Loom.<E>harness(List.of()).forge(operation);
+		return Loom.<E>thread(List.of()).forge(operation);
 	}
 
 	@Override
