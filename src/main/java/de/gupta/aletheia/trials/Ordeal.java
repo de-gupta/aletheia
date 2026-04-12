@@ -10,5 +10,5 @@ public interface Ordeal<T, R>
 		return function::apply;
 	}
 
-	R endure(final T boon) throws Exception;
+	R endure(final T sacrifice) throws Exception;
 }
