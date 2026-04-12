@@ -8,7 +8,7 @@ final class Fury<T> implements Fallible<T>
 {
 	private final Exception doom;
 
-	static <T> Fury<T> invoke(final Exception doom)
+	static <T> Fury<T> arise(final Exception doom)
 	{
 		return new Fury<>(doom);
 	}

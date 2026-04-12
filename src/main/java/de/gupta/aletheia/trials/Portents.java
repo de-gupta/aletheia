@@ -21,7 +21,7 @@ final class Portents
 			}
 		}
 
-		return Fury.invoke(fury);
+		return Fury.arise(fury);
 	}
 
 	private Portents()
