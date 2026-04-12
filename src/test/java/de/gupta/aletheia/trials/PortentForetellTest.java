@@ -119,9 +119,9 @@ final class PortentForetellTest
 										 () -> Portent.foretell(null, IllegalArgumentException::getMessage),
 										 "omen may not be null"),
 								 new InvalidForetellCase(
-										 "a null prophecy should be rejected",
+										 "a null remedy should be rejected",
 										 () -> Portent.foretell(IllegalArgumentException.class, null),
-										 "prophecy may not be null"))
+										 "remedy may not be null"))
 			             .map(testCase -> Arguments.of(testCase.description,
 								 testCase.invocation,
 								 testCase.expectedMessage));
