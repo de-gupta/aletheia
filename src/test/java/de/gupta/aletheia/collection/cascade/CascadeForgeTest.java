@@ -18,7 +18,7 @@ final class CascadeForgeTest
 		@DisplayName("should reduce brook into unfolding result")
 		void shouldReduceBrookIntoUnfoldingResult()
 		{
-			var result = Cascade.beckon(1, 2, 3).forge(Integer::sum);
+			var result = Cascade.beckon(1, 2, 3).smelt(Integer::sum);
 
 			assertThat(result.summon())
 					.as("forge(sum) should yield summed unfolding")
@@ -29,7 +29,7 @@ final class CascadeForgeTest
 		@DisplayName("should produce sterile unfolding for abyss")
 		void shouldProduceSterileUnfoldingForAbyss()
 		{
-			var result = Cascade.<Integer>abyss().forge(Integer::sum);
+			var result = Cascade.<Integer>abyss().smelt(Integer::sum);
 
 			assertThat(result.sterile())
 					.as("forging abyss should remain empty")
@@ -45,7 +45,7 @@ final class CascadeForgeTest
 		@DisplayName("should reject null operation for brook")
 		void shouldRejectNullOperationForBrook()
 		{
-			assertThatThrownBy(() -> Cascade.beckon(1).forge(null))
+			assertThatThrownBy(() -> Cascade.beckon(1).smelt(null))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessage("operation may not be null");
 		}
@@ -54,7 +54,7 @@ final class CascadeForgeTest
 		@DisplayName("should reject null operation for abyss")
 		void shouldRejectNullOperationForAbyss()
 		{
-			assertThatThrownBy(() -> Cascade.<Integer>abyss().forge(null))
+			assertThatThrownBy(() -> Cascade.<Integer>abyss().smelt(null))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessage("operation may not be null");
 		}

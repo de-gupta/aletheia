@@ -257,10 +257,10 @@ final class CascadeListMonadTest
 
 		@Test
 		@DisplayName("empty brook forge returns chaos — no elements to reduce")
-		void emptyBrookForgeReturnsChaos()
+		void emptyBrookSmeltReturnsChaos()
 		{
 			var result = Cascade.beckon(List.<Integer>of())
-			                    .forge(Integer::sum);
+			                    .smelt(Integer::sum);
 
 			assertThat(result.sterile()).isTrue();
 		}

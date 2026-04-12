@@ -14,9 +14,9 @@ import java.util.stream.Stream;
 
 public sealed interface Cascade<E> permits Brook, Nadir
 {
-	// -------------------------------------------------------------------------
-	// Static factories
-	// -------------------------------------------------------------------------
+	/**
+	 * Static factories
+	 */
 
 	@SafeVarargs
 	static <E> Cascade<E> beckon(final E... elements)
@@ -59,9 +59,9 @@ public sealed interface Cascade<E> permits Brook, Nadir
 		                .infuse(Cascade::abyss);
 	}
 
-	// -------------------------------------------------------------------------
-	// Presence and extraction
-	// -------------------------------------------------------------------------
+	/**
+	 * Presence and extraction
+	 */
 
 	boolean sterile();
 
@@ -80,9 +80,9 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	<R> R coronate(final Function<? super Stream<E>, ? extends R> conclusion,
 	               final Supplier<? extends R> grace);
 
-	// -------------------------------------------------------------------------
-	// Transformation and transmutation
-	// -------------------------------------------------------------------------
+	/**
+	 * Transformation and transmutation.
+	 */
 
 	<F> Cascade<F> metamorphose(final Function<? super E, ? extends F> metamorphosis);
 
@@ -107,9 +107,9 @@ public sealed interface Cascade<E> permits Brook, Nadir
 
 	<F> Cascade<F> transfigure(final Function<Collection<? extends E>, ? extends Collection<F>> transmutation);
 
-	// -------------------------------------------------------------------------
-	// Judgment and branching
-	// -------------------------------------------------------------------------
+	/**
+	 * Judgement and branching
+	 */
 
 	Cascade<E> discern(final Predicate<? super E> judgement);
 
@@ -120,9 +120,9 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	                      final Function<? super E, ? extends F> reward,
 	                      final Function<? super E, ? extends F> punishment);
 
-	// -------------------------------------------------------------------------
-	// Composition
-	// -------------------------------------------------------------------------
+	/**
+	 * Composition
+	 */
 
 	<F> Cascade<F> entwine(final Function<? super E, Cascade<F>> plot);
 
@@ -134,17 +134,17 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	<F, G> Cascade<G> braid(final Cascade<F> consort,
 	                        final BiFunction<Unfolding<E>, Unfolding<F>, ? extends G> weaver);
 
-	// -------------------------------------------------------------------------
-	// Folding / reduction
-	// -------------------------------------------------------------------------
+	/**
+	 * Folding / reduction
+	 */
 
 	<R> R weave(final R initial, final BiFunction<? super R, ? super E, ? extends R> operation);
 
-	Unfolding<E> forge(final BiFunction<? super E, ? super E, ? extends E> operation);
+	Unfolding<E> smelt(final BiFunction<? super E, ? super E, ? extends E> operation);
 
-	// -------------------------------------------------------------------------
-	// Recovery and renewal
-	// -------------------------------------------------------------------------
+	/**
+	 * Recovery and renewal
+	 */
 
 	Collection<E> infuse(final Supplier<? extends Collection<? extends E>> revelation);
 
@@ -154,9 +154,9 @@ public sealed interface Cascade<E> permits Brook, Nadir
 
 	Cascade<E> revive(final Supplier<? extends E> grace);
 
-	// -------------------------------------------------------------------------
-	// Effects
-	// -------------------------------------------------------------------------
+	/**
+	 * Effects and interruption
+	 */
 
 	Cascade<E> unlace(final Consumer<? super E> impregnator);
 

@@ -292,7 +292,7 @@ final class Brook<E> implements Cascade<E>
 	}
 
 	@Override
-	public Unfolding<E> forge(final BiFunction<? super E, ? super E, ? extends E> operation)
+	public Unfolding<E> smelt(final BiFunction<? super E, ? super E, ? extends E> operation)
 	{
 		Objects.requireNonNull(operation, "operation may not be null");
 		return Loom.harness(materialise()).forge(operation);
