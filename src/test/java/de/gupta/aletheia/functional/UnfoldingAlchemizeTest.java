@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-final class UnfoldingAlchemizeTests
+final class UnfoldingAlchemizeTest
 {
 	@Nested
 	@DisplayName("Tests for alchemize() method")
@@ -21,8 +21,8 @@ final class UnfoldingAlchemizeTests
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("alchemyTests")
 		<T, R> void metamorphose(final String description, final Unfolding<T> source,
-								 final Function<T, Optional<? extends R>> potion,
-								 final Unfolding<R> expectedResult)
+		                         final Function<T, Optional<? extends R>> potion,
+		                         final Unfolding<R> expectedResult)
 		{
 			assertThat(source.alchemize(potion))
 					.as("alchemize() for %s should result in %s when the potion is %s", source, expectedResult, potion)
@@ -140,12 +140,12 @@ final class UnfoldingAlchemizeTests
 		}
 
 		private record AlchemyTestCase<T, R>(String description, Unfolding<T> source,
-											 Function<T, Optional<? extends R>> potion,
-											 Unfolding<R> expectedResult)
+		                                     Function<T, Optional<? extends R>> potion,
+		                                     Unfolding<R> expectedResult)
 		{
 			static <T, R> AlchemyTestCase<T, R> of(final String description, final Unfolding<T> source,
-												   final Function<T, Optional<? extends R>> potion,
-												   final Unfolding<R> expectedResult)
+			                                       final Function<T, Optional<? extends R>> potion,
+			                                       final Unfolding<R> expectedResult)
 			{
 				return new AlchemyTestCase<>(description, source, potion, expectedResult);
 			}

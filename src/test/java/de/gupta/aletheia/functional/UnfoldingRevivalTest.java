@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-final class UnfoldingRevivalTests
+final class UnfoldingRevivalTest
 {
 	private record TestRecord(String name, int age)
 	{
@@ -30,7 +30,7 @@ final class UnfoldingRevivalTests
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("mythicAlternates")
 		<U> void shouldReturnTheSameInstanceWhenMyth(final String description, final Unfolding<U> myth,
-													 final U alternate)
+		                                             final U alternate)
 		{
 			assertThat(myth.revive(() -> alternate))
 					.as("revive() should return the same instance when a myth")
@@ -90,7 +90,7 @@ final class UnfoldingRevivalTests
 		private record MythicAlternateTestCase<U>(String description, Unfolding<U> myth, U alternate)
 		{
 			static <U> MythicAlternateTestCase<U> of(final String description, final Unfolding<U> myth,
-													 final U alternate)
+			                                         final U alternate)
 			{
 				return new MythicAlternateTestCase<>(description, myth, alternate);
 			}

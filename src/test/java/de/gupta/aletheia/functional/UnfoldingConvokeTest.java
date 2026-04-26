@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-final class UnfoldingConvokeTests
+final class UnfoldingConvokeTest
 {
 	@Nested
 	@DisplayName("Tests for convoke() method")

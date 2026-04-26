@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("Unfolding metamorphose tests")
-class UnfoldingMetamorphoseTests
+class UnfoldingMetamorphoseTest
 {
 	@Nested
 	@DisplayName("Basic metamorphose tests")
@@ -29,8 +29,8 @@ class UnfoldingMetamorphoseTests
 		@MethodSource("basicMetamorphoseTestCases")
 		@DisplayName("Should transform value correctly")
 		<T, R> void testBasicMetamorphose(final String description, final Unfolding<T> source,
-										  final Function<T, R> metamorphosis,
-										  final Unfolding<R> expectedResult)
+		                                  final Function<T, R> metamorphosis,
+		                                  final Unfolding<R> expectedResult)
 		{
 			var actual = source.metamorphose(metamorphosis);
 			assertThat(actual)
@@ -110,9 +110,9 @@ class UnfoldingMetamorphoseTests
 		@MethodSource("metamorphoseWithExceptionTestCases")
 		@DisplayName("Should transform value correctly when no exception occurs")
 		<T, R> void testMetamorphoseWithExceptionSuccess(final String description, final Unfolding<T> source,
-														 final Function<T, R> metamorphosis,
-														 final Supplier<RuntimeException> wrath,
-														 final Unfolding<R> expectedResult)
+		                                                 final Function<T, R> metamorphosis,
+		                                                 final Supplier<RuntimeException> wrath,
+		                                                 final Unfolding<R> expectedResult)
 		{
 			var actual = source.metamorphose(metamorphosis, wrath);
 			assertThat(actual)
@@ -125,9 +125,9 @@ class UnfoldingMetamorphoseTests
 		@MethodSource("metamorphoseExceptionThrowingTestCases")
 		@DisplayName("Should throw supplied exception when metamorphosis throws")
 		<T, R> void testMetamorphoseWithExceptionThrows(final String description, final Unfolding<T> source,
-														final Function<T, R> metamorphosis,
-														final Supplier<RuntimeException> wrath,
-														final Class<? extends RuntimeException> expectedExceptionType)
+		                                                final Function<T, R> metamorphosis,
+		                                                final Supplier<RuntimeException> wrath,
+		                                                final Class<? extends RuntimeException> expectedExceptionType)
 		{
 			assertThatThrownBy(() -> source.metamorphose(metamorphosis, wrath))
 					.as("metamorphose() with exception supplier should throw %s", expectedExceptionType.getSimpleName())
@@ -366,8 +366,8 @@ class UnfoldingMetamorphoseTests
 		@MethodSource("dualMetamorphoseTestCases")
 		@DisplayName("Should transform value with two functions correctly")
 		<T, U, R> void testDualMetamorphose(final String description, final Unfolding<T> source,
-											final Function<T, U> fate, final Function<T, R> destiny,
-											final Unfolding<Pair<U, R>> expectedResult)
+		                                    final Function<T, U> fate, final Function<T, R> destiny,
+		                                    final Unfolding<Pair<U, R>> expectedResult)
 		{
 			var actual = source.metamorphose(fate, destiny);
 			assertThat(actual)

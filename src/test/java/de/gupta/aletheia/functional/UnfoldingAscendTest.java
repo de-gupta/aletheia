@@ -15,10 +15,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("Unfolding ascend tests")
-final class UnfoldingAscendTests
+final class UnfoldingAscendTest
 {
 	private record AscendTestCase<T>(Unfolding<T> source, UnaryOperator<T> ascension,
-									 int levels, Unfolding<T> expectedResult)
+	                                 int levels, Unfolding<T> expectedResult)
 	{
 	}
 
@@ -38,8 +38,8 @@ final class UnfoldingAscendTests
 		@MethodSource("basicAscendTestCases")
 		@DisplayName("Should apply ascension correctly for given levels")
 		<T> void testBasicAscend(final String description, final Unfolding<T> source,
-								 final UnaryOperator<T> ascension, final int levels,
-								 final Unfolding<T> expectedResult)
+		                         final UnaryOperator<T> ascension, final int levels,
+		                         final Unfolding<T> expectedResult)
 		{
 			var actual = source.ascend(ascension, levels);
 			assertThat(actual)
@@ -197,7 +197,7 @@ final class UnfoldingAscendTests
 		@MethodSource("complexAscendTestCases")
 		@DisplayName("Should handle complex transformations correctly")
 		<T> void testComplexAscendTransformations(final String description,
-												  final AscendTestCase<T> testCase)
+		                                          final AscendTestCase<T> testCase)
 		{
 			var result = testCase.source().ascend(testCase.ascension(), testCase.levels());
 

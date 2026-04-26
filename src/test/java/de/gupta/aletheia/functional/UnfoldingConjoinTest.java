@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-final class UnfoldingConjoinTests
+final class UnfoldingConjoinTest
 {
 	@Nested
 	@DisplayName("Tests for emanate() method")
@@ -29,7 +29,7 @@ final class UnfoldingConjoinTests
 		@DisplayName("should emanate correct values when everything is present")
 		@MethodSource("emanateTestCases")
 		<T, U, R> void testEmanate(final String description, final Unfolding<T> source, final Function<T, U> marriage,
-								   final BiFunction<T, U, R> conjugation, final Unfolding<R> expectedResult)
+		                           final BiFunction<T, U, R> conjugation, final Unfolding<R> expectedResult)
 		{
 			assertThat(source.emanate(marriage, conjugation))
 					.as("emanate() for %s should result in %s", source, expectedResult)
@@ -40,7 +40,7 @@ final class UnfoldingConjoinTests
 		@MethodSource("emptyMarriageTestCases")
 		@DisplayName("should return empty unfolding when marriage produces empty consort")
 		<T, U, R> void testEmanateWithEmptyConsort(final String description, final Unfolding<T> source,
-												   final BiFunction<T, U, R> conjugation)
+		                                           final BiFunction<T, U, R> conjugation)
 		{
 			final Function<T, U> marriage = _ -> null;
 			assertThat(source.emanate(marriage, conjugation))
@@ -202,12 +202,12 @@ final class UnfoldingConjoinTests
 		}
 
 		private record EmptyMarriageTestCase<T, R>(String description, Unfolding<T> source,
-												   BiFunction<T, T, R> conjugation)
+		                                           BiFunction<T, T, R> conjugation)
 		{
 		}
 
 		private record EmanateTestCase<T, U, R>(String description, Unfolding<T> source, Function<T, U> marriage,
-												BiFunction<T, U, R> conjugation, Unfolding<R> expectedResult)
+		                                        BiFunction<T, U, R> conjugation, Unfolding<R> expectedResult)
 		{
 		}
 	}
@@ -220,8 +220,8 @@ final class UnfoldingConjoinTests
 		@DisplayName("should sanctify correct values when judgment passes")
 		@MethodSource("sanctifyTestCases")
 		<T, U, R> void testSanctify(final String description, final Unfolding<T> source, final Function<T, U> marriage,
-									final BiFunction<T, U, R> conjugation, final Predicate<R> judgment,
-									final Unfolding<R> expectedResult)
+		                            final BiFunction<T, U, R> conjugation, final Predicate<R> judgment,
+		                            final Unfolding<R> expectedResult)
 		{
 			final Supplier<RuntimeException> wrath = () -> new IllegalStateException("Judgment failed");
 
@@ -234,9 +234,9 @@ final class UnfoldingConjoinTests
 		@DisplayName("should throw exception when judgment fails")
 		@MethodSource("sanctifyJudgmentFailureTestCases")
 		<T, U, R> void testSanctifyWithFailedJudgment(final String description, final Unfolding<T> source,
-													  final Function<T, U> marriage,
-													  final BiFunction<T, U, R> conjugation,
-													  final Predicate<R> judgment, final String expectedMessage)
+		                                              final Function<T, U> marriage,
+		                                              final BiFunction<T, U, R> conjugation,
+		                                              final Predicate<R> judgment, final String expectedMessage)
 		{
 			final Supplier<RuntimeException> wrath = () -> new IllegalArgumentException(expectedMessage);
 
@@ -250,8 +250,8 @@ final class UnfoldingConjoinTests
 		@MethodSource("sanctifyEmptyMarriageTestCases")
 		@DisplayName("should throw exception when marriage produces empty consort")
 		<T, U, R> void testSanctifyWithEmptyConsort(final String description, final Unfolding<T> source,
-													final BiFunction<T, U, R> conjugation, final Predicate<R> judgment,
-													final String expectedMessage)
+		                                            final BiFunction<T, U, R> conjugation, final Predicate<R> judgment,
+		                                            final String expectedMessage)
 		{
 			final Function<T, U> marriage = _ -> null;
 			final Supplier<RuntimeException> wrath = () -> new IllegalStateException(expectedMessage);
@@ -462,21 +462,21 @@ final class UnfoldingConjoinTests
 		}
 
 		private record SanctifyEmptyMarriageTestCase<T, R>(String description, Unfolding<T> source,
-														   BiFunction<T, T, R> conjugation, Predicate<R> judgment,
-														   String expectedMessage)
+		                                                   BiFunction<T, T, R> conjugation, Predicate<R> judgment,
+		                                                   String expectedMessage)
 		{
 		}
 
 		private record SanctifyJudgmentFailureTestCase<T, U, R>(String description, Unfolding<T> source,
-																Function<T, U> marriage,
-																BiFunction<T, U, R> conjugation,
-																Predicate<R> judgment, String expectedMessage)
+		                                                        Function<T, U> marriage,
+		                                                        BiFunction<T, U, R> conjugation,
+		                                                        Predicate<R> judgment, String expectedMessage)
 		{
 		}
 
 		private record SanctifyTestCase<T, U, R>(String description, Unfolding<T> source, Function<T, U> marriage,
-												 BiFunction<T, U, R> conjugation, Predicate<R> judgment,
-												 Unfolding<R> expectedResult)
+		                                         BiFunction<T, U, R> conjugation, Predicate<R> judgment,
+		                                         Unfolding<R> expectedResult)
 		{
 		}
 	}

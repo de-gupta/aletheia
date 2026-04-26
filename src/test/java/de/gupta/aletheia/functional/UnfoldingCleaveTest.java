@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-final class UnfoldingCleaveTests
+final class UnfoldingCleaveTest
 {
 	@Nested
 	@DisplayName("Tests for coronate() method with branching")
@@ -30,7 +30,7 @@ final class UnfoldingCleaveTests
 		void shouldReturnRewardWhenPredicateMatches()
 		{
 			String result = Unfolding.beckon("hero")
-									 .coronate(s -> s.startsWith("h"), String::toUpperCase, String::toLowerCase);
+			                         .coronate(s -> s.startsWith("h"), String::toUpperCase, String::toLowerCase);
 			assertThat(result).isEqualTo("HERO");
 		}
 
@@ -39,7 +39,7 @@ final class UnfoldingCleaveTests
 		void shouldReturnPunishmentWhenPredicateDoesNotMatch()
 		{
 			String result = Unfolding.beckon("villain")
-									 .coronate(s -> s.startsWith("h"), String::toUpperCase, String::toLowerCase);
+			                         .coronate(s -> s.startsWith("h"), String::toUpperCase, String::toLowerCase);
 			assertThat(result).isEqualTo("villain");
 		}
 
@@ -91,7 +91,7 @@ final class UnfoldingCleaveTests
 		@MethodSource("emptyUnfoldingTestCases")
 		@DisplayName("should throw when input is empty")
 		<T, R> void shouldReturnEmptyForEmptyInput(String description, Predicate<T> predicate, R trueResult,
-												   R falseResult)
+		                                           R falseResult)
 		{
 			assertThatThrownBy(() -> Unfolding.<T>chaos().cleave(predicate, trueResult, falseResult))
 					.as("An empty unfolding should throw when cleave() is called")
@@ -102,7 +102,7 @@ final class UnfoldingCleaveTests
 		@MethodSource("generalPredicateTestCases")
 		@DisplayName("should return expected result according to predicate")
 		<T, R> void shouldReturnExpectedResult(String description, Unfolding<T> unfolding, Predicate<T> predicate,
-											   R trueResult, R falseResult)
+		                                       R trueResult, R falseResult)
 		{
 			R result = unfolding.cleave(predicate, trueResult, falseResult);
 			R expectedResult = predicate.test(unfolding.summon()) ? trueResult : falseResult;
@@ -203,10 +203,10 @@ final class UnfoldingCleaveTests
 		@MethodSource("judgmentScenarios")
 		@DisplayName("cleave(Map, punishment) — applies correct transformation or returns punishment")
 		<T, R> void cleavesCorrectly(final String description,
-									 final T hero,
-									 final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments,
-									 final R punishment,
-									 final R expected)
+		                             final T hero,
+		                             final SortedMap<Predicate<? super T>, Function<? super T, R>> judgments,
+		                             final R punishment,
+		                             final R expected)
 		{
 			assertThat(Unfolding.beckon(hero).cleave(judgments, punishment))
 					.as("cleave(judgments, punishment) should return expected result")
@@ -231,6 +231,29 @@ final class UnfoldingCleaveTests
 			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(judgments, null))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessage("punishment may not be null");
+		}
+
+		@Test
+		@DisplayName("cleave(Map, punishment) — throws when a mapper function for a matching predicate is null")
+		void throwsIfAnyMapperIsNullAndPredicateMatches()
+		{
+			Map<Predicate<? super String>, Function<? super String, String>> helper = new HashMap<>();
+			helper.put(OrderedPredicate.of(0, _ -> true), null);
+
+			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>(helper);
+
+			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(judgments, "punish"))
+					.isInstanceOf(NullPointerException.class);
+		}
+
+		@Test
+		@DisplayName("cleave(Map, punishment) — empty unfolding throws")
+		void emptyUnfoldingThrowsOnCleaveWithMap()
+		{
+			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>(
+					Map.of(OrderedPredicate.of(0, _ -> true), _ -> "ok"));
+			assertThatThrownBy(() -> Unfolding.<String>chaos().cleave(judgments, "punish"))
+					.isInstanceOf(EmptyUnfoldingException.class);
 		}
 
 		private static Stream<Arguments> judgmentScenarios()
@@ -370,41 +393,18 @@ final class UnfoldingCleaveTests
 			).map(tc -> Arguments.of(tc.description(), tc.hero(), tc.judgments(), tc.punishment(), tc.expected()));
 		}
 
-		@Test
-		@DisplayName("cleave(Map, punishment) — throws when a mapper function for a matching predicate is null")
-		void throwsIfAnyMapperIsNullAndPredicateMatches()
-		{
-			Map<Predicate<? super String>, Function<? super String, String>> helper = new HashMap<>();
-			helper.put(OrderedPredicate.of(0, _ -> true), null);
-
-			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>(helper);
-
-			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(judgments, "punish"))
-					.isInstanceOf(NullPointerException.class);
-		}
-
-		@Test
-		@DisplayName("cleave(Map, punishment) — empty unfolding throws")
-		void emptyUnfoldingThrowsOnCleaveWithMap()
-		{
-			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>(
-					Map.of(OrderedPredicate.of(0, _ -> true), _ -> "ok"));
-			assertThatThrownBy(() -> Unfolding.<String>chaos().cleave(judgments, "punish"))
-					.isInstanceOf(EmptyUnfoldingException.class);
-		}
-
 		private enum Day
 		{MON, TUE, SAT}
 
 		private record TestCase<K, V>(String description, K hero,
-									  SortedMap<Predicate<K>, Function<K, V>> judgments, V punishment,
-									  V expected)
+		                              SortedMap<Predicate<K>, Function<K, V>> judgments, V punishment,
+		                              V expected)
 		{
 			static <K, V> TestCase<K, V> from(final String description,
-											  final K hero,
-											  final Map<OrderedPredicate<K>, Function<K, V>> judgments,
-											  final V punishment,
-											  final V expected)
+			                                  final K hero,
+			                                  final Map<OrderedPredicate<K>, Function<K, V>> judgments,
+			                                  final V punishment,
+			                                  final V expected)
 			{
 				SortedMap<Predicate<K>, Function<K, V>> sortedJudgments = new TreeMap<>(judgments);
 				return new TestCase<>(description, hero, sortedJudgments, punishment, expected);
@@ -425,7 +425,7 @@ final class UnfoldingCleaveTests
 			judgments.put(OrderedPredicate.of(1, s -> s.startsWith("Theseus")), _ -> "Glory");
 
 			String result = Unfolding.beckon("Heracles the Mighty")
-									 .smite(judgments, () -> new RuntimeException("Divine silence"));
+			                         .smite(judgments, () -> new RuntimeException("Divine silence"));
 			assertThat(result).isEqualTo("Immortality");
 		}
 
@@ -438,7 +438,7 @@ final class UnfoldingCleaveTests
 			judgments.put(OrderedPredicate.of(1, s -> s.startsWith("Theseus")), _ -> "Glory");
 
 			String result = Unfolding.beckon("Theseus slayer")
-									 .smite(judgments, () -> new IllegalStateException("No hero answers"));
+			                         .smite(judgments, () -> new IllegalStateException("No hero answers"));
 			assertThat(result).isEqualTo("Glory");
 		}
 
@@ -451,7 +451,7 @@ final class UnfoldingCleaveTests
 			judgments.put(OrderedPredicate.of(1, s -> s.startsWith("Achilles")), _ -> "Glory");
 
 			assertThatThrownBy(() -> Unfolding.beckon("Mortal peasant")
-											  .smite(judgments, () -> new RuntimeException("Zeus's lightning")))
+			                                  .smite(judgments, () -> new RuntimeException("Zeus's lightning")))
 					.isInstanceOf(RuntimeException.class)
 					.hasMessage("Zeus's lightning");
 		}
@@ -477,7 +477,7 @@ final class UnfoldingCleaveTests
 			judgments.put(OrderedPredicate.of(1, s -> s.startsWith("a")), _ -> "Alpha blessing");
 
 			String result = Unfolding.beckon("alpha warrior")
-									 .smite(judgments, () -> new RuntimeException("Divine indifference"));
+			                         .smite(judgments, () -> new RuntimeException("Divine indifference"));
 			assertThat(result).isEqualTo("Warrior blessing");
 		}
 
@@ -515,7 +515,7 @@ final class UnfoldingCleaveTests
 			judgments.put(OrderedPredicate.of(1, _ -> true), _ -> "later blessing");
 
 			assertThatThrownBy(() -> Unfolding.beckon("nullbringer")
-											  .smite(judgments, () -> new RuntimeException("Null offering rejected")))
+			                                  .smite(judgments, () -> new RuntimeException("Null offering rejected")))
 					.isInstanceOf(RuntimeException.class)
 					.hasMessage("Null offering rejected");
 		}
