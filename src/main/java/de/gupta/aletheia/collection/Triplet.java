@@ -7,19 +7,19 @@ public record Triplet<A, B, C>(A first, B second, C third)
 		return new Triplet<>(first, second, third);
 	}
 
-	public static <A, B, C> Triplet<A, B, C> of(A first, Pair<B, C> second)
+	public static <A, B, C> Triplet<A, B, C> of(A first, Dyad<B, C> second)
 	{
-		return of(first, second.first(), second.second());
+		return of(first, second.sinister(), second.dexter());
 	}
 
-	public static <A, B, C> Triplet<A, B, C> of(Pair<A, B> first, C third)
+	public static <A, B, C> Triplet<A, B, C> of(Dyad<A, B> first, C third)
 	{
-		return of(first.first(), first.second(), third);
+		return of(first.sinister(), first.dexter(), third);
 	}
 
-	public static <A, B, C> Triplet<A, B, C> of(Pair<A, Pair<B, C>> pair)
+	public static <A, B, C> Triplet<A, B, C> of(Dyad<A, Dyad<B, C>> dyad)
 	{
-		return of(pair.first(), pair.second().first(), pair.second().second());
+		return of(dyad.sinister(), dyad.dexter().sinister(), dyad.dexter().dexter());
 	}
 
 	public A left()

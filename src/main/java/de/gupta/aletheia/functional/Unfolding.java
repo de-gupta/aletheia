@@ -1,6 +1,6 @@
 package de.gupta.aletheia.functional;
 
-import de.gupta.aletheia.collection.Pair;
+import de.gupta.aletheia.collection.Dyad;
 
 import java.util.Map;
 import java.util.Optional;
@@ -66,7 +66,7 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis);
 
-	<U, R> Unfolding<Pair<U, R>> metamorphose(final Function<? super T, ? extends U> fate,
+	<U, R> Unfolding<Dyad<U, R>> metamorphose(final Function<? super T, ? extends U> fate,
 	                                          final Function<? super T, ? extends R> destiny);
 
 	<R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis,
@@ -107,7 +107,7 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	 */
 	<R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot);
 
-	<R> Unfolding<Pair<T, R>> interlace(final Function<? super T, ? extends R> interlacing);
+	<R> Unfolding<Dyad<T, R>> interlace(final Function<? super T, ? extends R> interlacing);
 
 	<U, R> Unfolding<R> conjoin(final U consort, final BiFunction<? super T, ? super U, ? extends R> conjugation);
 

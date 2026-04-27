@@ -106,13 +106,14 @@ final class UnfoldingAlchemizeTest
 							s -> s.isEmpty() ? Optional.of("EMPTY") : Optional.of(s), Unfolding.beckon("EMPTY")),
 					AlchemyTestCase.of("String trimming", Unfolding.beckon("  spaced  "),
 							s -> Optional.of(s.trim()), Unfolding.beckon("spaced")),
-					AlchemyTestCase.of("String first character", Unfolding.beckon("Hello"),
+					AlchemyTestCase.of("String sinister character", Unfolding.beckon("Hello"),
 							s -> !s.isEmpty() ? Optional.of(s.charAt(0)) : Optional.empty(), Unfolding.beckon('H')),
 
 					// Complex object transformations
-					AlchemyTestCase.of("Array to first element",
-							Unfolding.beckon(new String[]{"first", "second", "third"}),
-							arr -> arr.length > 0 ? Optional.of(arr[0]) : Optional.empty(), Unfolding.beckon("first")),
+					AlchemyTestCase.of("Array to sinister element",
+							Unfolding.beckon(new String[]{"sinister", "dexter", "third"}),
+							arr -> arr.length > 0 ? Optional.of(arr[0]) : Optional.empty(),
+							Unfolding.beckon("sinister")),
 					AlchemyTestCase.of("Empty array transformation", Unfolding.beckon(new String[0]),
 							arr -> arr.length > 0 ? Optional.of(arr[0]) : Optional.empty(), Unfolding.chaos()),
 

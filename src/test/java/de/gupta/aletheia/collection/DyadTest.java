@@ -12,8 +12,8 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@DisplayName("Pair tests")
-final class PairTest
+@DisplayName("Dyad tests")
+final class DyadTest
 {
 	@Nested
 	@DisplayName("Factory and aliases")
@@ -24,12 +24,10 @@ final class PairTest
 		@DisplayName("of() should preserve both values")
 		<A, B> void ofShouldPreserveBothValues(final String as, final PairCase<A, B> tc)
 		{
-			var pair = Pair.of(tc.first(), tc.second());
+			var pair = Dyad.of(tc.first(), tc.second());
 
-			assertThat(pair.first()).as("first should match for %s", as).isEqualTo(tc.first());
-			assertThat(pair.second()).as("second should match for %s", as).isEqualTo(tc.second());
-			assertThat(pair.left()).as("left alias should match for %s", as).isEqualTo(tc.first());
-			assertThat(pair.right()).as("right alias should match for %s", as).isEqualTo(tc.second());
+			assertThat(pair.sinister()).as("sinister should match for %s", as).isEqualTo(tc.first());
+			assertThat(pair.dexter()).as("dexter should match for %s", as).isEqualTo(tc.second());
 		}
 
 		private static Stream<Arguments> pairCases()
@@ -56,22 +54,22 @@ final class PairTest
 	{
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("transformFirstCases")
-		@DisplayName("transformFirst() should update first value only")
+		@DisplayName("transformFirst() should update sinister value only")
 		<R> void transformFirstShouldUpdateFirstValueOnly(final String as, final TransformFirstCase<R> tc)
 		{
-			var transformed = tc.source().transformFirst(tc.transformation());
+			var transformed = tc.source().transformSinister(tc.transformation());
 
-			assertThat(transformed).as("first transformation should match for %s", as).isEqualTo(tc.expected());
+			assertThat(transformed).as("sinister transformation should match for %s", as).isEqualTo(tc.expected());
 		}
 
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("transformSecondCases")
-		@DisplayName("transformSecond() should update second value only")
+		@DisplayName("transformSecond() should update dexter value only")
 		<R> void transformSecondShouldUpdateSecondValueOnly(final String as, final TransformSecondCase<R> tc)
 		{
-			var transformed = tc.source().transformSecond(tc.transformation());
+			var transformed = tc.source().transformDexter(tc.transformation());
 
-			assertThat(transformed).as("second transformation should match for %s", as).isEqualTo(tc.expected());
+			assertThat(transformed).as("dexter transformation should match for %s", as).isEqualTo(tc.expected());
 		}
 
 		@ParameterizedTest(name = "{0}")
@@ -87,19 +85,19 @@ final class PairTest
 		private static Stream<Arguments> transformFirstCases()
 		{
 			return Stream.of(
-					TransformFirstCase.shape("string to length", Pair.of("storm", 3), String::length, Pair.of(5, 3)),
-					TransformFirstCase.shape("string to upper", Pair.of("storm", 3), String::toUpperCase,
-							Pair.of("STORM", 3))
+					TransformFirstCase.shape("string to length", Dyad.of("storm", 3), String::length, Dyad.of(5, 3)),
+					TransformFirstCase.shape("string to upper", Dyad.of("storm", 3), String::toUpperCase,
+							Dyad.of("STORM", 3))
 			).map(tc -> Arguments.of(tc.as(), tc));
 		}
 
 		private static Stream<Arguments> transformSecondCases()
 		{
 			return Stream.of(
-					TransformSecondCase.shape("multiply number", Pair.of("storm", 3), n -> n * 10,
-							Pair.of("storm", 30)),
-					TransformSecondCase.shape("render number", Pair.of("storm", 3), n -> "#" + n,
-							Pair.of("storm", "#3"))
+					TransformSecondCase.shape("multiply number", Dyad.of("storm", 3), n -> n * 10,
+							Dyad.of("storm", 30)),
+					TransformSecondCase.shape("render number", Dyad.of("storm", 3), n -> "#" + n,
+							Dyad.of("storm", "#3"))
 			).map(tc -> Arguments.of(tc.as(), tc));
 		}
 
@@ -107,9 +105,9 @@ final class PairTest
 		{
 			return Stream.of(
 					NullTransformationCase.shape("transformFirst with null",
-							() -> Pair.of("storm", 3).transformFirst(null)),
+							() -> Dyad.of("storm", 3).transformSinister(null)),
 					NullTransformationCase.shape("transformSecond with null",
-							() -> Pair.of("storm", 3).transformSecond((Function<Integer, Integer>) null))
+							() -> Dyad.of("storm", 3).transformDexter((Function<Integer, Integer>) null))
 			).map(tc -> Arguments.of(tc.as(), tc));
 		}
 
@@ -119,23 +117,23 @@ final class PairTest
 			void invoke();
 		}
 
-		private record TransformFirstCase<R>(String as, Pair<String, Integer> source,
-		                                     Function<String, R> transformation, Pair<R, Integer> expected)
+		private record TransformFirstCase<R>(String as, Dyad<String, Integer> source,
+		                                     Function<String, R> transformation, Dyad<R, Integer> expected)
 		{
-			private static <R> TransformFirstCase<R> shape(final String as, final Pair<String, Integer> source,
+			private static <R> TransformFirstCase<R> shape(final String as, final Dyad<String, Integer> source,
 			                                               final Function<String, R> transformation,
-			                                               final Pair<R, Integer> expected)
+			                                               final Dyad<R, Integer> expected)
 			{
 				return new TransformFirstCase<>(as, source, transformation, expected);
 			}
 		}
 
-		private record TransformSecondCase<R>(String as, Pair<String, Integer> source,
-		                                      Function<Integer, R> transformation, Pair<String, R> expected)
+		private record TransformSecondCase<R>(String as, Dyad<String, Integer> source,
+		                                      Function<Integer, R> transformation, Dyad<String, R> expected)
 		{
-			private static <R> TransformSecondCase<R> shape(final String as, final Pair<String, Integer> source,
+			private static <R> TransformSecondCase<R> shape(final String as, final Dyad<String, Integer> source,
 			                                                final Function<Integer, R> transformation,
-			                                                final Pair<String, R> expected)
+			                                                final Dyad<String, R> expected)
 			{
 				return new TransformSecondCase<>(as, source, transformation, expected);
 			}

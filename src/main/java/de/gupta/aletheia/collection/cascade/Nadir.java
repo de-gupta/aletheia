@@ -1,6 +1,6 @@
 package de.gupta.aletheia.collection.cascade;
 
-import de.gupta.aletheia.collection.Pair;
+import de.gupta.aletheia.collection.Dyad;
 import de.gupta.aletheia.collection.crucible.Crucible;
 import de.gupta.aletheia.collection.crucible.Forge;
 import de.gupta.aletheia.collection.crucible.Relic;
@@ -85,7 +85,7 @@ final class Nadir<E> implements Cascade<E>
 	// -------------------------------------------------------------------------
 
 	@Override
-	public <U, F> Cascade<Pair<U, F>> metamorphose(final Function<? super E, ? extends U> fate,
+	public <U, F> Cascade<Dyad<U, F>> metamorphose(final Function<? super E, ? extends U> fate,
 	                                               final Function<? super E, ? extends F> destiny)
 	{
 		return instance();
@@ -112,7 +112,7 @@ final class Nadir<E> implements Cascade<E>
 	}
 
 	@Override
-	public <F> Cascade<Pair<E, F>> interlace(final Function<? super E, ? extends F> interlacing)
+	public <F> Cascade<Dyad<E, F>> interlace(final Function<? super E, ? extends F> interlacing)
 	{
 		return instance();
 	}

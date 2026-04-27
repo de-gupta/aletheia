@@ -88,7 +88,7 @@ var woven = Unfolding.beckon("Ariadne")
 					 .interlace(String::length)
 					 .summon();
 
-// Pair[first=Ariadne, second=7]
+// Dyad[sinister=Ariadne, dexter=7]
 ```
 
 ### The empty vessel is revived

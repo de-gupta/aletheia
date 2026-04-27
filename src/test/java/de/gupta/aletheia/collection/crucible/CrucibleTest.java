@@ -47,7 +47,7 @@ final class CrucibleTest
 			return Stream.of(
 					new TestCase<>("empty ArrayList", new ArrayList<>()),
 					new TestCase<>("ArrayList with single element", List.of("element")),
-					new TestCase<>("ArrayList with multiple elements", List.of("first", "second", "third")),
+					new TestCase<>("ArrayList with multiple elements", List.of("sinister", "dexter", "third")),
 					new TestCase<>("HashSet with elements", Set.of(1, 2, 3)),
 					new TestCase<>("empty LinkedList", new LinkedList<>()),
 					new TestCase<>("LinkedList with null element", Collections.singletonList(null))
@@ -91,7 +91,7 @@ final class CrucibleTest
 			return Stream.of(
 					new TestCase<>("empty ArrayList", new ArrayList<>()),
 					new TestCase<>("ArrayList with single element", List.of("element")),
-					new TestCase<>("ArrayList with multiple elements", List.of("first", "second", "third")),
+					new TestCase<>("ArrayList with multiple elements", List.of("sinister", "dexter", "third")),
 					new TestCase<>("HashSet with elements", Set.of(1, 2, 3)),
 					new TestCase<>("empty LinkedList", new LinkedList<>()),
 					new TestCase<>("LinkedList with null element", Collections.singletonList(null))

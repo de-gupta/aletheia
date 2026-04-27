@@ -300,15 +300,15 @@ final class UnfoldingCleaveTest
 							"Zeus", "Zeus"),
 
 					// Edge cases (mythic flavor)
-					TestCase.from("When many omens agree, the earliest order speaks first",
+					TestCase.from("When many omens agree, the earliest order speaks sinister",
 							"alpha",
 							Map.of(anyNonEmpty, _ -> "Len>0", startsWithLowerA, _ -> "StartsWithA"),
 							"Punish", "Len>0"),
-					TestCase.from("If omens share the same rank, the first matching inscription still speaks",
+					TestCase.from("If omens share the same rank, the sinister matching inscription still speaks",
 							"Alpha",
 							Map.of(order5StartsWithA, _ -> "A", order5StartsWithB, _ -> "B"),
 							"Zeus", "A"),
-					TestCase.from("The ever-true prophecy at the tail end cannot overthrow the first sign",
+					TestCase.from("The ever-true prophecy at the tail end cannot overthrow the sinister sign",
 							"123",
 							Map.of(OrderedPredicate.of(0, s -> s.startsWith("1")), _ -> "StartsWith1", alwaysTrueLow,
 									_ -> "Always"),
@@ -375,13 +375,13 @@ final class UnfoldingCleaveTest
 					TestCase.from("Short-circuiting: later mapper not evaluated",
 							"both",
 							Map.of(
-									OrderedPredicate.of(0, (String _) -> true), _ -> "first",
+									OrderedPredicate.of(0, (String _) -> true), _ -> "sinister",
 									OrderedPredicate.of(1, (String _) -> true), _ ->
 									{
 										throw new AssertionError("mapper should not be called");
 									}
 							),
-							"punish", "first"),
+							"punish", "sinister"),
 					TestCase.from("Non-string result type Integer: punishment used when none match",
 							7,
 							Map.of(
@@ -469,7 +469,7 @@ final class UnfoldingCleaveTest
 		}
 
 		@Test
-		@DisplayName("smite(Map, wrath) — When multiple omens agree, earliest order speaks first")
+		@DisplayName("smite(Map, wrath) — When multiple omens agree, earliest order speaks sinister")
 		void earliestOrderSpeaksFirst()
 		{
 			SortedMap<Predicate<? super String>, Function<? super String, String>> judgments = new TreeMap<>();

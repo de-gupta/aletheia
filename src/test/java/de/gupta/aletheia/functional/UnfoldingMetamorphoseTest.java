@@ -1,6 +1,6 @@
 package de.gupta.aletheia.functional;
 
-import de.gupta.aletheia.collection.Pair;
+import de.gupta.aletheia.collection.Dyad;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -367,7 +367,7 @@ class UnfoldingMetamorphoseTest
 		@DisplayName("Should transform value with two functions correctly")
 		<T, U, R> void testDualMetamorphose(final String description, final Unfolding<T> source,
 		                                    final Function<T, U> fate, final Function<T, R> destiny,
-		                                    final Unfolding<Pair<U, R>> expectedResult)
+		                                    final Unfolding<Dyad<U, R>> expectedResult)
 		{
 			var actual = source.metamorphose(fate, destiny);
 			assertThat(actual)
@@ -408,14 +408,14 @@ class UnfoldingMetamorphoseTest
 							Unfolding.beckon("hello"),
 							(Function<String, Integer>) String::length,
 							(Function<String, String>) String::toUpperCase,
-							Unfolding.beckon(Pair.of(5, "HELLO"))
+							Unfolding.beckon(Dyad.of(5, "HELLO"))
 					),
 					Arguments.of(
 							"Integer to string and double transformation",
 							Unfolding.beckon(42),
 							(Function<Integer, String>) Object::toString,
 							(Function<Integer, Integer>) i -> i * 2,
-							Unfolding.beckon(Pair.of("42", 84))
+							Unfolding.beckon(Dyad.of("42", 84))
 					)
 			);
 		}

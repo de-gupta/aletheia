@@ -50,7 +50,7 @@ final class FallibleMetamorphoseTest
 
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("recoveryCases")
-		@DisplayName("should heed the first matching fury in declared order")
+		@DisplayName("should heed the sinister matching fury in declared order")
 		void shouldHeedTheFirstMatchingFuryInDeclaredOrder(final String description,
 		                                                   final List<Portent<String>> portents,
 		                                                   final Fallible<String> expected)
@@ -91,13 +91,13 @@ final class FallibleMetamorphoseTest
 		{
 			return Stream.of(
 								 new RecoveryCase(
-										 "a broader runtime portent declared first should prevail",
+										 "a broader runtime portent declared sinister should prevail",
 										 portents(
 												 Portent.foretell(RuntimeException.class, _ -> "general runtime"),
 												 Portent.foretell(IllegalArgumentException.class, _ -> "specific argument")),
 										 Fallible.beckon("general runtime")),
 								 new RecoveryCase(
-										 "a specific illegal argument portent declared first should prevail",
+										 "a specific illegal argument portent declared sinister should prevail",
 										 portents(
 												 Portent.foretell(IllegalArgumentException.class, _ -> "specific argument"),
 												 Portent.foretell(RuntimeException.class, _ -> "general runtime")),

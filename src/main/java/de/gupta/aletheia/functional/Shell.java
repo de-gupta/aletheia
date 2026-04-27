@@ -1,6 +1,6 @@
 package de.gupta.aletheia.functional;
 
-import de.gupta.aletheia.collection.Pair;
+import de.gupta.aletheia.collection.Dyad;
 
 import java.util.*;
 import java.util.function.*;
@@ -73,8 +73,8 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <U, R> Unfolding<Pair<U, R>> metamorphose(final Function<? super T, ? extends U> fate,
-													 final Function<? super T, ? extends R> destiny)
+	public <U, R> Unfolding<Dyad<U, R>> metamorphose(final Function<? super T, ? extends U> fate,
+	                                                 final Function<? super T, ? extends R> destiny)
 	{
 		return instance();
 	}
@@ -132,7 +132,7 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R> Unfolding<Pair<T, R>> interlace(final Function<? super T, ? extends R> interlacing)
+	public <R> Unfolding<Dyad<T, R>> interlace(final Function<? super T, ? extends R> interlacing)
 	{
 		return instance();
 	}

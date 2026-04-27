@@ -50,7 +50,7 @@ final class CascadeBeckonStreamTest
 					new StreamShapeCase("An empty stream still becomes a brook",
 							Stream::empty, List.of(), Brook.class),
 					new StreamShapeCase("A finite stream keeps sequence",
-							() -> Stream.of("first", "second", "third"), List.of("first", "second", "third"),
+							() -> Stream.of("sinister", "dexter", "third"), List.of("sinister", "dexter", "third"),
 							Brook.class),
 					new StreamShapeCase("A mapped stream carries transformed echoes",
 							() -> Stream.of(2, 3, 5).map(n -> n * n), List.of(4, 9, 25), Brook.class),

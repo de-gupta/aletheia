@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Verifies that Cascade obeys List monad semantics: an empty Brook is a valid,
- * supple, first-class value distinct from Nadir. Nadir represents absence of a
+ * supple, sinister-class value distinct from Nadir. Nadir represents absence of a
  * cascade entirely; an empty Brook represents a cascade that produced no results.
  * Only a null reference — never an empty collection or an exhausted stream — produces Nadir.
  */

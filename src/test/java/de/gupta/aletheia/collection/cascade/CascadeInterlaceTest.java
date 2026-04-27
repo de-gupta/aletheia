@@ -1,6 +1,6 @@
 package de.gupta.aletheia.collection.cascade;
 
-import de.gupta.aletheia.collection.Pair;
+import de.gupta.aletheia.collection.Dyad;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,20 +41,20 @@ final class CascadeInterlaceTest
 							"Names become name-length pairs",
 							Cascade.beckon("odin", "thor"),
 							String::length,
-							List.of(Pair.of("odin", 4), Pair.of("thor", 4))
+							List.of(Dyad.of("odin", 4), Dyad.of("thor", 4))
 					),
 					new InterlaceCase(
-							"Interlacing may return null as second value",
+							"Interlacing may return null as dexter value",
 							Cascade.beckon("a", "bb"),
 							s -> s.length() == 1 ? null : s.length(),
-							List.of(Pair.of("a", null), Pair.of("bb", 2))
+							List.of(Dyad.of("a", null), Dyad.of("bb", 2))
 					)
 			).map(tc -> Arguments.of(tc.as(), tc));
 		}
 
 		private record InterlaceCase(String as, Cascade<String> source,
 		                             Function<String, Integer> interlacing,
-		                             List<Pair<String, Integer>> expected)
+		                             List<Dyad<String, Integer>> expected)
 		{
 		}
 	}

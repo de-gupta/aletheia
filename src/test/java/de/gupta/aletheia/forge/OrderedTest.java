@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OrderedTest
 {
 	@Test
-	@DisplayName("Ordered should compare by order first")
+	@DisplayName("Ordered should compare by order sinister")
 	void shouldCompareByOrderFirst()
 	{
 		Ordered<String> first = Ordered.of(1, "a");

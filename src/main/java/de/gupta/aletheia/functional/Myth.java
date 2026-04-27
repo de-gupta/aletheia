@@ -1,6 +1,6 @@
 package de.gupta.aletheia.functional;
 
-import de.gupta.aletheia.collection.Pair;
+import de.gupta.aletheia.collection.Dyad;
 
 import java.util.*;
 import java.util.function.*;
@@ -162,12 +162,12 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <U, R> Unfolding<Pair<U, R>> metamorphose(final Function<? super T, ? extends U> fate,
-													 final Function<? super T, ? extends R> destiny)
+	public <U, R> Unfolding<Dyad<U, R>> metamorphose(final Function<? super T, ? extends U> fate,
+	                                                 final Function<? super T, ? extends R> destiny)
 	{
 		Objects.requireNonNull(fate, "fate may not be null");
 		Objects.requireNonNull(destiny, "destiny may not be null");
-		return Unfolding.beckon(Pair.of(fate.apply(hero), destiny.apply(hero)));
+		return Unfolding.beckon(Dyad.of(fate.apply(hero), destiny.apply(hero)));
 	}
 
 	@Override
@@ -233,11 +233,11 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R> Unfolding<Pair<T, R>> interlace(final Function<? super T, ? extends R> interlacing)
+	public <R> Unfolding<Dyad<T, R>> interlace(final Function<? super T, ? extends R> interlacing)
 	{
 		Objects.requireNonNull(interlacing, "interlacing may not be null");
 
-		return Unfolding.beckon(Pair.of(hero, interlacing.apply(hero)));
+		return Unfolding.beckon(Dyad.of(hero, interlacing.apply(hero)));
 	}
 
 	@Override
