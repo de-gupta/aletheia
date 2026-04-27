@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Tests for Triumph")
+@DisplayName("Triumph")
 final class TriumphTest
 {
 	private static Fallible<String> fury()
@@ -24,134 +24,128 @@ final class TriumphTest
 	}
 
 	@Nested
-	@DisplayName("Tests for equals()")
-	final class EqualityTests
+	@DisplayName("equals()")
+	final class Equality
 	{
 		@ParameterizedTest(name = "{0}")
-		@MethodSource("identityCases")
-		@DisplayName("should equal itself under identity comparison")
-		void shouldEqualItselfUnderIdentityComparison(final String description, final Fallible<?> triumph)
+		@MethodSource("equalsItselfCases")
+		@DisplayName("equals itself under identity comparison")
+		void equalsItself(final String as, final Fallible<?> triumph)
 		{
-			assertThat(triumph.equals(triumph))
-					.as("triumph should be equal to itself for: %s", description)
-					.isTrue();
+			assertThat(triumph)
+					.as("triumph should equal itself for: %s", as)
+					.isEqualTo(triumph);
 		}
 
 		@ParameterizedTest(name = "{0}")
-		@MethodSource("equalCases")
-		@DisplayName("should be equal when boon is the same value")
-		void shouldBeEqualWhenBoonIsTheSameValue(final String description,
-		                                         final Fallible<?> left,
-		                                         final Fallible<?> right)
+		@MethodSource("equalsAnotherTriumphWithTheSameBoonCases")
+		@DisplayName("equals another triumph carrying the same boon")
+		void equalsAnotherTriumphWithTheSameBoon(final String as, final EqualCase tc)
 		{
-			assertThat(left)
-					.as("triumphs bearing the same boon should be equal for: %s", description)
-					.isEqualTo(right);
+			assertThat(tc.left())
+					.as("triumphs bearing the same boon should be equal for: %s", as)
+					.isEqualTo(tc.right());
 		}
 
 		@ParameterizedTest(name = "{0}")
-		@MethodSource("unequalCases")
-		@DisplayName("should not be equal when boon or type differs")
-		void shouldNotBeEqualWhenBoonOrTypeDiffers(final String description,
-		                                           final Fallible<?> left,
-		                                           final Object right)
+		@MethodSource("doesNotEqualWhenBoonOrTypeDiffersCases")
+		@DisplayName("does not equal a triumph with a different boon, or a value of a different type")
+		void doesNotEqualWhenBoonOrTypeDiffers(final String as, final InequalCase tc)
 		{
-			assertThat(left)
-					.as("triumph should not equal the other party for: %s", description)
-					.isNotEqualTo(right);
+			assertThat(tc.left())
+					.as("triumph should not equal %s for: %s", tc.right(), as)
+					.isNotEqualTo(tc.right());
 		}
 
-		private static Stream<Arguments> identityCases()
+		private static Stream<Arguments> equalsItselfCases()
 		{
 			return Stream.of(
-								 new IdentityCase("a string triumph", Fallible.beckon("Orpheus")),
-								 new IdentityCase("an integer triumph", Fallible.beckon(42)),
-								 new IdentityCase("a null triumph", Fallible.beckon(null)))
-			             .map(tc -> Arguments.of(tc.description(), tc.triumph()));
+					new IdentityCase("a string triumph", Fallible.beckon("Orpheus")),
+					new IdentityCase("an integer triumph", Fallible.beckon(42)),
+					new IdentityCase("a null triumph", Fallible.beckon(null))
+			).map(tc -> Arguments.of(tc.as(), tc.triumph()));
 		}
 
-		private static Stream<Arguments> equalCases()
+		private static Stream<Arguments> equalsAnotherTriumphWithTheSameBoonCases()
 		{
 			return Stream.of(
-								 new EqualCase("string boon", Fallible.beckon("Orpheus"), Fallible.beckon("Orpheus")),
-								 new EqualCase("integer boon", Fallible.beckon(42), Fallible.beckon(42)),
-								 new EqualCase("null boon", Fallible.beckon(null), Fallible.beckon(null)))
-			             .map(tc -> Arguments.of(tc.description(), tc.left(), tc.right()));
+					new EqualCase("string boon", Fallible.beckon("Orpheus"), Fallible.beckon("Orpheus")),
+					new EqualCase("integer boon", Fallible.beckon(42), Fallible.beckon(42)),
+					new EqualCase("null boon", Fallible.beckon(null), Fallible.beckon(null))
+			).map(tc -> Arguments.of(tc.as(), tc));
 		}
 
-		private static Stream<Arguments> unequalCases()
+		private static Stream<Arguments> doesNotEqualWhenBoonOrTypeDiffersCases()
 		{
 			return Stream.of(
-								 new UnequalCase("null", Fallible.beckon("echo"), null),
-								 new UnequalCase("a fury", Fallible.beckon("echo"), fury()),
-								 new UnequalCase("a triumph with a different string boon",
-										 Fallible.beckon("Orpheus"), Fallible.beckon("Eurydice")),
-								 new UnequalCase("a non-null triumph against a null triumph",
-										 Fallible.beckon("echo"), Fallible.beckon(null)))
-			             .map(tc -> Arguments.of(tc.description(), tc.left(), tc.right()));
+					new InequalCase("null", Fallible.beckon("echo"), null),
+					new InequalCase("a fury", Fallible.beckon("echo"), fury()),
+					new InequalCase("a triumph with a different boon", Fallible.beckon("Orpheus"),
+							Fallible.beckon("Eurydice")),
+					new InequalCase("a non-null triumph against a null triumph", Fallible.beckon("echo"),
+							Fallible.beckon(null))
+			).map(tc -> Arguments.of(tc.as(), tc));
 		}
 
-		private record IdentityCase(String description, Fallible<?> triumph)
+		private record IdentityCase(String as, Fallible<?> triumph)
 		{
 		}
 
-		private record EqualCase(String description, Fallible<?> left, Fallible<?> right)
+		private record EqualCase(String as, Fallible<?> left, Fallible<?> right)
 		{
 		}
 
-		private record UnequalCase(String description, Fallible<?> left, Object right)
+		private record InequalCase(String as, Fallible<?> left, Object right)
 		{
 		}
 	}
 
 	@Nested
-	@DisplayName("Tests for hashCode()")
-	final class HashCodeTests
+	@DisplayName("hashCode()")
+	final class HashCode
 	{
 		@ParameterizedTest(name = "{0}")
-		@MethodSource("hashConsistencyCases")
-		@DisplayName("should return a stable hashCode across invocations")
-		void shouldReturnAStableHashCodeAcrossInvocations(final String description, final Fallible<?> triumph)
+		@MethodSource("returnsTheSameValueAcrossRepeatedCallsCases")
+		@DisplayName("returns the same value across repeated calls")
+		void returnsTheSameValueAcrossRepeatedCalls(final String as, final Fallible<?> triumph)
 		{
 			assertThat(triumph.hashCode())
-					.as("hashCode() should be stable across calls for: %s", description)
+					.as("hashCode() should be stable across calls for: %s", as)
 					.isEqualTo(triumph.hashCode());
 		}
 
 		@ParameterizedTest(name = "{0}")
-		@MethodSource("equalTriumphHashCases")
-		@DisplayName("should produce equal hashCodes for equal triumphs")
-		void shouldProduceEqualHashCodesForEqualTriumphs(final String description,
-		                                                 final Fallible<?> left,
-		                                                 final Fallible<?> right)
+		@MethodSource("isEqualForTriumphsThatCompareEqualCases")
+		@DisplayName("is equal for triumphs that compare equal")
+		void isEqualForTriumphsThatCompareEqual(final String as, final HashEqualCase tc)
 		{
-			assertThat(left.hashCode())
-					.as("equal triumphs should share the same hashCode for: %s", description)
-					.isEqualTo(right.hashCode());
+			assertThat(tc.left().hashCode())
+					.as("equal triumphs should share the same hashCode for: %s", as)
+					.isEqualTo(tc.right().hashCode());
 		}
 
-		private static Stream<Arguments> hashConsistencyCases()
+		private static Stream<Arguments> returnsTheSameValueAcrossRepeatedCallsCases()
 		{
 			return Stream.of(
-								 new HashConsistencyCase("a string triumph", Fallible.beckon("Orpheus")),
-								 new HashConsistencyCase("an integer triumph", Fallible.beckon(42)),
-								 new HashConsistencyCase("a null triumph", Fallible.beckon(null)))
-			             .map(tc -> Arguments.of(tc.description(), tc.triumph()));
+					new StabilityCase("a string triumph", Fallible.beckon("Orpheus")),
+					new StabilityCase("an integer triumph", Fallible.beckon(42)),
+					new StabilityCase("a null triumph", Fallible.beckon(null))
+			).map(tc -> Arguments.of(tc.as(), tc.triumph()));
 		}
 
-		private static Stream<Arguments> equalTriumphHashCases()
+		private static Stream<Arguments> isEqualForTriumphsThatCompareEqualCases()
 		{
 			return Stream.of(
-								 new EqualHashCase("string boons", Fallible.beckon("Orpheus"), Fallible.beckon("Orpheus")),
-								 new EqualHashCase("null boons", Fallible.beckon(null), Fallible.beckon(null)))
-			             .map(tc -> Arguments.of(tc.description(), tc.left(), tc.right()));
+					new HashEqualCase("string boons", Fallible.beckon("Orpheus"), Fallible.beckon("Orpheus")),
+					new HashEqualCase("null boons", Fallible.beckon(null), Fallible.beckon(null))
+			).map(tc -> Arguments.of(tc.as(), tc));
 		}
 
-		private record HashConsistencyCase(String description, Fallible<?> triumph)
+		private record StabilityCase(String as, Fallible<?> triumph)
 		{
 		}
 
-		private record EqualHashCase(String description, Fallible<?> left, Fallible<?> right)
+		private record HashEqualCase(String as, Fallible<?> left, Fallible<?> right)
 		{
 		}
 	}
