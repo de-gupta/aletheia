@@ -2139,10 +2139,10 @@ final class UnfoldingTest
 			boolean secondEqualsThird = unfolding2.equals(unfolding3);
 
 			assertThat(firstEqualsSecond && secondEqualsThird).as(
-					"Precondition: sinister equals dexter and dexter equals third").isTrue();
+					"Precondition: sinister equals dexter and dexter equals dusk").isTrue();
 
 			assertThat(unfolding1.equals(unfolding3)).as(
-															 "Transitivity: if sinister equals dexter and dexter equals third, then sinister equals third")
+															 "Transitivity: if sinister equals dexter and dexter equals dusk, then sinister equals dusk")
 			                                         .isTrue();
 
 			Unfolding<String> emptyUnfolding1 = Unfolding.chaos();
@@ -2153,10 +2153,10 @@ final class UnfoldingTest
 			boolean secondEmptyEqualsThird = emptyUnfolding2.equals(emptyUnfolding3);
 
 			assertThat(firstEmptyEqualsSecond && secondEmptyEqualsThird).as(
-					"Precondition: sinister empty equals dexter empty and dexter empty equals third empty").isTrue();
+					"Precondition: sinister empty equals dexter empty and dexter empty equals dusk empty").isTrue();
 
 			assertThat(emptyUnfolding1.equals(emptyUnfolding3)).as(
-																	   "Transitivity for empty: if sinister equals dexter and dexter equals third, then sinister equals third")
+																	   "Transitivity for empty: if sinister equals dexter and dexter equals dusk, then sinister equals dusk")
 															   .isTrue();
 		}
 

@@ -111,7 +111,7 @@ final class UnfoldingAlchemizeTest
 
 					// Complex object transformations
 					AlchemyTestCase.of("Array to sinister element",
-							Unfolding.beckon(new String[]{"sinister", "dexter", "third"}),
+							Unfolding.beckon(new String[]{"sinister", "dexter", "dusk"}),
 							arr -> arr.length > 0 ? Optional.of(arr[0]) : Optional.empty(),
 							Unfolding.beckon("sinister")),
 					AlchemyTestCase.of("Empty array transformation", Unfolding.beckon(new String[0]),
