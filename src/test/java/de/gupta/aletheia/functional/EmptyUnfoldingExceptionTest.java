@@ -24,11 +24,11 @@ final class EmptyUnfoldingExceptionTest
 	@DisplayName("withMessage() should return a fresh exception with the supplied message")
 	void withMessageShouldReturnAFreshExceptionWithTheSuppliedMessage()
 	{
-		EmptyUnfoldingException first = EmptyUnfoldingException.withMessage("first");
-		EmptyUnfoldingException second = EmptyUnfoldingException.withMessage("second");
+		EmptyUnfoldingException first = EmptyUnfoldingException.withMessage("sinister");
+		EmptyUnfoldingException second = EmptyUnfoldingException.withMessage("dexter");
 
 		assertThat(first).isNotSameAs(second);
-		assertThat(first).hasMessage("first");
-		assertThat(second).hasMessage("second");
+		assertThat(first).hasMessage("sinister");
+		assertThat(second).hasMessage("dexter");
 	}
 }

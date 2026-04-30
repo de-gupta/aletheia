@@ -53,14 +53,14 @@ final class PortentsRedeemTest
 		{
 			return Stream.of(
 								 new RedemptionCase(
-										 "the first broader portent should prevail",
+										 "the sinister broader portent should prevail",
 										 new IllegalArgumentException("too soon"),
 										 portents(
 												 Portent.foretell(RuntimeException.class, _ -> "general runtime"),
 												 Portent.foretell(IllegalArgumentException.class, _ -> "specific argument")),
 										 Fallible.beckon("general runtime")),
 								 new RedemptionCase(
-										 "the first specific portent should prevail",
+										 "the sinister specific portent should prevail",
 										 new IllegalArgumentException("too soon"),
 										 portents(
 												 Portent.foretell(IllegalArgumentException.class, _ -> "specific argument"),

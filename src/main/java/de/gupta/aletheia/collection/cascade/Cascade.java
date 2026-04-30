@@ -1,6 +1,6 @@
 package de.gupta.aletheia.collection.cascade;
 
-import de.gupta.aletheia.collection.Pair;
+import de.gupta.aletheia.collection.Dyad;
 import de.gupta.aletheia.collection.crucible.Crucible;
 import de.gupta.aletheia.collection.crucible.Forge;
 import de.gupta.aletheia.collection.crucible.Relic;
@@ -86,7 +86,7 @@ public sealed interface Cascade<E> permits Brook, Nadir
 
 	<F> Cascade<F> metamorphose(final Function<? super E, ? extends F> metamorphosis);
 
-	<U, F> Cascade<Pair<U, F>> metamorphose(final Function<? super E, ? extends U> fate,
+	<U, F> Cascade<Dyad<U, F>> metamorphose(final Function<? super E, ? extends U> fate,
 	                                        final Function<? super E, ? extends F> destiny);
 
 	Cascade<E> develop(final Predicate<? super E> judgement,
@@ -97,7 +97,7 @@ public sealed interface Cascade<E> permits Brook, Nadir
 
 	Cascade<E> ascend(final UnaryOperator<E> ascension, final int levels);
 
-	<F> Cascade<Pair<E, F>> interlace(final Function<? super E, ? extends F> interlacing);
+	<F> Cascade<Dyad<E, F>> interlace(final Function<? super E, ? extends F> interlacing);
 
 	Cascade<E> purify();
 

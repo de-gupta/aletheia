@@ -1,6 +1,6 @@
 package de.gupta.aletheia.collection.cascade;
 
-import de.gupta.aletheia.collection.Pair;
+import de.gupta.aletheia.collection.Dyad;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("Cascade metamorphose pair tests")
-final class CascadeMetamorphosePairTest
+final class CascadeMetamorphoseDyadTest
 {
 	@Nested
 	@DisplayName("Aspects of fate and destiny")
@@ -42,14 +42,14 @@ final class CascadeMetamorphosePairTest
 							Cascade.beckon("apollo", "odin"),
 							String::length,
 							String::toUpperCase,
-							List.of(Pair.of(6, "APOLLO"), Pair.of(4, "ODIN"))
+							List.of(Dyad.of(6, "APOLLO"), Dyad.of(4, "ODIN"))
 					),
 					PairCase.shape(
 							"Single name still receives both outcomes",
 							Cascade.beckon("freya"),
 							String::length,
 							s -> s + "-blessed",
-							List.of(Pair.of(5, "freya-blessed"))
+							List.of(Dyad.of(5, "freya-blessed"))
 					)
 			).map(tc -> Arguments.of(tc.as(), tc));
 		}
@@ -57,14 +57,14 @@ final class CascadeMetamorphosePairTest
 		private record PairCase(String as, Cascade<String> source,
 		                        Function<String, Integer> fate,
 		                        Function<String, String> destiny,
-		                        List<Pair<Integer, String>> expected)
+		                        List<Dyad<Integer, String>> expected)
 		{
 			private static PairCase shape(
 					final String as,
 					final Cascade<String> source,
 					final Function<String, Integer> fate,
 					final Function<String, String> destiny,
-					final List<Pair<Integer, String>> expected)
+					final List<Dyad<Integer, String>> expected)
 			{
 				return new PairCase(as, source, fate, destiny, expected);
 			}

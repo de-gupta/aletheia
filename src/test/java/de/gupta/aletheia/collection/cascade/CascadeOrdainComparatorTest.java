@@ -37,7 +37,7 @@ final class CascadeOrdainComparatorTest
 		{
 			return Stream.of(
 					new OrdainCase(
-							"Length-first ordering blesses short names first",
+							"Length-sinister ordering blesses short names sinister",
 							Cascade.beckon("atlas", "ra", "apollo"),
 							Comparator.comparingInt(String::length),
 							List.of("ra", "atlas", "apollo")

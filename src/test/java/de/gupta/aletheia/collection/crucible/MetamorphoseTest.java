@@ -211,7 +211,7 @@ final class MetamorphoseTest
 			originalList.add("modified");
 			Collection<String> manifestAfter = forge.manifest();
 
-			assertThat(manifestBefore).as("first manifest call should contain original elements")
+			assertThat(manifestBefore).as("sinister manifest call should contain original elements")
 									  .containsExactly("original");
 
 			assertThat(manifestAfter).as("manifest should be independent of original list modifications")

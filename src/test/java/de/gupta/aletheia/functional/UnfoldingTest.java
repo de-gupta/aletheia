@@ -1,6 +1,6 @@
 package de.gupta.aletheia.functional;
 
-import de.gupta.aletheia.collection.Pair;
+import de.gupta.aletheia.collection.Dyad;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -1319,15 +1319,15 @@ final class UnfoldingTest
 		@MethodSource("presentResultTestCases")
 		@DisplayName("should transform present value to pair containing original and transformed values")
 		<T, R> void shouldTransformToPresentValue(String description, Unfolding<T> unfolding,
-												  Function<T, R> transformer, Unfolding<Pair<T, R>> expectedResult)
+		                                          Function<T, R> transformer, Unfolding<Dyad<T, R>> expectedResult)
 		{
-			Unfolding<Pair<T, R>> result = unfolding.interlace(transformer);
+			Unfolding<Dyad<T, R>> result = unfolding.interlace(transformer);
 
 			assertThat(result.supple()).as("interlace() for %s should result in present unfolding", unfolding).isTrue();
-			assertThat(result.summon().first()).as("interlace() result first value should match original")
-											   .isEqualTo(unfolding.summon());
-			assertThat(result.summon().second()).as("interlace() result second value should match transformed")
-												.isEqualTo(expectedResult.summon().second());
+			assertThat(result.summon().sinister()).as("interlace() result sinister value should match original")
+			                                      .isEqualTo(unfolding.summon());
+			assertThat(result.summon().dexter()).as("interlace() result dexter value should match transformed")
+			                                    .isEqualTo(expectedResult.summon().dexter());
 		}
 
 		@ParameterizedTest(name = "{0}")
@@ -1336,7 +1336,7 @@ final class UnfoldingTest
 		<T, R> void shouldTransformToEmptyUnfolding(String description, Unfolding<T> unfolding,
 													Function<T, R> transformer)
 		{
-			Unfolding<Pair<T, R>> result = unfolding.interlace(transformer);
+			Unfolding<Dyad<T, R>> result = unfolding.interlace(transformer);
 
 			assertThat(result.sterile()).as("interlace() for %s should result in empty unfolding", unfolding).isTrue();
 		}
@@ -1359,17 +1359,18 @@ final class UnfoldingTest
 		{
 			return Stream.of(
 								 new PresentResultTestCase<>("Present string value should be transformed to pair with length",
-										 Unfolding.beckon("hello"), String::length, Unfolding.beckon(Pair.of("hello", 5))),
+										 Unfolding.beckon("hello"), String::length,
+										 Unfolding.beckon(Dyad.of("hello", 5))),
 								 new PresentResultTestCase<>("Present string value should be transformed to pair with uppercase",
 										 Unfolding.beckon("hello"), String::toUpperCase,
-										 Unfolding.beckon(Pair.of("hello", "HELLO"))), new PresentResultTestCase<>(
+										 Unfolding.beckon(Dyad.of("hello", "HELLO"))), new PresentResultTestCase<>(
 										 "Present integer value should be transformed to pair with string representation",
-										 Unfolding.beckon(42), Object::toString, Unfolding.beckon(Pair.of(42, "42"))),
+										 Unfolding.beckon(42), Object::toString, Unfolding.beckon(Dyad.of(42, "42"))),
 								 new PresentResultTestCase<>(
 										 "Present value should be transformed to pair with null when transformer returns null",
-										 Unfolding.beckon("test"), _ -> null, Unfolding.beckon(Pair.of("test", null))),
+										 Unfolding.beckon("test"), _ -> null, Unfolding.beckon(Dyad.of("test", null))),
 								 new PresentResultTestCase<>("Present empty string should be transformed correctly",
-										 Unfolding.beckon(""), String::length, Unfolding.beckon(Pair.of("", 0))))
+										 Unfolding.beckon(""), String::length, Unfolding.beckon(Dyad.of("", 0))))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.transformer, tc.expectedResult));
 		}
 
@@ -1381,7 +1382,7 @@ final class UnfoldingTest
 		}
 
 		private record PresentResultTestCase<T, R>(String description, Unfolding<T> unfolding,
-												   Function<T, R> transformer, Unfolding<Pair<T, R>> expectedResult)
+		                                           Function<T, R> transformer, Unfolding<Dyad<T, R>> expectedResult)
 		{
 		}
 
@@ -1488,8 +1489,8 @@ final class UnfoldingTest
 								 new SuppleBraidTestCase<>("Two integer unfoldings should be combined with addition",
 										 Unfolding.beckon(10), Unfolding.beckon(5), Integer::sum, Unfolding.beckon(15)),
 								 new SuppleBraidTestCase<>("Two unfoldings should be combined to create a pair",
-										 Unfolding.beckon("key"), Unfolding.beckon("value"), Pair::of,
-										 Unfolding.beckon(Pair.of("key", "value"))))
+										 Unfolding.beckon("key"), Unfolding.beckon("value"), Dyad::of,
+										 Unfolding.beckon(Dyad.of("key", "value"))))
 						 .map(tc -> Arguments.of(tc.description, tc.journey, tc.consort, tc.weaver, tc.expectedResult));
 		}
 
@@ -1637,7 +1638,8 @@ final class UnfoldingTest
 								 new PresentResultTestCase<>("Present integer value should be combined with another integer",
 										 Unfolding.beckon(10), 5, Integer::sum, Unfolding.beckon(15)),
 								 new PresentResultTestCase<>("Present value should be combined with consort to create a pair",
-										 Unfolding.beckon("key"), "value", Pair::of, Unfolding.beckon(Pair.of("key", "value"))),
+										 Unfolding.beckon("key"), "value", Dyad::of, Unfolding.beckon(
+										 Dyad.of("key", "value"))),
 								 new PresentResultTestCase<>("Present empty string should be combined correctly",
 										 Unfolding.beckon(""), "suffix", String::concat, Unfolding.beckon("suffix")))
 						 .map(tc -> Arguments.of(tc.description, tc.unfolding, tc.consort, tc.conjugation,
@@ -2108,7 +2110,7 @@ final class UnfoldingTest
 			Unfolding<String> unfolding2 = Unfolding.beckon("test");
 
 			assertThat(unfolding1.equals(unfolding2)).as(
-															 "First unfolding should equal second unfolding with same value")
+															 "First unfolding should equal dexter unfolding with same value")
 													 .isEqualTo(unfolding2.equals(unfolding1));
 
 			Unfolding<String> presentUnfolding = Unfolding.beckon("test");
@@ -2137,10 +2139,11 @@ final class UnfoldingTest
 			boolean secondEqualsThird = unfolding2.equals(unfolding3);
 
 			assertThat(firstEqualsSecond && secondEqualsThird).as(
-					"Precondition: first equals second and second equals third").isTrue();
+					"Precondition: sinister equals dexter and dexter equals dusk").isTrue();
 
 			assertThat(unfolding1.equals(unfolding3)).as(
-					"Transitivity: if first equals second and second equals third, then first equals third").isTrue();
+															 "Transitivity: if sinister equals dexter and dexter equals dusk, then sinister equals dusk")
+			                                         .isTrue();
 
 			Unfolding<String> emptyUnfolding1 = Unfolding.chaos();
 			Unfolding<Integer> emptyUnfolding2 = Unfolding.chaos();
@@ -2150,10 +2153,10 @@ final class UnfoldingTest
 			boolean secondEmptyEqualsThird = emptyUnfolding2.equals(emptyUnfolding3);
 
 			assertThat(firstEmptyEqualsSecond && secondEmptyEqualsThird).as(
-					"Precondition: first empty equals second empty and second empty equals third empty").isTrue();
+					"Precondition: sinister empty equals dexter empty and dexter empty equals dusk empty").isTrue();
 
 			assertThat(emptyUnfolding1.equals(emptyUnfolding3)).as(
-																	   "Transitivity for empty: if first equals second and second equals third, then first equals third")
+																	   "Transitivity for empty: if sinister equals dexter and dexter equals dusk, then sinister equals dusk")
 															   .isTrue();
 		}
 
@@ -2382,7 +2385,7 @@ final class UnfoldingTest
 		void eurydice()
 		{
 			String result = Unfolding.beckon("Eurydice").interlace(String::length)
-									 .metamorphose(pair -> pair.first() + " (" + pair.second() + ")")
+			                         .metamorphose(pair -> pair.sinister() + " (" + pair.dexter() + ")")
 									 .coronate(Function.identity());
 
 			assertThat(result).isEqualTo("Eurydice (8)");
@@ -2492,13 +2495,13 @@ final class UnfoldingTest
 					.interlace(this::mapToFeast)
 
 					// Refold into SacredEvent
-					.metamorphose(pair -> SacredEvent.of(pair.second(), christmas, pair.first()))
+					.metamorphose(pair -> SacredEvent.of(pair.dexter(), christmas, pair.sinister()))
 
 					// Interlace again with duration from Christmas
 					.interlace(SacredEvent::daysSinceChristmas)
 
 					// Refold into poetic summary
-					.metamorphose(pair -> formatSummary(pair.first(), pair.second()))
+					.metamorphose(pair -> formatSummary(pair.sinister(), pair.dexter()))
 
 					// Conclude
 					.coronate(Function.identity());

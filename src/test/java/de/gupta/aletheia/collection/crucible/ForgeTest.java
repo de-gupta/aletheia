@@ -62,7 +62,7 @@ final class ForgeTest
 			return Stream.of(
 					new TestCase<>("empty ArrayList", new ArrayList<>()),
 					new TestCase<>("ArrayList with single element", List.of("element")),
-					new TestCase<>("ArrayList with multiple elements", List.of("first", "second", "third")),
+					new TestCase<>("ArrayList with multiple elements", List.of("sinister", "dexter", "dusk")),
 					new TestCase<>("HashSet with elements", Set.of(1, 2, 3)),
 					new TestCase<>("empty LinkedList", new LinkedList<>()),
 					new TestCase<>("LinkedList with null element", Collections.singletonList(null))
@@ -119,21 +119,21 @@ final class ForgeTest
 		@DisplayName("should not modify the original forge when embracing")
 		void shouldNotModifyTheOriginalForgeWhenEmbracing()
 		{
-			Forge<String> original = Forge.kindle(new ArrayList<>(List.of("first", "second")));
+			Forge<String> original = Forge.kindle(new ArrayList<>(List.of("sinister", "dexter")));
 
-			Crucible<String> embraced = original.embrace("third");
+			Crucible<String> embraced = original.embrace("dusk");
 
 			assertThat(original.manifest()).as("The original forge should remain unchanged after embrace()")
-										   .containsExactly("first", "second");
+			                               .containsExactly("sinister", "dexter");
 			assertThat(embraced.manifest()).as("The returned forge should contain the embraced element")
-										   .containsExactly("first", "second", "third");
+			                               .containsExactly("sinister", "dexter", "dusk");
 		}
 
 		private static Stream<Arguments> testCases()
 		{
 			return Stream.of(
 					new TestCase<>("empty collection with string", new ArrayList<>(), "new element"),
-					new TestCase<>("collection with elements and new string", List.of("first", "second"), "third"),
+					new TestCase<>("collection with elements and new string", List.of("sinister", "dexter"), "dusk"),
 					new TestCase<>("numeric collection with new number", List.of(1, 2), 3),
 					new TestCase<>("collection with null elements", Collections.singletonList(null), "element")
 			).map(tc -> Arguments.of(tc.description, tc.initialCollection, tc.element));
@@ -189,21 +189,21 @@ final class ForgeTest
 		@DisplayName("should not modify the original forge when banishing")
 		void shouldNotModifyTheOriginalForgeWhenBanishing()
 		{
-			Forge<String> original = Forge.kindle(new ArrayList<>(List.of("first", "second", "third")));
+			Forge<String> original = Forge.kindle(new ArrayList<>(List.of("sinister", "dexter", "dusk")));
 
-			Crucible<String> banished = original.banish("second");
+			Crucible<String> banished = original.banish("dexter");
 
 			assertThat(original.manifest()).as("The original forge should remain unchanged after banish()")
-										   .containsExactly("first", "second", "third");
+			                               .containsExactly("sinister", "dexter", "dusk");
 			assertThat(banished.manifest()).as("The returned forge should exclude the banished element")
-										   .containsExactly("first", "third");
+			                               .containsExactly("sinister", "dusk");
 		}
 
 		private static Stream<Arguments> testCases()
 		{
 			return Stream.of(
-					new TestCase<>("collection with element to remove", new ArrayList<>(List.of("first", "second")),
-							"first"),
+					new TestCase<>("collection with element to remove", new ArrayList<>(List.of("sinister", "dexter")),
+							"sinister"),
 					new TestCase<>("numeric collection removing number", new ArrayList<>(List.of(1, 2, 3)), 2),
 					new TestCase<>("single element collection", new ArrayList<>(List.of("only")), "only"),
 					new TestCase<>("collection with duplicates", new ArrayList<>(Arrays.asList("dup", "dup", "other")),
@@ -254,7 +254,7 @@ final class ForgeTest
 			return Stream.of(
 					new TestCase<>("empty collection", new ArrayList<>()),
 					new TestCase<>("single element collection", List.of("element")),
-					new TestCase<>("multiple elements collection", List.of("first", "second", "third")),
+					new TestCase<>("multiple elements collection", List.of("sinister", "dexter", "dusk")),
 					new TestCase<>("collection with null", Collections.singletonList(null))
 			).map(tc -> Arguments.of(tc.description, tc.collection));
 		}
@@ -286,7 +286,7 @@ final class ForgeTest
 			return Stream.of(
 					new TestCase<>("empty collection", new ArrayList<>()),
 					new TestCase<>("single element collection", List.of("element")),
-					new TestCase<>("multiple elements collection", List.of("first", "second", "third")),
+					new TestCase<>("multiple elements collection", List.of("sinister", "dexter", "dusk")),
 					new TestCase<>("collection with null", Collections.singletonList(null))
 			).map(tc -> Arguments.of(tc.description, tc.collection));
 		}
@@ -304,11 +304,11 @@ final class ForgeTest
 		@DisplayName("should support chaining multiple operations")
 		void shouldSupportChainingMultipleOperations()
 		{
-			Forge<String> forge = Forge.kindle(new ArrayList<>(List.of("first")));
+			Forge<String> forge = Forge.kindle(new ArrayList<>(List.of("sinister")));
 
-			Crucible<String> result = forge.embrace("second")
-										   .embrace("third")
-										   .banish("first")
+			Crucible<String> result = forge.embrace("dexter")
+			                               .embrace("dusk")
+										   .banish("sinister")
 										   .awaken()
 										   .embrace("fourth");
 

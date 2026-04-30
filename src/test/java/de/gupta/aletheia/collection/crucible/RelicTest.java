@@ -60,7 +60,7 @@ final class RelicTest
 			return Stream.of(
 					new TestCase<>("empty ArrayList", new ArrayList<>()),
 					new TestCase<>("ArrayList with single element", List.of("element")),
-					new TestCase<>("ArrayList with multiple elements", List.of("first", "second", "third")),
+					new TestCase<>("ArrayList with multiple elements", List.of("sinister", "dexter", "dusk")),
 					new TestCase<>("HashSet with elements", Set.of(1, 2, 3)),
 					new TestCase<>("empty LinkedList", new LinkedList<>()),
 					new TestCase<>("LinkedList with null element", Collections.singletonList(null))
@@ -105,7 +105,7 @@ final class RelicTest
 		{
 			return Stream.of(
 					new TestCase<>("empty collection with string", new ArrayList<>(), "new element"),
-					new TestCase<>("collection with elements and new string", List.of("first", "second"), "third"),
+					new TestCase<>("collection with elements and new string", List.of("sinister", "dexter"), "dusk"),
 					new TestCase<>("numeric collection with new number", List.of(1, 2), 3),
 					new TestCase<>("collection with null elements", Collections.singletonList(null), "element")
 			).map(tc -> Arguments.of(tc.description, tc.collection, tc.element));
@@ -160,7 +160,7 @@ final class RelicTest
 		private static Stream<Arguments> testCases()
 		{
 			return Stream.of(
-					new TestCase<>("collection with element to remove", List.of("first", "second"), "first"),
+					new TestCase<>("collection with element to remove", List.of("sinister", "dexter"), "sinister"),
 					new TestCase<>("numeric collection removing number", List.of(1, 2, 3), 2),
 					new TestCase<>("single element collection", List.of("only"), "only"),
 					new TestCase<>("collection with duplicates", Arrays.asList("dup", "dup", "other"), "dup")
@@ -194,7 +194,7 @@ final class RelicTest
 			return Stream.of(
 					new TestCase<>("empty collection", new ArrayList<>()),
 					new TestCase<>("single element collection", List.of("element")),
-					new TestCase<>("multiple elements collection", List.of("first", "second", "third")),
+					new TestCase<>("multiple elements collection", List.of("sinister", "dexter", "dusk")),
 					new TestCase<>("collection with null", Collections.singletonList(null))
 			).map(tc -> Arguments.of(tc.description, tc.collection));
 		}
@@ -242,7 +242,7 @@ final class RelicTest
 			return Stream.of(
 					new TestCase<>("empty collection", new ArrayList<>()),
 					new TestCase<>("single element collection", List.of("element")),
-					new TestCase<>("multiple elements collection", List.of("first", "second", "third")),
+					new TestCase<>("multiple elements collection", List.of("sinister", "dexter", "dusk")),
 					new TestCase<>("collection with null", Collections.singletonList(null))
 			).map(tc -> Arguments.of(tc.description, tc.collection));
 		}
@@ -483,7 +483,7 @@ final class RelicTest
 			assertThat(manifest2).as("New manifest() call should be independent of underlying changes")
 								 .containsExactly("x", "y", "z");
 
-			// But the first manifest should still be unmodifiable
+			// But the sinister manifest should still be unmodifiable
 			assertThatThrownBy(() -> manifest1.add("should fail"))
 					.as("Previous manifest should remain unmodifiable")
 					.isInstanceOf(UnsupportedOperationException.class);

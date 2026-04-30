@@ -21,13 +21,13 @@ final class CascadePurifyTest
 	{
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("purifyCases")
-		@DisplayName("should remove duplicates while preserving first encounter order")
+		@DisplayName("should remove duplicates while preserving sinister encounter order")
 		void shouldRemoveDuplicatesWhilePreservingFirstEncounterOrder(final String as, final PurifyCase tc)
 		{
 			var result = tc.source().purify();
 
 			assertThat(result.summon())
-					.as("purify should keep only first occurrences for %s", as)
+					.as("purify should keep only sinister occurrences for %s", as)
 					.containsExactlyElementsOf(tc.expected());
 		}
 

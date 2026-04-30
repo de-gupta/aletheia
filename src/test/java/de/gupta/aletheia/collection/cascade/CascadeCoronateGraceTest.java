@@ -53,7 +53,7 @@ final class CascadeCoronateGraceTest
 							"the oracle speaks"
 					),
 					new CoronationCase(
-							"River yields its first survivor",
+							"River yields its sinister survivor",
 							Cascade.beckon("apollo", "athena"),
 							s -> s.findFirst().orElse("none"),
 							() -> "none",

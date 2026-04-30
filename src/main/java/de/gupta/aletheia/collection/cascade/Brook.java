@@ -1,6 +1,6 @@
 package de.gupta.aletheia.collection.cascade;
 
-import de.gupta.aletheia.collection.Pair;
+import de.gupta.aletheia.collection.Dyad;
 import de.gupta.aletheia.collection.crucible.Crucible;
 import de.gupta.aletheia.collection.crucible.Forge;
 import de.gupta.aletheia.collection.crucible.Relic;
@@ -118,12 +118,12 @@ final class Brook<E> implements Cascade<E>
 	}
 
 	@Override
-	public <U, F> Cascade<Pair<U, F>> metamorphose(final Function<? super E, ? extends U> fate,
+	public <U, F> Cascade<Dyad<U, F>> metamorphose(final Function<? super E, ? extends U> fate,
 	                                               final Function<? super E, ? extends F> destiny)
 	{
 		Objects.requireNonNull(fate, "fate may not be null");
 		Objects.requireNonNull(destiny, "destiny may not be null");
-		return transmute(s -> s.map(e -> Pair.of(fate.apply(e), destiny.apply(e))));
+		return transmute(s -> s.map(e -> Dyad.of(fate.apply(e), destiny.apply(e))));
 	}
 
 	@Override
@@ -162,10 +162,10 @@ final class Brook<E> implements Cascade<E>
 	}
 
 	@Override
-	public <F> Cascade<Pair<E, F>> interlace(final Function<? super E, ? extends F> interlacing)
+	public <F> Cascade<Dyad<E, F>> interlace(final Function<? super E, ? extends F> interlacing)
 	{
 		Objects.requireNonNull(interlacing, "interlacing may not be null");
-		return transmute(s -> s.map(e -> Pair.of(e, interlacing.apply(e))));
+		return transmute(s -> s.map(e -> Dyad.of(e, interlacing.apply(e))));
 	}
 
 	@Override
