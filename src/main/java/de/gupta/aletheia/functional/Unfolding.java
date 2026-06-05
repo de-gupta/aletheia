@@ -2,15 +2,103 @@ package de.gupta.aletheia.functional;
 
 import de.gupta.aletheia.collection.Dyad;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.SequencedCollection;
-import java.util.SequencedMap;
+import java.util.*;
 import java.util.function.*;
 import java.util.stream.Stream;
 
 public sealed interface Unfolding<T> permits Shell, Myth
 {
+	// ── Conventional names ────────────────────────────────────────────────────────────────────────
+	// Standard Optional/Stream-style API. Each method delegates to its mythic equivalent below.
+
+	static <T> Unfolding<T> of(final T value)
+	{
+		return beckon(Objects.requireNonNull(value));
+	}
+
+	static <T> Unfolding<T> ofNullable(final T value)
+	{
+		return beckon(value);
+	}
+
+	static <T> Unfolding<T> empty()
+	{
+		return chaos();
+	}
+
+	static <T> Unfolding<T> fromOptional(final Optional<T> optional)
+	{
+		return augur(optional);
+	}
+
+	static <T> Unfolding<T> fromStream(final Stream<T> stream)
+	{
+		return distill(stream);
+	}
+
+	default T get()
+	{
+		return summon();
+	}
+
+	default boolean isPresent()
+	{
+		return supple();
+	}
+
+	default boolean isEmpty()
+	{
+		return sterile();
+	}
+
+	default <R> Unfolding<R> map(final Function<? super T, ? extends R> mapper)
+	{
+		return metamorphose(mapper);
+	}
+
+	default <R> Unfolding<R> flatMap(final Function<? super T, Unfolding<R>> mapper)
+	{
+		return entwine(mapper);
+	}
+
+	default <R> Unfolding<R> flatMapOptional(final Function<? super T, Optional<? extends R>> mapper)
+	{
+		return alchemize(mapper);
+	}
+
+	default Unfolding<T> filter(final Predicate<? super T> predicate)
+	{
+		return discern(predicate);
+	}
+
+	default T orElse(final T other)
+	{
+		return infuse(other);
+	}
+
+	default T orElseGet(final Supplier<? extends T> supplier)
+	{
+		return infuse(supplier);
+	}
+
+	default T orElseThrow(final Supplier<? extends RuntimeException> exceptionSupplier)
+	{
+		return decree(exceptionSupplier);
+	}
+
+	default Unfolding<T> orElseRecover(final Supplier<Unfolding<T>> recovery)
+	{
+		return resurrect(recovery);
+	}
+
+	default Unfolding<T> peek(final Consumer<? super T> consumer)
+	{
+		return unlace(consumer);
+	}
+
+	// ── Mythic (canonical) API ────────────────────────────────────────────────────────────────────
+	// Primary vocabulary. Conventional aliases are above.
+
 	static <T> Unfolding<T> distill(final Stream<T> brook)
 	{
 		return augur(brook.findFirst());

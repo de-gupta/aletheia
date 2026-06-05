@@ -14,6 +14,123 @@ import java.util.stream.Stream;
 
 public sealed interface Cascade<E> permits Brook, Nadir
 {
+	// ── Conventional names ────────────────────────────────────────────────────────────────────────
+	// Standard Stream/Collection-style API. Each method delegates to its mythic equivalent below.
+
+	@SafeVarargs
+	static <E> Cascade<E> of(final E... elements)
+	{
+		return beckon(elements);
+	}
+
+	static <E> Cascade<E> of(final Collection<E> elements)
+	{
+		return beckon(elements);
+	}
+
+	static <E> Cascade<E> of(final Stream<? extends E> stream)
+	{
+		return beckon(stream);
+	}
+
+	static <E> Cascade<E> empty()
+	{
+		return abyss();
+	}
+
+	static <E> Cascade<E> ofConditional(final Collection<E> elements, final boolean condition)
+	{
+		return adjudicate(elements, condition);
+	}
+
+	static <E> Cascade<E> fromCrucible(final Crucible<E> crucible)
+	{
+		return distill(crucible);
+	}
+
+	default boolean isEmpty()
+	{
+		return sterile();
+	}
+
+	default boolean isNotEmpty()
+	{
+		return supple();
+	}
+
+	default Collection<E> toCollection()
+	{
+		return summon();
+	}
+
+	default <F> Cascade<F> map(final Function<? super E, ? extends F> mapper)
+	{
+		return metamorphose(mapper);
+	}
+
+	default Cascade<E> filter(final Predicate<? super E> predicate)
+	{
+		return discern(predicate);
+	}
+
+	default <F> Cascade<F> flatMap(final Function<? super E, Cascade<F>> mapper)
+	{
+		return entwine(mapper);
+	}
+
+	default <F> Cascade<F> flatMapOptional(final Function<? super E, Optional<? extends F>> mapper)
+	{
+		return alchemize(mapper);
+	}
+
+	default Cascade<E> peek(final Consumer<? super E> consumer)
+	{
+		return unlace(consumer);
+	}
+
+	default Cascade<E> sorted(final Comparator<? super E> comparator)
+	{
+		return ordain(comparator);
+	}
+
+	default Cascade<E> sorted()
+	{
+		return ordain();
+	}
+
+	default Cascade<E> distinct()
+	{
+		return purify();
+	}
+
+	default <R> R fold(final R initial, final BiFunction<? super R, ? super E, ? extends R> operation)
+	{
+		return weave(initial, operation);
+	}
+
+	default Unfolding<E> reduce(final BiFunction<? super E, ? super E, ? extends E> operation)
+	{
+		return smelt(operation);
+	}
+
+	default Collection<E> orElse(final Collection<? extends E> other)
+	{
+		return infuse(other);
+	}
+
+	default Collection<E> orElseGet(final Supplier<? extends Collection<? extends E>> supplier)
+	{
+		return infuse(supplier);
+	}
+
+	default Cascade<E> orElseRecover(final Supplier<Cascade<E>> recovery)
+	{
+		return resurrect(recovery);
+	}
+
+	// ── Mythic (canonical) API ────────────────────────────────────────────────────────────────────
+	// Primary vocabulary. Conventional aliases are above.
+
 	/**
 	 * Static factories
 	 */
