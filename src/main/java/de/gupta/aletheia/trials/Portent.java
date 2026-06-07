@@ -4,10 +4,27 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
+/**
+ * Conventional (exception-recovery-style) factory is listed first for easy discovery.
+ * Delegates to its canonical mythic counterpart below.
+ */
 public final class Portent<R>
 {
 	private final Class<? extends Exception> omen;
 	private final Function<? super Exception, ? extends R> remedy;
+
+	// ── Conventional names ────────────────────────────────────────────────────────────────────────
+
+	/**
+	 * @see #foretell(Class, Function)
+	 */
+	public static <E extends Exception, R> Portent<R> on(final Class<E> exceptionType,
+	                                                     final Function<? super E, ? extends R> handler)
+	{
+		return foretell(exceptionType, handler);
+	}
+
+	// ── Mythic (canonical) API ────────────────────────────────────────────────────────────────────
 
 	public static <E extends Exception, R> Portent<R> foretell(final Class<E> omen,
 	                                                           final Function<? super E, ? extends R> remedy)
