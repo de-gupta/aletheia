@@ -4,7 +4,7 @@
 
     <groupId>io.github.de-gupta</groupId>
     <artifactId>aletheia</artifactId>
-    <version>0.10.1-SNAPSHOT</version>
+    <version>0.10.1</version>
 
     <name>${project.artifactId}</name>
     <description>A library with functional classes for java</description>
@@ -45,7 +45,7 @@
         <connection>scm:git:git@github.com:de-gupta/aletheia.git</connection>
         <developerConnection>scm:git:git@github.com:de-gupta/aletheia.git</developerConnection>
         <url>https://github.com/de-gupta/aletheia.git</url>
-        <tag>HEAD</tag>
+        <tag>v0.10.1</tag>
     </scm>
 
     <build>
