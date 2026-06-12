@@ -28,18 +28,4 @@
         </dependency>
     </dependencies>
 
-    <scm>
-        <connection>scm:git:git@github.com:de-gupta/aletheia.git</connection>
-        <developerConnection>scm:git:git@github.com:de-gupta/aletheia.git</developerConnection>
-        <url>https://github.com/de-gupta/aletheia.git</url>
-        <tag>HEAD</tag>
-    </scm>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>central</id>
-            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
-
 </project>
