@@ -263,13 +263,13 @@ final class Myth<T> implements Unfolding<T>
 
 	@Override
 	public <U> Unfolding<T> wield(final Function<? super T, ? extends U> instrument,
-	                              final BiFunction<? super T, ? super U, Unfolding<T>> wielding)
+	                              final BiFunction<Unfolding<T>, ? super U, Unfolding<T>> wielding)
 	{
 		Objects.requireNonNull(instrument, "instrument may not be null");
 		Objects.requireNonNull(wielding, "wielding may not be null");
 
 		final U intermediate = instrument.apply(hero);
-		return Optional.ofNullable(wielding.apply(hero, intermediate))
+		return Optional.ofNullable(wielding.apply(this, intermediate))
 		               .orElseGet(Unfolding::chaos);
 	}
 

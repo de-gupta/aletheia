@@ -26,7 +26,7 @@ final class UnfoldingWieldTest
 		@MethodSource("wieldPresentTestCases")
 		<T, U> void testWieldWhenPresent(final String description, final Unfolding<T> source,
 		                                 final Function<T, U> instrument,
-		                                 final BiFunction<T, U, Unfolding<T>> wielding,
+		                                 final BiFunction<Unfolding<T>, U, Unfolding<T>> wielding,
 		                                 final Unfolding<T> expected)
 		{
 			assertThat(source.wield(instrument, wielding))
@@ -40,7 +40,7 @@ final class UnfoldingWieldTest
 		{
 			final Unfolding<String> source = Unfolding.chaos();
 
-			assertThat(source.wield(t -> t.toUpperCase(), (t, u) -> Unfolding.beckon(t)))
+			assertThat(source.wield(t -> t.toUpperCase(), (self, u) -> self))
 					.isEqualTo(Unfolding.chaos());
 		}
 
@@ -57,10 +57,10 @@ final class UnfoldingWieldTest
 						sideEffect.set("instrument called");
 						return t;
 					},
-					(t, u) ->
+					(self, u) ->
 					{
 						sideEffect.set("wielding called");
-						return Unfolding.beckon(t);
+						return self;
 					}
 			);
 
@@ -75,7 +75,7 @@ final class UnfoldingWieldTest
 
 			final Unfolding<String> result = source.wield(
 					String::length,
-					(t, len) -> Unfolding.beckon(t)
+					(self, len) -> self
 			);
 
 			assertThat(result).isEqualTo(Unfolding.beckon("hello"));
@@ -88,10 +88,10 @@ final class UnfoldingWieldTest
 			final Unfolding<String> present = Unfolding.beckon("hello");
 			final Unfolding<String> absent = Unfolding.beckon("hi");
 
-			assertThat(present.wield(String::length, (t, len) -> len > 3 ? Unfolding.beckon(t) : Unfolding.chaos()))
+			assertThat(present.wield(String::length, (self, len) -> len > 3 ? self : Unfolding.chaos()))
 					.isEqualTo(Unfolding.beckon("hello"));
 
-			assertThat(absent.wield(String::length, (t, len) -> len > 3 ? Unfolding.beckon(t) : Unfolding.chaos()))
+			assertThat(absent.wield(String::length, (self, len) -> len > 3 ? self : Unfolding.chaos()))
 					.isEqualTo(Unfolding.chaos());
 		}
 
@@ -103,8 +103,8 @@ final class UnfoldingWieldTest
 			final Unfolding<Integer> negative = Unfolding.beckon(-3);
 
 			final Function<Integer, Boolean> instrument = n -> n > 0;
-			final BiFunction<Integer, Boolean, Unfolding<Integer>> wielding =
-					(n, isPositive) -> Unfolding.beckon(isPositive ? n * 2 : Math.abs(n));
+			final BiFunction<Unfolding<Integer>, Boolean, Unfolding<Integer>> wielding =
+					(self, isPositive) -> self.metamorphose(n -> isPositive ? n * 2 : Math.abs(n));
 
 			assertThat(positive.wield(instrument, wielding)).isEqualTo(Unfolding.beckon(10));
 			assertThat(negative.wield(instrument, wielding)).isEqualTo(Unfolding.beckon(3));
@@ -119,10 +119,10 @@ final class UnfoldingWieldTest
 
 			final Unfolding<String> result = source.wield(
 					String::length,
-					(t, len) ->
+					(self, len) ->
 					{
 						observed.set(len);
-						return Unfolding.beckon(t);
+						return self;
 					}
 			);
 
@@ -131,12 +131,29 @@ final class UnfoldingWieldTest
 		}
 
 		@Test
+		@DisplayName("should allow cleave branching using intermediate without re-wrapping")
+		void testWieldWithCleave()
+		{
+			final int threshold = 750;
+
+			final Unfolding<Integer> above = Unfolding.beckon(980);
+			final Unfolding<Integer> below = Unfolding.beckon(680);
+
+			final Function<Integer, Integer> gap = score -> score - threshold;
+			final BiFunction<Unfolding<Integer>, Integer, Unfolding<Integer>> wielding =
+					(self, g) -> self.cleave(_ -> g >= 0, s -> s, s -> s + (-g / 2));
+
+			assertThat(above.wield(gap, wielding)).isEqualTo(Unfolding.beckon(980));
+			assertThat(below.wield(gap, wielding)).isEqualTo(Unfolding.beckon(715));
+		}
+
+		@Test
 		@DisplayName("should treat null return from wielding as chaos")
 		void testWieldNullHandlerReturnBecomesChoas()
 		{
 			final Unfolding<String> source = Unfolding.beckon("hello");
 
-			assertThat(source.wield(String::length, (t, u) -> null))
+			assertThat(source.wield(String::length, (self, u) -> null))
 					.isEqualTo(Unfolding.chaos());
 		}
 
@@ -149,10 +166,10 @@ final class UnfoldingWieldTest
 
 			source.wield(
 					_ -> null,
-					(t, u) ->
+					(self, u) ->
 					{
 						capturedIntermediate.set(u);
-						return Unfolding.beckon(t);
+						return self;
 					}
 			);
 
@@ -165,7 +182,7 @@ final class UnfoldingWieldTest
 		{
 			final Unfolding<String> source = Unfolding.beckon("test");
 
-			assertThatThrownBy(() -> source.wield(null, (t, u) -> Unfolding.beckon(t)))
+			assertThatThrownBy(() -> source.wield(null, (self, u) -> self))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessageContaining("instrument may not be null");
 		}
@@ -198,43 +215,43 @@ final class UnfoldingWieldTest
 					new WieldTestCase<>("pass-through string",
 							Unfolding.beckon("hello"),
 							(Function<String, String>) t -> t.toUpperCase(),
-							(t, u) -> Unfolding.beckon(t),
+							(self, u) -> self,
 							Unfolding.beckon("hello")),
 
 					new WieldTestCase<>("filter passes",
 							Unfolding.beckon(10),
 							(Function<Integer, Boolean>) n -> n % 2 == 0,
-							(n, even) -> even ? Unfolding.beckon(n) : Unfolding.chaos(),
+							(self, even) -> even ? self : Unfolding.chaos(),
 							Unfolding.beckon(10)),
 
 					new WieldTestCase<>("filter blocks",
 							Unfolding.beckon(7),
 							(Function<Integer, Boolean>) n -> n % 2 == 0,
-							(n, even) -> even ? Unfolding.beckon(n) : Unfolding.chaos(),
+							(self, even) -> even ? self : Unfolding.chaos(),
 							Unfolding.chaos()),
 
-					new WieldTestCase<>("transform on positive intermediate",
+					new WieldTestCase<>("transform using intermediate",
 							Unfolding.beckon(4),
 							(Function<Integer, Integer>) n -> n * n,
-							(n, squared) -> Unfolding.beckon(n + squared),
+							(self, squared) -> self.metamorphose(n -> n + squared),
 							Unfolding.beckon(20)),
 
 					new WieldTestCase<>("string: use length as routing key",
 							Unfolding.beckon("hi"),
 							(Function<String, Integer>) String::length,
-							(t, len) -> Unfolding.beckon(len > 4 ? t.toUpperCase() : t.toLowerCase()),
+							(self, len) -> self.metamorphose(t -> len > 4 ? t.toUpperCase() : t.toLowerCase()),
 							Unfolding.beckon("hi")),
 
 					new WieldTestCase<>("empty source stays empty",
 							Unfolding.chaos(),
 							(Function<String, String>) t -> t.toUpperCase(),
-							(t, u) -> Unfolding.beckon(t),
+							(self, u) -> self,
 							Unfolding.chaos())
 			).map(tc -> Arguments.of(tc.description(), tc.source(), tc.instrument(), tc.wielding(), tc.expected()));
 		}
 
 		private record WieldTestCase<T, U>(String description, Unfolding<T> source, Function<T, U> instrument,
-		                                   BiFunction<T, U, Unfolding<T>> wielding, Unfolding<T> expected)
+		                                   BiFunction<Unfolding<T>, U, Unfolding<T>> wielding, Unfolding<T> expected)
 		{
 		}
 	}

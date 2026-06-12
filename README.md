@@ -81,6 +81,26 @@ var verdict = Unfolding.beckon(42)
 // "even"
 ```
 
+### The instrument is forged before the crossroads
+
+When an intermediate value must inform branching without losing the original, `wield` derives it first and
+hands the original `Unfolding` directly into the handler — no re-wrapping, no allocation.
+
+```java
+var result = Unfolding.beckon(680)
+                      .wield(
+                              score -> score - 750,
+                              (self, gap) -> self.cleave(
+                                      _ -> gap >= 0,
+                                      s -> s,
+                                      s -> s + (-gap / 2)
+                              )
+                      )
+                      .summon();
+
+// 715 — partial recovery applied because 680 is below the threshold of 750
+```
+
 ### Two threads are interlaced
 
 ```java
