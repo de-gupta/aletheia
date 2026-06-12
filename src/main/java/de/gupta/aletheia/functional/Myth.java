@@ -262,6 +262,18 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <U> Unfolding<T> wield(final Function<? super T, ? extends U> instrument,
+	                              final BiFunction<? super T, ? super U, Unfolding<T>> wielding)
+	{
+		Objects.requireNonNull(instrument, "instrument may not be null");
+		Objects.requireNonNull(wielding, "wielding may not be null");
+
+		final U intermediate = instrument.apply(hero);
+		return Optional.ofNullable(wielding.apply(hero, intermediate))
+		               .orElseGet(Unfolding::chaos);
+	}
+
+	@Override
 	public <U, R> Unfolding<R> sanctify(final Function<? super T, U> marriage,
 										final BiFunction<? super T, ? super U, R> conjugation,
 										final Predicate<? super R> judgement,

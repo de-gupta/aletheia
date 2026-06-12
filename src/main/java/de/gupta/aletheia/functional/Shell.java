@@ -151,6 +151,13 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <U> Unfolding<T> wield(final Function<? super T, ? extends U> instrument,
+	                              final BiFunction<? super T, ? super U, Unfolding<T>> wielding)
+	{
+		return instance();
+	}
+
+	@Override
 	public <U, R> Unfolding<R> sanctify(final Function<? super T, U> marriage,
 										final BiFunction<? super T, ? super U, R> conjugation,
 										final Predicate<? super R> judgement,

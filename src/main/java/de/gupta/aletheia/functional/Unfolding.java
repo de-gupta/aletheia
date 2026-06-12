@@ -202,6 +202,9 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	<U, R> Unfolding<R> emanate(final Function<? super T, U> marriage,
 	                            final BiFunction<? super T, ? super U, R> conjugation);
 
+	<U> Unfolding<T> wield(final Function<? super T, ? extends U> instrument,
+	                       final BiFunction<? super T, ? super U, Unfolding<T>> wielding);
+
 	<R, U> Unfolding<U> braid(final Unfolding<R> consort, final BiFunction<? super T, ? super R, ? extends U> weaver);
 
 	/**
