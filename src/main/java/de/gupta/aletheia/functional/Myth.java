@@ -183,6 +183,61 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> Unfolding<R> trifurcate(final ToIntFunction<? super T> reckoning,
+	                                   final Function<? super T, ? extends R> diminished,
+	                                   final Function<? super T, ? extends R> balanced,
+	                                   final Function<? super T, ? extends R> ascendant)
+	{
+		Objects.requireNonNull(reckoning, "reckoning may not be null");
+		Objects.requireNonNull(diminished, "diminished may not be null");
+		Objects.requireNonNull(balanced, "balanced may not be null");
+		Objects.requireNonNull(ascendant, "ascendant may not be null");
+
+		return switch (Integer.signum(reckoning.applyAsInt(hero)))
+		{
+			case -1 -> Unfolding.beckon(diminished.apply(hero));
+			case 0 -> Unfolding.beckon(balanced.apply(hero));
+			default -> Unfolding.beckon(ascendant.apply(hero));
+		};
+	}
+
+	@Override
+	public <R> R trifurcate(final ToIntFunction<? super T> reckoning,
+	                        final Supplier<? extends R> diminished,
+	                        final Supplier<? extends R> balanced,
+	                        final Supplier<? extends R> ascendant)
+	{
+		Objects.requireNonNull(reckoning, "reckoning may not be null");
+		Objects.requireNonNull(diminished, "diminished may not be null");
+		Objects.requireNonNull(balanced, "balanced may not be null");
+		Objects.requireNonNull(ascendant, "ascendant may not be null");
+
+		return switch (Integer.signum(reckoning.applyAsInt(hero)))
+		{
+			case -1 -> diminished.get();
+			case 0 -> balanced.get();
+			default -> ascendant.get();
+		};
+	}
+
+	@Override
+	public <R> R trifurcate(final ToIntFunction<? super T> reckoning, final R diminished, final R balanced,
+	                        final R ascendant)
+	{
+		Objects.requireNonNull(reckoning, "reckoning may not be null");
+		Objects.requireNonNull(diminished, "diminished may not be null");
+		Objects.requireNonNull(balanced, "balanced may not be null");
+		Objects.requireNonNull(ascendant, "ascendant may not be null");
+
+		return switch (Integer.signum(reckoning.applyAsInt(hero)))
+		{
+			case -1 -> diminished;
+			case 0 -> balanced;
+			default -> ascendant;
+		};
+	}
+
+	@Override
 	public <R> Unfolding<R> metamorphose(final Function<? super T, ? extends R> metamorphosis)
 	{
 		Objects.requireNonNull(metamorphosis, "metamorphosis may not be null");

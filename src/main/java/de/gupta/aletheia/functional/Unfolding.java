@@ -190,6 +190,18 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R> R fulminate(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments);
 
+	<R> Unfolding<R> trifurcate(final ToIntFunction<? super T> reckoning,
+	                            final Function<? super T, ? extends R> diminished,
+	                            final Function<? super T, ? extends R> balanced,
+	                            final Function<? super T, ? extends R> ascendant);
+
+	<R> R trifurcate(final ToIntFunction<? super T> reckoning,
+	                 final Supplier<? extends R> diminished,
+	                 final Supplier<? extends R> balanced,
+	                 final Supplier<? extends R> ascendant);
+
+	<R> R trifurcate(final ToIntFunction<? super T> reckoning, R diminished, R balanced, R ascendant);
+
 	<U, R> Unfolding<R> sanctify(final Function<? super T, U> marriage,
 	                             final BiFunction<? super T, ? super U, R> conjugation,
 	                             final Predicate<? super R> judgement,

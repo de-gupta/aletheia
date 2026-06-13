@@ -139,6 +139,31 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> Unfolding<R> trifurcate(final ToIntFunction<? super T> reckoning,
+	                                   final Function<? super T, ? extends R> diminished,
+	                                   final Function<? super T, ? extends R> balanced,
+	                                   final Function<? super T, ? extends R> ascendant)
+	{
+		return instance();
+	}
+
+	@Override
+	public <R> R trifurcate(final ToIntFunction<? super T> reckoning,
+	                        final Supplier<? extends R> diminished,
+	                        final Supplier<? extends R> balanced,
+	                        final Supplier<? extends R> ascendant)
+	{
+		throw EmptyUnfoldingException.instance();
+	}
+
+	@Override
+	public <R> R trifurcate(final ToIntFunction<? super T> reckoning, final R diminished, final R balanced,
+	                        final R ascendant)
+	{
+		throw EmptyUnfoldingException.instance();
+	}
+
+	@Override
 	public <R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot)
 	{
 		return instance();
