@@ -145,6 +145,34 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> R smite(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments,
+	                   final Supplier<? extends RuntimeException> wrath)
+	{
+		Objects.requireNonNull(judgments, "judgments may not be null");
+		Objects.requireNonNull(wrath, "wrath may not be null");
+
+		judgments.forEach((judgement, reward) ->
+		{
+			Objects.requireNonNull(judgement, "judgement may not be null");
+			Objects.requireNonNull(reward, "reward may not be null");
+		});
+
+		return judgments.sequencedEntrySet()
+		                .stream()
+		                .filter(entry -> entry.getKey().test(hero))
+		                .findFirst()
+		                .map(entry -> entry.getValue().apply(hero))
+		                .orElseThrow(wrath);
+	}
+
+	@Override
+	public <R> R smite(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments)
+	{
+		return smite(judgments,
+				() -> EmptyUnfoldingException.withMessage("No judgment was met; the map must be exhaustive"));
+	}
+
+	@Override
 	public Unfolding<T> develop(final Predicate<? super T> judgement,
 								final Function<? super T, ? extends T> development)
 	{

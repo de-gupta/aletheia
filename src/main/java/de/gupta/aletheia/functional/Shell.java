@@ -126,6 +126,19 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> R smite(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments,
+	                   final Supplier<? extends RuntimeException> wrath)
+	{
+		throw EmptyUnfoldingException.instance();
+	}
+
+	@Override
+	public <R> R smite(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments)
+	{
+		throw EmptyUnfoldingException.instance();
+	}
+
+	@Override
 	public <R> Unfolding<R> entwine(final Function<? super T, Unfolding<R>> plot)
 	{
 		return instance();
