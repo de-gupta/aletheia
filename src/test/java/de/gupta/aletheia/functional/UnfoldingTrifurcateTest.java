@@ -9,7 +9,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.stream.Stream;
 
@@ -60,7 +59,7 @@ final class UnfoldingTrifurcateTest
 		void testNullReckoning()
 		{
 			assertThatThrownBy(() -> Unfolding.beckon(1).trifurcate(
-					(ToIntFunction<Integer>) null, _ -> "d", _ -> "b", _ -> "a"))
+					null, _ -> "d", _ -> "b", _ -> "a"))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessageContaining("reckoning may not be null");
 		}
@@ -145,7 +144,7 @@ final class UnfoldingTrifurcateTest
 		<T, R> void testBranchRouting(final String description, final Unfolding<T> source,
 		                              final ToIntFunction<T> reckoning, final R expected)
 		{
-			assertThat(source.<R>trifurcate(reckoning, () -> (R) "diminished", () -> (R) "balanced",
+			assertThat(source.trifurcate(reckoning, () -> (R) "diminished", () -> (R) "balanced",
 					() -> (R) "ascendant"))
 					.as("trifurcate() for %s should return %s", source, expected)
 					.isEqualTo(expected);
@@ -229,7 +228,7 @@ final class UnfoldingTrifurcateTest
 		void testNullReckoning()
 		{
 			assertThatThrownBy(() -> Unfolding.beckon(1).trifurcate(
-					(ToIntFunction<Integer>) null, () -> "d", () -> "b", () -> "a"))
+					null, () -> "d", () -> "b", () -> "a"))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessageContaining("reckoning may not be null");
 		}
@@ -239,7 +238,7 @@ final class UnfoldingTrifurcateTest
 		void testNullDiminished()
 		{
 			assertThatThrownBy(() -> Unfolding.beckon(1).trifurcate(
-					n -> n, (Supplier<String>) null, () -> "b", () -> "a"))
+					n -> n, null, () -> "b", () -> "a"))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessageContaining("diminished may not be null");
 		}
@@ -249,7 +248,7 @@ final class UnfoldingTrifurcateTest
 		void testNullBalanced()
 		{
 			assertThatThrownBy(() -> Unfolding.beckon(1).trifurcate(
-					n -> n, () -> "d", (Supplier<String>) null, () -> "a"))
+					n -> n, () -> "d", null, () -> "a"))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessageContaining("balanced may not be null");
 		}
@@ -259,7 +258,7 @@ final class UnfoldingTrifurcateTest
 		void testNullAscendant()
 		{
 			assertThatThrownBy(() -> Unfolding.beckon(1).trifurcate(
-					n -> n, () -> "d", () -> "b", (Supplier<String>) null))
+					n -> n, () -> "d", () -> "b", null))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessageContaining("ascendant may not be null");
 		}
@@ -291,7 +290,7 @@ final class UnfoldingTrifurcateTest
 		<T, R> void testBranchRouting(final String description, final Unfolding<T> source,
 		                              final ToIntFunction<T> reckoning, final R expected)
 		{
-			assertThat(source.<R>trifurcate(reckoning, (R) "diminished", (R) "balanced", (R) "ascendant"))
+			assertThat(source.trifurcate(reckoning, (R) "diminished", (R) "balanced", (R) "ascendant"))
 					.as("trifurcate() for %s should return %s", source, expected)
 					.isEqualTo(expected);
 		}
@@ -308,7 +307,7 @@ final class UnfoldingTrifurcateTest
 		@DisplayName("should throw NullPointerException when reckoning is null")
 		void testNullReckoning()
 		{
-			assertThatThrownBy(() -> Unfolding.beckon(1).trifurcate((ToIntFunction<Integer>) null, "d", "b", "a"))
+			assertThatThrownBy(() -> Unfolding.beckon(1).trifurcate(null, "d", "b", "a"))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessageContaining("reckoning may not be null");
 		}
