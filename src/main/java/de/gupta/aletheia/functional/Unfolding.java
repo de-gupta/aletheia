@@ -174,6 +174,11 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	Unfolding<T> discern(final Predicate<? super T> judgement,
 	                     final Supplier<? extends RuntimeException> wrath);
 
+	default Verdict<T> cleave()
+	{
+		return verdict();
+	}
+
 	<R> Unfolding<R> cleave(final Predicate<? super T> judgement,
 	                        final Function<? super T, ? extends R> reward,
 	                        final Function<? super T, ? extends R> punishment);
@@ -189,6 +194,8 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	            final Supplier<? extends RuntimeException> wrath);
 
 	<R> R fulminate(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments);
+
+	Verdict<T> verdict();
 
 	<R> Unfolding<R> trifurcate(final ToIntFunction<? super T> reckoning,
 	                            final Function<? super T, ? extends R> diminished,

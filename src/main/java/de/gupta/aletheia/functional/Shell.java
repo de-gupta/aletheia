@@ -139,6 +139,12 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public Verdict<T> verdict()
+	{
+		return EmptyVerdict.instance();
+	}
+
+	@Override
 	public <R> Unfolding<R> trifurcate(final ToIntFunction<? super T> reckoning,
 	                                   final Function<? super T, ? extends R> diminished,
 	                                   final Function<? super T, ? extends R> balanced,

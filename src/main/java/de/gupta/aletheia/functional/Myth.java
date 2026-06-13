@@ -173,6 +173,12 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public Verdict<T> verdict()
+	{
+		return new PresentVerdict<>(hero);
+	}
+
+	@Override
 	public Unfolding<T> develop(final Predicate<? super T> judgement,
 								final Function<? super T, ? extends T> development)
 	{
