@@ -133,7 +133,7 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R> R smite(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments)
+	public <R> R fulminate(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments)
 	{
 		throw EmptyUnfoldingException.instance();
 	}

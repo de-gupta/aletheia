@@ -188,7 +188,7 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	<R> R smite(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments,
 	            final Supplier<? extends RuntimeException> wrath);
 
-	<R> R smite(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments);
+	<R> R fulminate(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments);
 
 	<U, R> Unfolding<R> sanctify(final Function<? super T, U> marriage,
 	                             final BiFunction<? super T, ? super U, R> conjugation,

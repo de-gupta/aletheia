@@ -166,7 +166,7 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
-	public <R> R smite(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments)
+	public <R> R fulminate(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments)
 	{
 		return smite(judgments,
 				() -> EmptyUnfoldingException.withMessage("No judgment was met; the map must be exhaustive"));

@@ -170,30 +170,30 @@ final class UnfoldingSmiteTest
 	}
 
 	@Nested
-	@DisplayName("Tests for smite(SequencedMap) method — exhaustive map, built-in exception")
-	class SmiteSequencedMapExhaustiveTests
+	@DisplayName("Tests for fulminate(SequencedMap) method — exhaustive map, built-in exception")
+	class FulminateTests
 	{
 		@ParameterizedTest(name = "{0}")
 		@DisplayName("should return result when a judgment matches")
-		@MethodSource("smiteExhaustiveMatchTestCases")
+		@MethodSource("fulminateMatchTestCases")
 		<T, R> void testMatchReturnsResult(final String description, final Unfolding<T> source,
 		                                   final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments,
 		                                   final R expected)
 		{
-			assertThat(source.smite(judgments))
-					.as("smite() for %s should return %s", source, expected)
+			assertThat(source.fulminate(judgments))
+					.as("fulminate() for %s should return %s", source, expected)
 					.isEqualTo(expected);
 		}
 
 		@ParameterizedTest(name = "{0}")
 		@DisplayName("should respect insertion order — first predicate in the map wins")
-		@MethodSource("smiteExhaustiveOrderingTestCases")
+		@MethodSource("fulminateOrderingTestCases")
 		<T, R> void testInsertionOrderRespected(final String description, final Unfolding<T> source,
 		                                        final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments,
 		                                        final R expected)
 		{
-			assertThat(source.smite(judgments))
-					.as("smite() ordering for %s should return %s", source, expected)
+			assertThat(source.fulminate(judgments))
+					.as("fulminate() ordering for %s should return %s", source, expected)
 					.isEqualTo(expected);
 		}
 
@@ -205,7 +205,7 @@ final class UnfoldingSmiteTest
 					new LinkedHashMap<>();
 			judgments.put(n -> n > 100, _ -> "large");
 
-			assertThatThrownBy(() -> Unfolding.beckon(5).smite(judgments))
+			assertThatThrownBy(() -> Unfolding.beckon(5).fulminate(judgments))
 					.isInstanceOf(EmptyUnfoldingException.class)
 					.hasMessageContaining("exhaustive");
 		}
@@ -218,7 +218,7 @@ final class UnfoldingSmiteTest
 					new LinkedHashMap<>();
 			judgments.put(n -> n > 0, _ -> "positive");
 
-			assertThatThrownBy(() -> Unfolding.<Integer>chaos().smite(judgments))
+			assertThatThrownBy(() -> Unfolding.<Integer>chaos().fulminate(judgments))
 					.isInstanceOf(EmptyUnfoldingException.class);
 		}
 
@@ -226,13 +226,13 @@ final class UnfoldingSmiteTest
 		@DisplayName("should throw NullPointerException when judgments is null")
 		void testNullJudgments()
 		{
-			assertThatThrownBy(() -> Unfolding.beckon("x").smite(
+			assertThatThrownBy(() -> Unfolding.beckon("x").fulminate(
 					(SequencedMap<Predicate<? super String>, Function<? super String, String>>) null))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessageContaining("judgments may not be null");
 		}
 
-		private static Stream<Arguments> smiteExhaustiveMatchTestCases()
+		private static Stream<Arguments> fulminateMatchTestCases()
 		{
 			return Stream.of(
 					new SmiteTestCase<>("positive integer", Unfolding.beckon(7), signMap(), "positive"),
@@ -245,7 +245,7 @@ final class UnfoldingSmiteTest
 			).map(tc -> Arguments.of(tc.description(), tc.source(), tc.judgments(), tc.expected()));
 		}
 
-		private static Stream<Arguments> smiteExhaustiveOrderingTestCases()
+		private static Stream<Arguments> fulminateOrderingTestCases()
 		{
 			final SequencedMap<Predicate<? super Integer>, Function<? super Integer, String>> broaderFirst =
 					new LinkedHashMap<>();
