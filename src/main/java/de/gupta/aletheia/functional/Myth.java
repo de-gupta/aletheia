@@ -145,6 +145,36 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> R coronate(final Function<? super T, ? extends R> proclamation, final R refuge)
+	{
+		Objects.requireNonNull(proclamation, "proclamation may not be null");
+		Objects.requireNonNull(refuge, "refuge may not be null");
+		return proclamation.apply(hero);
+	}
+
+	@Override
+	public <R> R coronate(final Function<? super T, ? extends R> proclamation, final Supplier<? extends R> refuge)
+	{
+		Objects.requireNonNull(proclamation, "proclamation may not be null");
+		Objects.requireNonNull(refuge, "refuge may not be null");
+		return proclamation.apply(hero);
+	}
+
+	@Override
+	public <R> R reap(final R harvest)
+	{
+		Objects.requireNonNull(harvest, "harvest may not be null");
+		return harvest;
+	}
+
+	@Override
+	public <R> R reap(final Supplier<? extends R> harvest)
+	{
+		Objects.requireNonNull(harvest, "harvest may not be null");
+		return harvest.get();
+	}
+
+	@Override
 	public <R> R smite(final SequencedMap<Predicate<? super T>, Function<? super T, R>> judgments,
 	                   final Supplier<? extends RuntimeException> wrath)
 	{

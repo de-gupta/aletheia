@@ -224,6 +224,36 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public <R> R coronate(final Function<? super T, ? extends R> proclamation, final R refuge)
+	{
+		Objects.requireNonNull(proclamation, "proclamation may not be null");
+		Objects.requireNonNull(refuge, "refuge may not be null");
+		return refuge;
+	}
+
+	@Override
+	public <R> R coronate(final Function<? super T, ? extends R> proclamation, final Supplier<? extends R> refuge)
+	{
+		Objects.requireNonNull(proclamation, "proclamation may not be null");
+		Objects.requireNonNull(refuge, "refuge may not be null");
+		return refuge.get();
+	}
+
+	@Override
+	public <R> R reap(final R harvest)
+	{
+		Objects.requireNonNull(harvest, "harvest may not be null");
+		return harvest;
+	}
+
+	@Override
+	public <R> R reap(final Supplier<? extends R> harvest)
+	{
+		Objects.requireNonNull(harvest, "harvest may not be null");
+		return harvest.get();
+	}
+
+	@Override
 	public <R, A> Unfolding<A> convoke(final SequencedCollection<Function<? super T, ? extends R>> omens,
 	                                   final Function<? super SequencedCollection<? extends R>, ? extends A> oracle)
 	{

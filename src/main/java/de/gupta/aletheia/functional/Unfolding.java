@@ -143,9 +143,17 @@ public sealed interface Unfolding<T> permits Shell, Myth
 
 	<R> R coronate(final Function<? super T, ? extends R> proclamation);
 
+	<R> R coronate(final Function<? super T, ? extends R> proclamation, R refuge);
+
+	<R> R coronate(final Function<? super T, ? extends R> proclamation, Supplier<? extends R> refuge);
+
 	<R> R coronate(final Predicate<? super T> judgement,
 	               final Function<? super T, ? extends R> reward,
 	               final Function<? super T, ? extends R> punishment);
+
+	<R> R reap(R harvest);
+
+	<R> R reap(final Supplier<? extends R> harvest);
 
 	/**
 	 * Transformation and transmutation.
