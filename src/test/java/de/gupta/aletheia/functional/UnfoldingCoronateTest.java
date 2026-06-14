@@ -105,8 +105,8 @@ final class UnfoldingCoronateTest
 		final class WithNullArguments
 		{
 			@Test
-			@DisplayName("throws when proclamation is null")
-			void throwsWhenProclamationIsNull()
+			@DisplayName("throws when proclamation is null and source is present")
+			void throwsWhenProclamationIsNullAndSourceIsPresent()
 			{
 				assertThatThrownBy(() -> Unfolding.beckon("x").coronate(null, 0))
 						.as("null proclamation on present source")
@@ -115,8 +115,18 @@ final class UnfoldingCoronateTest
 			}
 
 			@Test
-			@DisplayName("throws when refuge is null")
-			void throwsWhenRefugeIsNull()
+			@DisplayName("throws when proclamation is null and source is empty")
+			void throwsWhenProclamationIsNullAndSourceIsEmpty()
+			{
+				assertThatThrownBy(() -> Unfolding.<String>chaos().coronate(null, 0))
+						.as("null proclamation on empty source")
+						.isInstanceOf(NullPointerException.class)
+						.hasMessageContaining("proclamation may not be null");
+			}
+
+			@Test
+			@DisplayName("throws when refuge is null and source is present")
+			void throwsWhenRefugeIsNullAndSourceIsPresent()
 			{
 				assertThatThrownBy(() -> Unfolding.beckon("x").coronate(String::length, (Integer) null))
 						.as("null refuge on present source")
@@ -178,6 +188,24 @@ final class UnfoldingCoronateTest
 		@DisplayName("when Unfolding is empty")
 		final class WhenUnfoldingIsEmpty
 		{
+			@Test
+			@DisplayName("does not invoke proclamation when source is empty")
+			void doesNotInvokeProclamationWhenSourceIsEmpty()
+			{
+				final AtomicInteger proclamationCalls = new AtomicInteger();
+
+				Unfolding.<String>chaos().coronate(
+						s ->
+						{
+							proclamationCalls.incrementAndGet();
+							return s.length();
+						}, () -> 0);
+
+				assertThat(proclamationCalls.get())
+						.as("proclamation call count on empty source")
+						.isEqualTo(0);
+			}
+
 			@ParameterizedTest(name = "{0}")
 			@MethodSource("evaluatesRefugeSupplierAndReturnsItsResultCases")
 			@DisplayName("evaluates refuge supplier exactly once and returns its result")
@@ -211,8 +239,8 @@ final class UnfoldingCoronateTest
 		final class WithNullArguments
 		{
 			@Test
-			@DisplayName("throws when proclamation is null")
-			void throwsWhenProclamationIsNull()
+			@DisplayName("throws when proclamation is null and source is present")
+			void throwsWhenProclamationIsNullAndSourceIsPresent()
 			{
 				assertThatThrownBy(() -> Unfolding.beckon("x").coronate(null, () -> 0))
 						.as("null proclamation on present source")
@@ -221,8 +249,18 @@ final class UnfoldingCoronateTest
 			}
 
 			@Test
-			@DisplayName("throws when refuge supplier is null")
-			void throwsWhenRefugeSupplierIsNull()
+			@DisplayName("throws when proclamation is null and source is empty")
+			void throwsWhenProclamationIsNullAndSourceIsEmpty()
+			{
+				assertThatThrownBy(() -> Unfolding.<String>chaos().coronate(null, () -> 0))
+						.as("null proclamation on empty source")
+						.isInstanceOf(NullPointerException.class)
+						.hasMessageContaining("proclamation may not be null");
+			}
+
+			@Test
+			@DisplayName("throws when refuge supplier is null and source is present")
+			void throwsWhenRefugeSupplierIsNullAndSourceIsPresent()
 			{
 				assertThatThrownBy(() -> Unfolding.beckon("x").coronate(String::length, null))
 						.as("null refuge supplier on present source")

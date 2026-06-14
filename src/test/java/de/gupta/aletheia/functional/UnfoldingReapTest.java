@@ -156,6 +156,18 @@ final class UnfoldingReapTest
 		}
 
 		@Test
+		@DisplayName("returns supplier result when prior chain step stays present")
+		void returnsSupplierResultWhenPriorChainStepStaysPresent()
+		{
+			final String result = Unfolding.beckon("hello world")
+			                               .discern(s -> s.length() > 5)
+			                               .reap(() -> "constant");
+
+			assertThat(result).as("chain stayed present — reap supplier should still be evaluated")
+			                  .isEqualTo("constant");
+		}
+
+		@Test
 		@DisplayName("allows chain exceptions to propagate before reaping")
 		void allowsChainExceptionsToPropagateBeforeReaping()
 		{
