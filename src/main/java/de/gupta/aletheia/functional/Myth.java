@@ -42,6 +42,19 @@ final class Myth<T> implements Unfolding<T>
 	}
 
 	@Override
+	public Unfolding<T> interdict(final Predicate<? super T> judgement,
+	                              final Supplier<? extends RuntimeException> wrath)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		Objects.requireNonNull(wrath, "wrath may not be null");
+		if (judgement.test(hero))
+		{
+			throw wrath.get();
+		}
+		return this;
+	}
+
+	@Override
 	public int hashCode()
 	{
 		return Objects.hashCode(hero);

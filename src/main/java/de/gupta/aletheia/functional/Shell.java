@@ -35,6 +35,13 @@ final class Shell<T> implements Unfolding<T>
 	}
 
 	@Override
+	public Unfolding<T> interdict(final Predicate<? super T> judgement,
+	                              final Supplier<? extends RuntimeException> wrath)
+	{
+		return instance();
+	}
+
+	@Override
 	public boolean sterile()
 	{
 		return true;

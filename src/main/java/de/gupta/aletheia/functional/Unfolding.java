@@ -81,6 +81,11 @@ public sealed interface Unfolding<T> permits Shell, Myth
 		return infuse(supplier);
 	}
 
+	default T orElseThrow()
+	{
+		return summon();
+	}
+
 	default T orElseThrow(final Supplier<? extends RuntimeException> exceptionSupplier)
 	{
 		return decree(exceptionSupplier);
@@ -266,4 +271,6 @@ public sealed interface Unfolding<T> permits Shell, Myth
 	void interdict(final Supplier<? extends RuntimeException> wrath);
 
 	void interdict(final Function<? super T, Supplier<? extends RuntimeException>> wrath);
+
+	Unfolding<T> interdict(final Predicate<? super T> judgement, final Supplier<? extends RuntimeException> wrath);
 }
