@@ -3,6 +3,8 @@ package de.gupta.aletheia.forge;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class OrderedTest
@@ -48,5 +50,22 @@ class OrderedTest
 		assertThat(first).isNotEqualTo(fourth); // Different element
 
 		assertThat(first.hashCode()).isNotEqualTo(second.hashCode());
+	}
+
+	@Test
+	@DisplayName("hashCode() computes the expected formula using order, sequence, and element")
+	void hashCodeFollowsFormula() throws Exception
+	{
+		final Ordered<String> o = Ordered.of(2, "test");
+
+		final Field sequenceField = Ordered.class.getDeclaredField("sequence");
+		sequenceField.setAccessible(true);
+		final long sequence = (long) sequenceField.get(o);
+
+		int expected = 2;
+		expected = 31 * expected + Long.hashCode(sequence);
+		expected = 31 * expected + "test".hashCode();
+
+		assertThat(o.hashCode()).isEqualTo(expected);
 	}
 }

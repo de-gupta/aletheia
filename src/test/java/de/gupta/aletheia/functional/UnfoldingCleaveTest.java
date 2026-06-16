@@ -8,10 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -244,6 +241,20 @@ final class UnfoldingCleaveTest
 
 			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(judgments, "punish"))
 					.isInstanceOf(NullPointerException.class);
+		}
+
+		@Test
+		@DisplayName("cleave(Map, punishment) — validates all entries eagerly; null mapper for non-matching predicate throws")
+		void throwsIfAnyMapperIsNullEvenForNonMatchingPredicate()
+		{
+			final SequencedMap<Predicate<? super String>, Function<? super String, String>> judgments =
+					new LinkedHashMap<>();
+			judgments.put(_ -> false, null);
+			judgments.put(_ -> true, _ -> "result");
+
+			assertThatThrownBy(() -> Unfolding.beckon("hero").cleave(judgments, "punish"))
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("reward may not be null");
 		}
 
 		@Test

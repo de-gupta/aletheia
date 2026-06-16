@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 final class UnfoldingTest
 {
@@ -2177,6 +2178,17 @@ final class UnfoldingTest
 
 			// Note: Different unfoldings may have the same hashCode by coincidence,
 			// so we don't assert that they must have different hashCodes when not equal
+		}
+
+		@Test
+		@DisplayName("hashCode() delegates to Objects.hashCode of the wrapped value")
+		void hashCodeDelegatesToWrappedValue()
+		{
+			assertSoftly(_ ->
+			{
+				assertThat(Unfolding.beckon("hello").hashCode()).isEqualTo(Objects.hashCode("hello"));
+				assertThat(Unfolding.beckon(42).hashCode()).isEqualTo(Objects.hashCode(42));
+			});
 		}
 
 		@ParameterizedTest(name = "{0}")

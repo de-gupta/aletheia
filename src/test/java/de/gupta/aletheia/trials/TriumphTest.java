@@ -2,11 +2,13 @@ package de.gupta.aletheia.trials;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -139,6 +141,14 @@ final class TriumphTest
 					new HashEqualCase("string boons", Fallible.beckon("Orpheus"), Fallible.beckon("Orpheus")),
 					new HashEqualCase("null boons", Fallible.beckon(null), Fallible.beckon(null))
 			).map(tc -> Arguments.of(tc.as(), tc));
+		}
+
+		@Test
+		@DisplayName("hashCode() delegates to Objects.hashCode of the wrapped boon")
+		void hashCodeDelegatesToWrappedBoon()
+		{
+			assertThat(Fallible.beckon("Orpheus").hashCode()).isEqualTo(Objects.hashCode("Orpheus"));
+			assertThat(Fallible.beckon(42).hashCode()).isEqualTo(Objects.hashCode(42));
 		}
 
 		private record StabilityCase(String as, Fallible<?> triumph)

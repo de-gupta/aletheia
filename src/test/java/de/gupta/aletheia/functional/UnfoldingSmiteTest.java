@@ -109,6 +109,20 @@ final class UnfoldingSmiteTest
 		}
 
 		@Test
+		@DisplayName("should throw NullPointerException for null mapper on non-matching predicate — eager validation")
+		void testNullMapperForNonMatchingPredicate()
+		{
+			final SequencedMap<Predicate<? super String>, Function<? super String, String>> judgments =
+					new LinkedHashMap<>();
+			judgments.put(_ -> false, null);
+			judgments.put(_ -> true, _ -> "result");
+
+			assertThatThrownBy(() -> Unfolding.beckon("hero").smite(judgments, IllegalStateException::new))
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("reward may not be null");
+		}
+
+		@Test
 		@DisplayName("should throw NullPointerException when wrath is null")
 		void testNullWrath()
 		{

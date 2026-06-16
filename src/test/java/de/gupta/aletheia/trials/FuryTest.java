@@ -2,11 +2,13 @@ package de.gupta.aletheia.trials;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -168,6 +170,18 @@ final class FuryTest
 											 throw sharedDoom;
 										 }, List.of())))
 			             .map(tc -> Arguments.of(tc.description(), tc.left(), tc.right()));
+		}
+
+		@Test
+		@DisplayName("hashCode() delegates to Objects.hashCode of the wrapped doom")
+		void hashCodeDelegatesToWrappedDoom()
+		{
+			final IllegalArgumentException doom = new IllegalArgumentException("hashtest");
+			final Fallible<String> fury = Fallible.beckon("x").metamorphose(_ ->
+			{
+				throw doom;
+			}, List.of());
+			assertThat(fury.hashCode()).isEqualTo(Objects.hashCode(doom));
 		}
 
 		private record HashConsistencyCase(String description, Fallible<String> fury)
