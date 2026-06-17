@@ -311,7 +311,7 @@ final class Brook<E> implements Cascade<E>
 	}
 
 	@Override
-	public <R, A> R gather(final Collector<? super E, A, R> collector)
+	public <R, A> R precipitate(final Collector<? super E, A, R> collector)
 	{
 		Objects.requireNonNull(collector, "collector may not be null");
 		return source.get().collect(collector);

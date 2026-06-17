@@ -76,16 +76,16 @@ public sealed interface Cascade<E> permits Brook, Nadir
 
 	Unfolding<E> dusk();
 
-	default <R, A> R collect(final Collector<? super E, A, R> collector)
+	default <R, A> R gather(final Collector<? super E, A, R> collector)
 	{
-		return gather(collector);
+		return precipitate(collector);
 	}
 
 	/**
 	 * Aggregation
 	 */
 
-	<R, A> R gather(final Collector<? super E, A, R> collector);
+	<R, A> R precipitate(final Collector<? super E, A, R> collector);
 
 	default long tally()
 	{

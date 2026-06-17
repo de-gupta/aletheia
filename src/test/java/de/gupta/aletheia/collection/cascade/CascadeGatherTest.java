@@ -14,8 +14,8 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@DisplayName("Cascade#gather")
-final class CascadeGatherTest
+@DisplayName("Cascade#precipitate")
+final class CascadePrecipitateTest
 {
 	@Nested
 	@DisplayName("when Cascade is present")
@@ -24,7 +24,7 @@ final class CascadeGatherTest
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("collectsViaCollectorCases")
 		@DisplayName("applies the collector and returns its result")
-		<R> void appliesCollectorAndReturnsResult(final String as, final GatherCase<R> tc)
+		<R> void appliesCollectorAndReturnsResult(final String as, final PrecipitateCase<R> tc)
 		{
 			assertThat(tc.invoke())
 					.as(as)
@@ -32,21 +32,21 @@ final class CascadeGatherTest
 		}
 
 		@Test
-		@DisplayName("collect() delegates to gather()")
-		void collectDelegatesToGather()
+		@DisplayName("gather() delegates to precipitate()")
+		void gatherDelegatesToPrecipitate()
 		{
 			final Cascade<Integer> cascade = Cascade.beckon(1, 2, 3);
 
-			assertThat(cascade.collect(Collectors.toList()))
-					.as("collect() must equal gather()")
-					.isEqualTo(cascade.gather(Collectors.toList()));
+			assertThat(cascade.gather(Collectors.toList()))
+					.as("gather() must equal precipitate()")
+					.isEqualTo(cascade.precipitate(Collectors.toList()));
 		}
 
 		@Test
 		@DisplayName("throws when collector is null")
 		void throwsWhenCollectorIsNull()
 		{
-			assertThatThrownBy(() -> Cascade.beckon(1).gather(null))
+			assertThatThrownBy(() -> Cascade.beckon(1).precipitate(null))
 					.isInstanceOf(NullPointerException.class)
 					.hasMessage("collector may not be null");
 		}
@@ -54,14 +54,14 @@ final class CascadeGatherTest
 		private static Stream<Arguments> collectsViaCollectorCases()
 		{
 			return Stream.of(
-					new GatherCase<>("count via Collectors.counting()",
-							() -> Cascade.beckon(1, 2, 3).gather(Collectors.counting()), 3L),
-					new GatherCase<>("join strings",
-							() -> Cascade.beckon("a", "b", "c").gather(Collectors.joining(", ")), "a, b, c"),
-					new GatherCase<>("sum integers",
-							() -> Cascade.beckon(1, 2, 3, 4).gather(Collectors.summingInt(Integer::intValue)), 10),
-					new GatherCase<>("collect to list",
-							() -> Cascade.beckon(10, 20).gather(Collectors.toList()), List.of(10, 20))
+					new PrecipitateCase<>("count via Collectors.counting()",
+							() -> Cascade.beckon(1, 2, 3).precipitate(Collectors.counting()), 3L),
+					new PrecipitateCase<>("join strings",
+							() -> Cascade.beckon("a", "b", "c").precipitate(Collectors.joining(", ")), "a, b, c"),
+					new PrecipitateCase<>("sum integers",
+							() -> Cascade.beckon(1, 2, 3, 4).precipitate(Collectors.summingInt(Integer::intValue)), 10),
+					new PrecipitateCase<>("collect to list",
+							() -> Cascade.beckon(10, 20).precipitate(Collectors.toList()), List.of(10, 20))
 			).map(tc -> Arguments.of(tc.as(), tc));
 		}
 
@@ -71,7 +71,7 @@ final class CascadeGatherTest
 			R invoke();
 		}
 
-		private record GatherCase<R>(String as, Invocation<R> invocation, R expected)
+		private record PrecipitateCase<R>(String as, Invocation<R> invocation, R expected)
 		{
 			R invoke()
 			{
@@ -88,7 +88,7 @@ final class CascadeGatherTest
 		@DisplayName("returns the collector identity for empty stream")
 		void returnsCollectorIdentityForEmptyStream()
 		{
-			assertThat(Cascade.<Integer>abyss().gather(Collectors.counting()))
+			assertThat(Cascade.<Integer>abyss().precipitate(Collectors.counting()))
 					.as("count on empty cascade should be zero")
 					.isEqualTo(0L);
 		}
@@ -97,7 +97,7 @@ final class CascadeGatherTest
 		@DisplayName("returns empty list when collecting to list")
 		void returnsEmptyListWhenCollectingToList()
 		{
-			assertThat(Cascade.<String>abyss().gather(Collectors.toList()))
+			assertThat(Cascade.<String>abyss().precipitate(Collectors.toList()))
 					.as("toList on empty cascade should be empty")
 					.isEmpty();
 		}
