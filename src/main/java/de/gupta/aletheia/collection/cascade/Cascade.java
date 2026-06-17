@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.*;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 public sealed interface Cascade<E> permits Brook, Nadir
@@ -67,6 +68,56 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	{
 		return herald();
 	}
+
+	default Unfolding<E> last()
+	{
+		return dusk();
+	}
+
+	Unfolding<E> dusk();
+
+	default <R, A> R collect(final Collector<? super E, A, R> collector)
+	{
+		return gather(collector);
+	}
+
+	/**
+	 * Aggregation
+	 */
+
+	<R, A> R gather(final Collector<? super E, A, R> collector);
+
+	default long tally()
+	{
+		return reckon();
+	}
+
+	long reckon();
+
+	default Unfolding<E> maximum(final Comparator<? super E> comparator)
+	{
+		return zenith(comparator);
+	}
+
+	Unfolding<E> zenith(final Comparator<? super E> comparator);
+
+	default Unfolding<E> minimum(final Comparator<? super E> comparator)
+	{
+		return nadir(comparator);
+	}
+
+	Unfolding<E> nadir(final Comparator<? super E> comparator);
+
+	default boolean all(final Predicate<? super E> test)
+	{
+		return affirm(test);
+	}
+
+	/**
+	 * Query
+	 */
+
+	boolean affirm(final Predicate<? super E> judgement);
 
 	default <F> Cascade<F> map(final Function<? super E, ? extends F> mapper)
 	{
@@ -229,6 +280,13 @@ public sealed interface Cascade<E> permits Brook, Nadir
 
 	Cascade<E> ordain();
 
+	default boolean any(final Predicate<? super E> test)
+	{
+		return permit(test);
+	}
+
+	boolean permit(final Predicate<? super E> judgement);
+
 	<F> Cascade<F> transfigure(final Function<Collection<? extends E>, ? extends Collection<F>> transmutation);
 
 	/**
@@ -265,6 +323,41 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	<R> R weave(final R initial, final BiFunction<? super R, ? super E, ? extends R> operation);
 
 	Unfolding<E> smelt(final BiFunction<? super E, ? super E, ? extends E> operation);
+
+	default boolean none(final Predicate<? super E> test)
+	{
+		return deny(test);
+	}
+
+	boolean deny(final Predicate<? super E> judgement);
+
+	default boolean contains(final E element)
+	{
+		return harbor(element);
+	}
+
+	boolean harbor(final E element);
+
+	default Unfolding<E> find(final Predicate<? super E> test)
+	{
+		return seek(test);
+	}
+
+	Unfolding<E> seek(final Predicate<? super E> judgement);
+
+	default Cascade<E> skip(final int n)
+	{
+		return forsake(n);
+	}
+
+	Cascade<E> forsake(final int n);
+
+	default Cascade<E> limit(final int n)
+	{
+		return temper(n);
+	}
+
+	Cascade<E> temper(final int n);
 
 	/**
 	 * Recovery and renewal

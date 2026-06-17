@@ -9,6 +9,7 @@ import de.gupta.aletheia.functional.Unfolding;
 
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 final class Brook<E> implements Cascade<E>
@@ -295,6 +296,85 @@ final class Brook<E> implements Cascade<E>
 	public Unfolding<E> herald()
 	{
 		return Unfolding.distill(source.get());
+	}
+
+	@Override
+	public Cascade<E> forsake(final int n)
+	{
+		return channel(s -> s.skip(n));
+	}
+
+	@Override
+	public Cascade<E> temper(final int n)
+	{
+		return channel(s -> s.limit(n));
+	}
+
+	@Override
+	public <R, A> R gather(final Collector<? super E, A, R> collector)
+	{
+		Objects.requireNonNull(collector, "collector may not be null");
+		return source.get().collect(collector);
+	}
+
+	@Override
+	public long reckon()
+	{
+		return source.get().count();
+	}
+
+	@Override
+	public Unfolding<E> zenith(final Comparator<? super E> comparator)
+	{
+		Objects.requireNonNull(comparator, "comparator may not be null");
+		return Unfolding.augur(source.get().max(comparator));
+	}
+
+	@Override
+	public Unfolding<E> nadir(final Comparator<? super E> comparator)
+	{
+		Objects.requireNonNull(comparator, "comparator may not be null");
+		return Unfolding.augur(source.get().min(comparator));
+	}
+
+	@Override
+	public boolean affirm(final Predicate<? super E> judgement)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		return source.get().allMatch(judgement);
+	}
+
+	@Override
+	public boolean permit(final Predicate<? super E> judgement)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		return source.get().anyMatch(judgement);
+	}
+
+	@Override
+	public boolean deny(final Predicate<? super E> judgement)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		return source.get().noneMatch(judgement);
+	}
+
+	@Override
+	public boolean harbor(final E element)
+	{
+		return source.get().anyMatch(e -> Objects.equals(e, element));
+	}
+
+	@Override
+	public Unfolding<E> seek(final Predicate<? super E> judgement)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		return Unfolding.distill(source.get().filter(judgement));
+	}
+
+	@Override
+	public Unfolding<E> dusk()
+	{
+		return Unfolding.augur(source.get().reduce((_, b) -> b));
 	}
 
 	@Override

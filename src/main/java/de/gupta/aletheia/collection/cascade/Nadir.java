@@ -9,6 +9,7 @@ import de.gupta.aletheia.functional.Unfolding;
 
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 final class Nadir<E> implements Cascade<E>
@@ -215,6 +216,79 @@ final class Nadir<E> implements Cascade<E>
 	public Unfolding<E> herald()
 	{
 		return Unfolding.chaos();
+	}
+
+	@Override
+	public Unfolding<E> dusk()
+	{
+		return Unfolding.chaos();
+	}
+
+	@Override
+	public <R, A> R gather(final Collector<? super E, A, R> collector)
+	{
+		Objects.requireNonNull(collector, "collector may not be null");
+		return Stream.<E>empty().collect(collector);
+	}
+
+	@Override
+	public long reckon()
+	{
+		return 0L;
+	}
+
+	@Override
+	public Unfolding<E> zenith(final Comparator<? super E> comparator)
+	{
+		return Unfolding.chaos();
+	}
+
+	@Override
+	public Unfolding<E> nadir(final Comparator<? super E> comparator)
+	{
+		return Unfolding.chaos();
+	}
+
+	@Override
+	public boolean affirm(final Predicate<? super E> judgement)
+	{
+		return true;
+	}
+
+	@Override
+	public boolean permit(final Predicate<? super E> judgement)
+	{
+		return false;
+	}
+
+	@Override
+	public boolean deny(final Predicate<? super E> judgement)
+	{
+		return true;
+	}
+
+	@Override
+	public boolean harbor(final E element)
+	{
+		return false;
+	}
+
+	@Override
+	public Unfolding<E> seek(final Predicate<? super E> judgement)
+	{
+		return Unfolding.chaos();
+	}
+
+	@Override
+	public Cascade<E> forsake(final int n)
+	{
+		return instance();
+	}
+
+	@Override
+	public Cascade<E> temper(final int n)
+	{
+		return instance();
 	}
 
 	@Override
