@@ -292,6 +292,12 @@ final class Brook<E> implements Cascade<E>
 	}
 
 	@Override
+	public Unfolding<E> herald()
+	{
+		return Unfolding.distill(source.get());
+	}
+
+	@Override
 	public Unfolding<E> smelt(final BiFunction<? super E, ? super E, ? extends E> operation)
 	{
 		Objects.requireNonNull(operation, "operation may not be null");

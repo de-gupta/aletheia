@@ -212,6 +212,12 @@ final class Nadir<E> implements Cascade<E>
 	// -------------------------------------------------------------------------
 
 	@Override
+	public Unfolding<E> herald()
+	{
+		return Unfolding.chaos();
+	}
+
+	@Override
 	public Unfolding<E> smelt(final BiFunction<? super E, ? super E, ? extends E> operation)
 	{
 		Objects.requireNonNull(operation, "operation may not be null");

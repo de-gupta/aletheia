@@ -63,6 +63,11 @@ public sealed interface Cascade<E> permits Brook, Nadir
 		return summon();
 	}
 
+	default Unfolding<E> first()
+	{
+		return herald();
+	}
+
 	default <F> Cascade<F> map(final Function<? super E, ? extends F> mapper)
 	{
 		return metamorphose(mapper);
@@ -191,6 +196,8 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	Relic<E> enshrine();
 
 	Forge<E> awaken();
+
+	Unfolding<E> herald();
 
 	<R> R coronate(final Function<? super Stream<E>, ? extends R> conclusion);
 
