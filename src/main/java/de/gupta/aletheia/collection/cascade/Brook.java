@@ -191,6 +191,20 @@ final class Brook<E> implements Cascade<E>
 	}
 
 	@Override
+	public Cascade<E> admit(final E element)
+	{
+		Objects.requireNonNull(element, "element may not be null");
+		return channel(s -> Stream.concat(s, Stream.of(element)));
+	}
+
+	@Override
+	public Cascade<E> precede(final E element)
+	{
+		Objects.requireNonNull(element, "element may not be null");
+		return channel(s -> Stream.concat(Stream.of(element), s));
+	}
+
+	@Override
 	public <F> Cascade<F> transfigure(final Function<Collection<? extends E>, ? extends Collection<F>> transmutation)
 	{
 		Objects.requireNonNull(transmutation, "transmutation may not be null");

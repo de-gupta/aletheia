@@ -137,6 +137,20 @@ final class Nadir<E> implements Cascade<E>
 	}
 
 	@Override
+	public Cascade<E> admit(final E element)
+	{
+		Objects.requireNonNull(element, "element may not be null");
+		return Cascade.beckon(List.of(element));
+	}
+
+	@Override
+	public Cascade<E> precede(final E element)
+	{
+		Objects.requireNonNull(element, "element may not be null");
+		return Cascade.beckon(List.of(element));
+	}
+
+	@Override
 	public <F> Cascade<F> transfigure(final Function<Collection<? extends E>, ? extends Collection<F>> transmutation)
 	{
 		return instance();

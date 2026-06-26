@@ -159,6 +159,13 @@ public sealed interface Cascade<E> permits Brook, Nadir
 		return purify();
 	}
 
+	default Cascade<E> append(final E element)
+	{
+		return admit(element);
+	}
+
+	Cascade<E> admit(final E element);
+
 	default <R> R fold(final R initial, final BiFunction<? super R, ? super E, ? extends R> operation)
 	{
 		return weave(initial, operation);
@@ -288,6 +295,13 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	Cascade<E> ordain(final Comparator<? super E> order);
 
 	Cascade<E> ordain();
+
+	default Cascade<E> prepend(final E element)
+	{
+		return precede(element);
+	}
+
+	Cascade<E> precede(final E element);
 
 	default boolean any(final Predicate<? super E> test)
 	{
