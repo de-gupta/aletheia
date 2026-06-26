@@ -137,6 +137,37 @@ final class Nadir<E> implements Cascade<E>
 	}
 
 	@Override
+	public Cascade<E> abide(final Predicate<? super E> judgement)
+	{
+		return instance();
+	}
+
+	@Override
+	public Cascade<E> waive(final Predicate<? super E> judgement)
+	{
+		return instance();
+	}
+
+	@Override
+	public Cascade<E> invert()
+	{
+		return instance();
+	}
+
+	@Override
+	public Unfolding<E> at(final int index)
+	{
+		return Unfolding.chaos();
+	}
+
+	@Override
+	public Dyad<Cascade<E>, Cascade<E>> bisect(final Predicate<? super E> judgement)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		return Dyad.of(instance(), instance());
+	}
+
+	@Override
 	public Cascade<E> admit(final Cascade<E> other)
 	{
 		Objects.requireNonNull(other, "other may not be null");

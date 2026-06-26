@@ -23,10 +23,10 @@ final class Brook<E> implements Cascade<E>
 		return ignite(source);
 	}
 
-	static <E> Cascade<E> kindle(final Collection<? extends E> elements)
+	static <E> Cascade<E> kindle(final Crucible<E> crucible)
 	{
-		Objects.requireNonNull(elements, "elements may not be null");
-		return ignite(() -> confluent(elements.stream()));
+		Objects.requireNonNull(crucible, "crucible may not be null");
+		return kindle(crucible.manifest());
 	}
 
 	static <E> Cascade<E> kindle(final E[] elements)
@@ -41,10 +41,11 @@ final class Brook<E> implements Cascade<E>
 		return ignite(() -> confluent(stream));
 	}
 
-	static <E> Cascade<E> kindle(final Crucible<E> crucible)
+	static <E> Cascade<E> kindle(final Collection<? extends E> elements)
 	{
-		Objects.requireNonNull(crucible, "crucible may not be null");
-		return ignite(() -> crucible.manifest().stream());
+		Objects.requireNonNull(elements, "elements may not be null");
+		final var ordered = elements instanceof SequencedCollection<? extends E> sc ? sc : new ArrayList<>(elements);
+		return ignite(() -> confluent(ordered.stream()));
 	}
 
 	private static <E> Brook<E> ignite(final Supplier<Stream<E>> source)
@@ -188,6 +189,41 @@ final class Brook<E> implements Cascade<E>
 	public Cascade<E> ordain()
 	{
 		return channel(s -> s.sorted((a, b) -> ((Comparable<E>) a).compareTo(b)));
+	}
+
+	@Override
+	public Unfolding<E> at(final int index)
+	{
+		if (index < 0) return Unfolding.chaos();
+		return Unfolding.distill(source.get().skip(index));
+	}
+
+	@Override
+	public Cascade<E> invert()
+	{
+		return ignite(() -> source.get().toList().reversed().stream());
+	}
+
+	@Override
+	public Cascade<E> abide(final Predicate<? super E> judgement)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		return channel(s -> s.takeWhile(judgement));
+	}
+
+	@Override
+	public Cascade<E> waive(final Predicate<? super E> judgement)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		return channel(s -> s.dropWhile(judgement));
+	}
+
+	@Override
+	public Dyad<Cascade<E>, Cascade<E>> bisect(final Predicate<? super E> judgement)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		final var partitioned = source.get().collect(Collectors.partitioningBy(judgement));
+		return Dyad.of(Cascade.beckon(partitioned.get(true)), Cascade.beckon(partitioned.get(false)));
 	}
 
 	@Override

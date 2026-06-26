@@ -157,6 +157,25 @@ public sealed interface Cascade<E> permits Brook, Nadir
 		return purify();
 	}
 
+	default Cascade<E> takeWhile(final Predicate<? super E> predicate)
+	{
+		return abide(predicate);
+	}
+
+	Cascade<E> abide(final Predicate<? super E> judgement);
+
+	default Cascade<E> dropWhile(final Predicate<? super E> predicate)
+	{
+		return waive(predicate);
+	}
+
+	Cascade<E> waive(final Predicate<? super E> judgement);
+
+	default Cascade<E> reverse()
+	{
+		return invert();
+	}
+
 	default Cascade<E> append(final E element)
 	{
 		return admit(element);
@@ -286,6 +305,8 @@ public sealed interface Cascade<E> permits Brook, Nadir
 
 	Unfolding<E> herald();
 
+	Cascade<E> invert();
+
 	<R> R coronate(final Function<? super Stream<E>, ? extends R> conclusion);
 
 	<R> R coronate(final Function<? super Stream<E>, ? extends R> conclusion,
@@ -311,6 +332,18 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	<F> Cascade<Dyad<E, F>> interlace(final Function<? super E, ? extends F> interlacing);
 
 	Cascade<E> purify();
+
+	default Unfolding<E> get(final int index)
+	{
+		return at(index);
+	}
+
+	Unfolding<E> at(final int index);
+
+	default Dyad<Cascade<E>, Cascade<E>> partition(final Predicate<? super E> predicate)
+	{
+		return bisect(predicate);
+	}
 
 	Cascade<E> ordain(final Comparator<? super E> order);
 
@@ -366,6 +399,8 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	<F> Cascade<F> cleave(final Predicate<? super E> judgement,
 	                      final Function<? super E, ? extends F> reward,
 	                      final Function<? super E, ? extends F> punishment);
+
+	Dyad<Cascade<E>, Cascade<E>> bisect(final Predicate<? super E> judgement);
 
 	/**
 	 * Composition
