@@ -198,10 +198,38 @@ final class Brook<E> implements Cascade<E>
 	}
 
 	@Override
+	public Cascade<E> admit(final Collection<? extends E> elements)
+	{
+		Objects.requireNonNull(elements, "elements may not be null");
+		return channel(s -> Stream.concat(s, confluent(elements.stream())));
+	}
+
+	@Override
+	public Cascade<E> admit(final Cascade<E> other)
+	{
+		Objects.requireNonNull(other, "other may not be null");
+		return channel(s -> Stream.concat(s, other.stream()));
+	}
+
+	@Override
+	public Cascade<E> precede(final Collection<? extends E> elements)
+	{
+		Objects.requireNonNull(elements, "elements may not be null");
+		return channel(s -> Stream.concat(confluent(elements.stream()), s));
+	}
+
+	@Override
 	public Cascade<E> precede(final E element)
 	{
 		Objects.requireNonNull(element, "element may not be null");
 		return channel(s -> Stream.concat(Stream.of(element), s));
+	}
+
+	@Override
+	public Cascade<E> precede(final Cascade<E> other)
+	{
+		Objects.requireNonNull(other, "other may not be null");
+		return channel(s -> Stream.concat(other.stream(), s));
 	}
 
 	@Override

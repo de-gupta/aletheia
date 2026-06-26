@@ -164,7 +164,21 @@ public sealed interface Cascade<E> permits Brook, Nadir
 		return admit(element);
 	}
 
+	default Cascade<E> append(final Collection<? extends E> elements)
+	{
+		return admit(elements);
+	}
+
+	Cascade<E> admit(final Collection<? extends E> elements);
+
 	Cascade<E> admit(final E element);
+
+	default Cascade<E> append(final Cascade<E> other)
+	{
+		return admit(other);
+	}
+
+	Cascade<E> admit(final Cascade<E> other);
 
 	default <R> R fold(final R initial, final BiFunction<? super R, ? super E, ? extends R> operation)
 	{
@@ -301,7 +315,21 @@ public sealed interface Cascade<E> permits Brook, Nadir
 		return precede(element);
 	}
 
+	default Cascade<E> prepend(final Collection<? extends E> elements)
+	{
+		return precede(elements);
+	}
+
+	Cascade<E> precede(final Collection<? extends E> elements);
+
 	Cascade<E> precede(final E element);
+
+	default Cascade<E> prepend(final Cascade<E> other)
+	{
+		return precede(other);
+	}
+
+	Cascade<E> precede(final Cascade<E> other);
 
 	default boolean any(final Predicate<? super E> test)
 	{

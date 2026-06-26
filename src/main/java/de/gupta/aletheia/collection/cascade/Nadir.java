@@ -144,10 +144,38 @@ final class Nadir<E> implements Cascade<E>
 	}
 
 	@Override
+	public Cascade<E> admit(final Collection<? extends E> elements)
+	{
+		Objects.requireNonNull(elements, "elements may not be null");
+		return Cascade.beckon(elements.stream());
+	}
+
+	@Override
+	public Cascade<E> admit(final Cascade<E> other)
+	{
+		Objects.requireNonNull(other, "other may not be null");
+		return other;
+	}
+
+	@Override
 	public Cascade<E> precede(final E element)
 	{
 		Objects.requireNonNull(element, "element may not be null");
 		return Cascade.beckon(List.of(element));
+	}
+
+	@Override
+	public Cascade<E> precede(final Collection<? extends E> elements)
+	{
+		Objects.requireNonNull(elements, "elements may not be null");
+		return Cascade.beckon(elements.stream());
+	}
+
+	@Override
+	public Cascade<E> precede(final Cascade<E> other)
+	{
+		Objects.requireNonNull(other, "other may not be null");
+		return other;
 	}
 
 	@Override

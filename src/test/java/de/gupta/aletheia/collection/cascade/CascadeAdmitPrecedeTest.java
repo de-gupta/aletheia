@@ -81,6 +81,90 @@ final class CascadeAdmitPrecedeTest
 		}
 
 		@Nested
+		@DisplayName("admit(Collection) — appends collection at tail")
+		final class AdmitCollection
+		{
+			@Test
+			@DisplayName("appends all collection elements in order at tail")
+			void appendsCollectionAtTail()
+			{
+				assertThat(Cascade.beckon("a", "b").admit(List.of("c", "d")).summon())
+						.as("collection appended at tail")
+						.containsExactly("a", "b", "c", "d");
+			}
+
+			@Test
+			@DisplayName("admits empty collection leaves cascade unchanged")
+			void admitsEmptyCollectionLeavesUnchanged()
+			{
+				assertThat(Cascade.beckon("a", "b").admit(List.of()).summon())
+						.as("empty collection — no change")
+						.containsExactly("a", "b");
+			}
+
+			@Test
+			@DisplayName("promotes Nadir to the admitted collection")
+			void promotesNadirToAdmittedCollection()
+			{
+				assertThat(Cascade.<String>abyss().admit(List.of("x", "y")).summon())
+						.as("Nadir promoted by admitting collection")
+						.containsExactly("x", "y");
+			}
+
+			@Test
+			@DisplayName("throws when collection is null")
+			void throwsWhenCollectionIsNull()
+			{
+				assertThatThrownBy(() -> Cascade.beckon("a").admit((java.util.Collection<String>) null))
+						.isInstanceOf(NullPointerException.class)
+						.hasMessageContaining("elements may not be null");
+			}
+		}
+
+		@Nested
+		@DisplayName("admit(Cascade) — appends Cascade at tail")
+		final class AdmitCascade
+		{
+			@Test
+			@DisplayName("appends all elements of other Cascade at tail")
+			void appendsCascadeAtTail()
+			{
+				assertThat(Cascade.beckon("a", "b").admit(Cascade.beckon("c", "d")).summon())
+						.as("other cascade appended at tail")
+						.containsExactly("a", "b", "c", "d");
+			}
+
+			@Test
+			@DisplayName("admits empty Cascade leaves cascade unchanged")
+			void admitsEmptyCascadeLeavesUnchanged()
+			{
+				assertThat(Cascade.beckon("a").admit(Cascade.abyss()).summon())
+						.as("empty cascade admitted — no change")
+						.containsExactly("a");
+			}
+
+			@Test
+			@DisplayName("Nadir returns other Cascade directly")
+			void nadirReturnsOtherCascade()
+			{
+				final Cascade<String> other = Cascade.beckon("x", "y");
+
+				assertThat(Cascade.<String>abyss().admit(other).summon())
+						.as("Nadir + cascade = cascade")
+						.containsExactlyElementsOf(other.summon());
+			}
+
+			@Test
+			@DisplayName("throws when other Cascade is null")
+			void throwsWhenOtherCascadeIsNull()
+			{
+				assertThatThrownBy(() -> Cascade.beckon("a").admit((Cascade<String>) null))
+						.isInstanceOf(NullPointerException.class)
+						.hasMessageContaining("other may not be null");
+			}
+		}
+
+		@Nested
 		@DisplayName("when Cascade is empty")
 		final class WhenCascadeIsEmpty
 		{
@@ -111,7 +195,7 @@ final class CascadeAdmitPrecedeTest
 			@DisplayName("throws when element is null on present cascade")
 			void throwsWhenElementIsNullOnPresentCascade()
 			{
-				assertThatThrownBy(() -> Cascade.beckon("a").admit(null))
+				assertThatThrownBy(() -> Cascade.beckon("a").admit((String) null))
 						.as("null element on present cascade")
 						.isInstanceOf(NullPointerException.class)
 						.hasMessageContaining("element may not be null");
@@ -121,7 +205,7 @@ final class CascadeAdmitPrecedeTest
 			@DisplayName("throws when element is null on empty cascade")
 			void throwsWhenElementIsNullOnEmptyCascade()
 			{
-				assertThatThrownBy(() -> Cascade.<String>abyss().admit(null))
+				assertThatThrownBy(() -> Cascade.<String>abyss().admit((String) null))
 						.as("null element on empty cascade")
 						.isInstanceOf(NullPointerException.class)
 						.hasMessageContaining("element may not be null");
@@ -209,6 +293,90 @@ final class CascadeAdmitPrecedeTest
 		}
 
 		@Nested
+		@DisplayName("precede(Collection) — prepends collection at head")
+		final class PrecedeCollection
+		{
+			@Test
+			@DisplayName("prepends all collection elements in order at head")
+			void prependsCollectionAtHead()
+			{
+				assertThat(Cascade.beckon("c", "d").precede(List.of("a", "b")).summon())
+						.as("collection prepended at head")
+						.containsExactly("a", "b", "c", "d");
+			}
+
+			@Test
+			@DisplayName("precedes empty collection leaves cascade unchanged")
+			void precedesEmptyCollectionLeavesUnchanged()
+			{
+				assertThat(Cascade.beckon("a", "b").precede(List.of()).summon())
+						.as("empty collection — no change")
+						.containsExactly("a", "b");
+			}
+
+			@Test
+			@DisplayName("promotes Nadir to the preceded collection")
+			void promotesNadirToPrecededCollection()
+			{
+				assertThat(Cascade.<String>abyss().precede(List.of("x", "y")).summon())
+						.as("Nadir promoted by preceding collection")
+						.containsExactly("x", "y");
+			}
+
+			@Test
+			@DisplayName("throws when collection is null")
+			void throwsWhenCollectionIsNull()
+			{
+				assertThatThrownBy(() -> Cascade.beckon("a").precede((java.util.Collection<String>) null))
+						.isInstanceOf(NullPointerException.class)
+						.hasMessageContaining("elements may not be null");
+			}
+		}
+
+		@Nested
+		@DisplayName("precede(Cascade) — prepends Cascade at head")
+		final class PrecedeCascade
+		{
+			@Test
+			@DisplayName("prepends all elements of other Cascade at head")
+			void prependsCascadeAtHead()
+			{
+				assertThat(Cascade.beckon("c", "d").precede(Cascade.beckon("a", "b")).summon())
+						.as("other cascade prepended at head")
+						.containsExactly("a", "b", "c", "d");
+			}
+
+			@Test
+			@DisplayName("precedes empty Cascade leaves cascade unchanged")
+			void precedesEmptyCascadeLeavesUnchanged()
+			{
+				assertThat(Cascade.beckon("a").precede(Cascade.abyss()).summon())
+						.as("empty cascade preceded — no change")
+						.containsExactly("a");
+			}
+
+			@Test
+			@DisplayName("Nadir returns other Cascade directly")
+			void nadirReturnsOtherCascade()
+			{
+				final Cascade<String> other = Cascade.beckon("x", "y");
+
+				assertThat(Cascade.<String>abyss().precede(other).summon())
+						.as("Nadir + cascade = cascade")
+						.containsExactlyElementsOf(other.summon());
+			}
+
+			@Test
+			@DisplayName("throws when other Cascade is null")
+			void throwsWhenOtherCascadeIsNull()
+			{
+				assertThatThrownBy(() -> Cascade.beckon("a").precede((Cascade<String>) null))
+						.isInstanceOf(NullPointerException.class)
+						.hasMessageContaining("other may not be null");
+			}
+		}
+
+		@Nested
 		@DisplayName("when Cascade is empty")
 		final class WhenCascadeIsEmpty
 		{
@@ -239,7 +407,7 @@ final class CascadeAdmitPrecedeTest
 			@DisplayName("throws when element is null on present cascade")
 			void throwsWhenElementIsNullOnPresentCascade()
 			{
-				assertThatThrownBy(() -> Cascade.beckon("a").precede(null))
+				assertThatThrownBy(() -> Cascade.beckon("a").precede((String) null))
 						.as("null element on present cascade")
 						.isInstanceOf(NullPointerException.class)
 						.hasMessageContaining("element may not be null");
@@ -249,7 +417,7 @@ final class CascadeAdmitPrecedeTest
 			@DisplayName("throws when element is null on empty cascade")
 			void throwsWhenElementIsNullOnEmptyCascade()
 			{
-				assertThatThrownBy(() -> Cascade.<String>abyss().precede(null))
+				assertThatThrownBy(() -> Cascade.<String>abyss().precede((String) null))
 						.as("null element on empty cascade")
 						.isInstanceOf(NullPointerException.class)
 						.hasMessageContaining("element may not be null");
