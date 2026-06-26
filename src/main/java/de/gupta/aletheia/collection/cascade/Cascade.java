@@ -6,9 +6,7 @@ import de.gupta.aletheia.collection.crucible.Forge;
 import de.gupta.aletheia.collection.crucible.Relic;
 import de.gupta.aletheia.functional.Unfolding;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
@@ -169,13 +167,21 @@ public sealed interface Cascade<E> permits Brook, Nadir
 		return admit(elements);
 	}
 
-	Cascade<E> admit(final Collection<? extends E> elements);
-
-	Cascade<E> admit(final E element);
-
 	default Cascade<E> append(final Cascade<E> other)
 	{
 		return admit(other);
+	}
+
+	default Cascade<E> admit(final E element)
+	{
+		Objects.requireNonNull(element, "element may not be null");
+		return admit(List.of(element));
+	}
+
+	default Cascade<E> admit(final Collection<? extends E> elements)
+	{
+		Objects.requireNonNull(elements, "elements may not be null");
+		return admit(Cascade.beckon(elements.stream()));
 	}
 
 	Cascade<E> admit(final Cascade<E> other);
@@ -320,13 +326,21 @@ public sealed interface Cascade<E> permits Brook, Nadir
 		return precede(elements);
 	}
 
-	Cascade<E> precede(final Collection<? extends E> elements);
-
-	Cascade<E> precede(final E element);
-
 	default Cascade<E> prepend(final Cascade<E> other)
 	{
 		return precede(other);
+	}
+
+	default Cascade<E> precede(final E element)
+	{
+		Objects.requireNonNull(element, "element may not be null");
+		return precede(List.of(element));
+	}
+
+	default Cascade<E> precede(final Collection<? extends E> elements)
+	{
+		Objects.requireNonNull(elements, "elements may not be null");
+		return precede(Cascade.beckon(elements.stream()));
 	}
 
 	Cascade<E> precede(final Cascade<E> other);
