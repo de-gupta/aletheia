@@ -90,7 +90,21 @@ public sealed interface Cascade<E> permits Brook, Nadir
 		return reckon();
 	}
 
+	default long tally(final Predicate<? super E> predicate)
+	{
+		return reckon(predicate);
+	}
+
+	long reckon(final Predicate<? super E> judgement);
+
+	default <K> Cascade<E> distinctBy(final Function<? super E, ? extends K> keyExtractor)
+	{
+		return purify(keyExtractor);
+	}
+
 	long reckon();
+
+	<K> Cascade<E> purify(final Function<? super E, ? extends K> essence);
 
 	default Unfolding<E> maximum(final Comparator<? super E> comparator)
 	{
@@ -332,6 +346,13 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	<F> Cascade<Dyad<E, F>> interlace(final Function<? super E, ? extends F> interlacing);
 
 	Cascade<E> purify();
+
+	default Cascade<Dyad<Integer, E>> indexed()
+	{
+		return enumerate();
+	}
+
+	Cascade<Dyad<Integer, E>> enumerate();
 
 	default Unfolding<E> get(final int index)
 	{

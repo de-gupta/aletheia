@@ -289,6 +289,24 @@ final class Nadir<E> implements Cascade<E>
 	}
 
 	@Override
+	public long reckon(final Predicate<? super E> judgement)
+	{
+		return 0L;
+	}
+
+	@Override
+	public <K> Cascade<E> purify(final Function<? super E, ? extends K> essence)
+	{
+		return instance();
+	}
+
+	@Override
+	public Cascade<Dyad<Integer, E>> enumerate()
+	{
+		return Nadir.instance();
+	}
+
+	@Override
 	public Unfolding<E> zenith(final Comparator<? super E> comparator)
 	{
 		return Unfolding.chaos();

@@ -172,9 +172,37 @@ final class Brook<E> implements Cascade<E>
 	}
 
 	@Override
+	public long reckon(final Predicate<? super E> judgement)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		return source.get().filter(judgement).count();
+	}
+
+	@Override
+	public <K> Cascade<E> purify(final Function<? super E, ? extends K> essence)
+	{
+		Objects.requireNonNull(essence, "essence may not be null");
+		return ignite(() ->
+		{
+			final var seen = new LinkedHashSet<K>();
+			return source.get().filter(e -> seen.add(essence.apply(e)));
+		});
+	}
+
+	@Override
 	public Cascade<E> purify()
 	{
 		return channel(Stream::distinct);
+	}
+
+	@Override
+	public Cascade<Dyad<Integer, E>> enumerate()
+	{
+		return ignite(() ->
+		{
+			final var index = new int[]{0};
+			return source.get().map(e -> Dyad.of(index[0]++, e));
+		});
 	}
 
 	@Override
