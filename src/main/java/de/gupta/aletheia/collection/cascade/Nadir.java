@@ -286,6 +286,21 @@ final class Nadir<E> implements Cascade<E>
 	}
 
 	@Override
+	public <K> Cascade<E> amalgamate(final Function<? super E, ? extends K> essence,
+	                                 final BinaryOperator<E> confluence)
+	{
+		return instance();
+	}
+
+	@Override
+	public <K> Cascade<E> amalgamate(final Function<? super E, ? extends K> essence,
+	                                 final BinaryOperator<E> confluence,
+	                                 final Predicate<? super E> dissolution)
+	{
+		return instance();
+	}
+
+	@Override
 	public Cascade<E> temper(final int n)
 	{
 		return instance();

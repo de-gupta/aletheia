@@ -169,6 +169,15 @@ public sealed interface Cascade<E> permits Brook, Nadir
 		return smelt(operation);
 	}
 
+	default <K> Cascade<E> normalize(final Function<? super E, ? extends K> keyExtractor,
+	                                 final BinaryOperator<E> combiner)
+	{
+		return amalgamate(keyExtractor, combiner);
+	}
+
+	<K> Cascade<E> amalgamate(final Function<? super E, ? extends K> essence,
+	                          final BinaryOperator<E> confluence);
+
 	default Collection<E> orElse(final Collection<? extends E> other)
 	{
 		return infuse(other);
@@ -323,6 +332,17 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	<R> R weave(final R initial, final BiFunction<? super R, ? super E, ? extends R> operation);
 
 	Unfolding<E> smelt(final BiFunction<? super E, ? super E, ? extends E> operation);
+
+	default <K> Cascade<E> normalize(final Function<? super E, ? extends K> keyExtractor,
+	                                 final BinaryOperator<E> combiner,
+	                                 final Predicate<? super E> removalPredicate)
+	{
+		return amalgamate(keyExtractor, combiner, removalPredicate);
+	}
+
+	<K> Cascade<E> amalgamate(final Function<? super E, ? extends K> essence,
+	                          final BinaryOperator<E> confluence,
+	                          final Predicate<? super E> dissolution);
 
 	default boolean none(final Predicate<? super E> test)
 	{

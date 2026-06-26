@@ -10,6 +10,7 @@ import de.gupta.aletheia.functional.Unfolding;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 final class Brook<E> implements Cascade<E>
@@ -375,6 +376,31 @@ final class Brook<E> implements Cascade<E>
 	public Unfolding<E> dusk()
 	{
 		return Unfolding.augur(source.get().reduce((_, b) -> b));
+	}
+
+	@Override
+	public <K> Cascade<E> amalgamate(final Function<? super E, ? extends K> essence,
+	                                 final BinaryOperator<E> confluence)
+	{
+		Objects.requireNonNull(essence, "essence may not be null");
+		Objects.requireNonNull(confluence, "confluence may not be null");
+
+		return Cascade.beckon(
+				source.get()
+				      .collect(Collectors.toMap(essence, Function.identity(), confluence, LinkedHashMap::new))
+				      .values());
+	}
+
+	@Override
+	public <K> Cascade<E> amalgamate(final Function<? super E, ? extends K> essence,
+	                                 final BinaryOperator<E> confluence,
+	                                 final Predicate<? super E> dissolution)
+	{
+		Objects.requireNonNull(essence, "essence may not be null");
+		Objects.requireNonNull(confluence, "confluence may not be null");
+		Objects.requireNonNull(dissolution, "dissolution may not be null");
+
+		return amalgamate(essence, confluence).discern(dissolution.negate());
 	}
 
 	@Override
