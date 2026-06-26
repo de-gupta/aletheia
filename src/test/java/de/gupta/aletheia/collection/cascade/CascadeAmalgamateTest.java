@@ -63,6 +63,118 @@ final class CascadeAmalgamateTest
 			}
 
 			@Test
+			@DisplayName("combines string values by concatenation")
+			void combinesStringValuesByConcatenation()
+			{
+				record Phrase(String topic, String text)
+				{
+				}
+
+				final Cascade<Phrase> source = Cascade.beckon(
+						new Phrase("greeting", "hello"),
+						new Phrase("greeting", " world"),
+						new Phrase("farewell", "goodbye")
+				);
+
+				final List<Phrase> result = source.amalgamate(
+						Phrase::topic,
+						(a, b) -> new Phrase(a.topic(), a.text() + b.text())
+				).summon().stream().toList();
+
+				assertThat(result)
+						.as("greeting phrases concatenated; farewell unchanged")
+						.containsExactlyInAnyOrder(new Phrase("greeting", "hello world"),
+								new Phrase("farewell", "goodbye"));
+			}
+
+			@Test
+			@DisplayName("combines list values by union")
+			void combinesListValuesByUnion()
+			{
+				record Bucket(String label, List<Integer> items)
+				{
+				}
+
+				final Cascade<Bucket> source = Cascade.beckon(
+						new Bucket("a", List.of(1, 2)),
+						new Bucket("b", List.of(10)),
+						new Bucket("a", List.of(3, 4))
+				);
+
+				final List<Bucket> result = source.amalgamate(
+						Bucket::label,
+						(x, y) ->
+						{
+							final var merged = new java.util.ArrayList<Integer>(x.items());
+							merged.addAll(y.items());
+							return new Bucket(x.label(), List.copyOf(merged));
+						}
+				).summon().stream().toList();
+
+				assertThat(result).as("label 'a' buckets merged; 'b' unchanged").hasSize(2);
+				assertThat(result.stream().filter(b -> b.label().equals("a")).findFirst().orElseThrow().items())
+						.as("merged 'a' items")
+						.containsExactlyInAnyOrder(1, 2, 3, 4);
+				assertThat(result.stream().filter(b -> b.label().equals("b")).findFirst().orElseThrow().items())
+						.as("'b' items unchanged")
+						.containsExactly(10);
+			}
+
+			@Test
+			@DisplayName("works with non-string key extractor — Integer key")
+			void worksWithIntegerKey()
+			{
+				record Entry(int parity, String label)
+				{
+				}
+
+				final Cascade<Entry> source = Cascade.beckon(
+						new Entry(0, "even-a"),
+						new Entry(1, "odd-a"),
+						new Entry(0, "even-b"),
+						new Entry(1, "odd-b")
+				);
+
+				final List<Entry> result = source.amalgamate(
+						Entry::parity,
+						(a, b) -> new Entry(a.parity(), a.label() + "+" + b.label())
+				).summon().stream().toList();
+
+				assertThat(result).as("two distinct parities → two entries after amalgamation").hasSize(2);
+				assertThat(result.stream().filter(e -> e.parity() == 0).findFirst().orElseThrow().label())
+						.as("even entries combined").isEqualTo("even-a+even-b");
+				assertThat(result.stream().filter(e -> e.parity() == 1).findFirst().orElseThrow().label())
+						.as("odd entries combined").isEqualTo("odd-a+odd-b");
+			}
+
+			@Test
+			@DisplayName("works with composite key extracted from multiple fields")
+			void worksWithCompositeKey()
+			{
+				record Observation(String region, String category, int value)
+				{
+				}
+
+				final Cascade<Observation> source = Cascade.beckon(
+						new Observation("north", "sales", 100),
+						new Observation("north", "costs", 40),
+						new Observation("north", "sales", 50),
+						new Observation("south", "sales", 200)
+				);
+
+				final List<Observation> result = source.amalgamate(
+						obs -> obs.region() + ":" + obs.category(),
+						(a, b) -> new Observation(a.region(), a.category(), a.value() + b.value())
+				).summon().stream().toList();
+
+				assertThat(result).as("three distinct region:category pairs").hasSize(3);
+				assertThat(result.stream()
+				                 .filter(o -> o.region().equals("north") && o.category().equals("sales"))
+				                 .findFirst().orElseThrow().value())
+						.as("north:sales combined").isEqualTo(150);
+			}
+
+			@Test
 			@DisplayName("normalize() delegates to amalgamate()")
 			void normalizeDelegatesToAmalgamate()
 			{
@@ -192,6 +304,65 @@ final class CascadeAmalgamateTest
 				assertThat(combineAndPurge(source).summon())
 						.as("all terms dissolved — cascade content should be empty")
 						.isEmpty();
+			}
+
+			@Test
+			@DisplayName("dissolves entries whose combined string value is blank")
+			void dissolvesBlankStringValues()
+			{
+				record Tag(String key, String value)
+				{
+				}
+
+				final Cascade<Tag> source = Cascade.beckon(
+						new Tag("a", "hello"),
+						new Tag("b", ""),
+						new Tag("b", ""),
+						new Tag("c", "world")
+				);
+
+				final List<Tag> result = source.amalgamate(
+						Tag::key,
+						(x, y) -> new Tag(x.key(), x.value() + y.value()),
+						tag -> tag.value().isBlank()
+				).summon().stream().toList();
+
+				assertThat(result)
+						.as("'b' dissolves — empty strings concatenate to blank")
+						.containsExactlyInAnyOrder(new Tag("a", "hello"), new Tag("c", "world"));
+			}
+
+			@Test
+			@DisplayName("dissolves entries whose combined list is empty after filtering")
+			void dissolvesEmptyListTerms()
+			{
+				record Bag(String key, List<Integer> values)
+				{
+				}
+
+				final Cascade<Bag> source = Cascade.beckon(
+						new Bag("keep", List.of(1, 2)),
+						new Bag("drop", List.of()),
+						new Bag("keep", List.of(3))
+				);
+
+				final List<Bag> result = source.amalgamate(
+						Bag::key,
+						(a, b) ->
+						{
+							final var merged = new java.util.ArrayList<Integer>(a.values());
+							merged.addAll(b.values());
+							return new Bag(a.key(), List.copyOf(merged));
+						},
+						bag -> bag.values().isEmpty()
+				).summon().stream().toList();
+
+				assertThat(result)
+						.as("'drop' bag has no values and dissolves; 'keep' survives")
+						.hasSize(1);
+				assertThat(result.getFirst().values())
+						.as("'keep' bag merged values")
+						.containsExactlyInAnyOrder(1, 2, 3);
 			}
 
 			@Test
