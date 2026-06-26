@@ -161,6 +161,12 @@ final class Nadir<E> implements Cascade<E>
 	}
 
 	@Override
+	public Cascade<E> interdict(final Predicate<? super E> judgement, final Supplier<? extends RuntimeException> wrath)
+	{
+		return instance();
+	}
+
+	@Override
 	public Dyad<Cascade<E>, Cascade<E>> bisect(final Predicate<? super E> judgement)
 	{
 		Objects.requireNonNull(judgement, "judgement may not be null");

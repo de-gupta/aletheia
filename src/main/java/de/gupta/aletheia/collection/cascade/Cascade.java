@@ -402,6 +402,8 @@ public sealed interface Cascade<E> permits Brook, Nadir
 
 	Dyad<Cascade<E>, Cascade<E>> bisect(final Predicate<? super E> judgement);
 
+	Cascade<E> interdict(final Predicate<? super E> judgement, final Supplier<? extends RuntimeException> wrath);
+
 	/**
 	 * Composition
 	 */

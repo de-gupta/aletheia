@@ -227,6 +227,18 @@ final class Brook<E> implements Cascade<E>
 	}
 
 	@Override
+	public Cascade<E> interdict(final Predicate<? super E> judgement, final Supplier<? extends RuntimeException> wrath)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		Objects.requireNonNull(wrath, "wrath may not be null");
+		if (source.get().anyMatch(judgement))
+		{
+			throw wrath.get();
+		}
+		return this;
+	}
+
+	@Override
 	public Cascade<E> admit(final Cascade<E> other)
 	{
 		Objects.requireNonNull(other, "other may not be null");
