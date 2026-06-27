@@ -396,6 +396,13 @@ final class Brook<E> implements Cascade<E>
 	}
 
 	@Override
+	public Cascade<E> forsake(final Predicate<? super E> judgement)
+	{
+		Objects.requireNonNull(judgement, "judgement may not be null");
+		return channel(s -> s.filter(judgement.negate()));
+	}
+
+	@Override
 	public Cascade<E> temper(final int n)
 	{
 		return channel(s -> s.limit(n));

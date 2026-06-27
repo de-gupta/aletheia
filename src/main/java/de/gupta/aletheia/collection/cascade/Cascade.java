@@ -484,7 +484,14 @@ public sealed interface Cascade<E> permits Brook, Nadir
 		return forsake(n);
 	}
 
+	default Cascade<E> removeIf(final Predicate<? super E> predicate)
+	{
+		return forsake(predicate);
+	}
+
 	Cascade<E> forsake(final int n);
+
+	Cascade<E> forsake(final Predicate<? super E> judgement);
 
 	default Cascade<E> limit(final int n)
 	{
