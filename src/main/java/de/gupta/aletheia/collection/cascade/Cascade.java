@@ -9,6 +9,7 @@ import de.gupta.aletheia.functional.Unfolding;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public sealed interface Cascade<E> permits Brook, Nadir
@@ -62,6 +63,27 @@ public sealed interface Cascade<E> permits Brook, Nadir
 		return summon();
 	}
 
+	default List<E> toList()
+	{
+		return precipitate(Collectors.toUnmodifiableList());
+	}
+
+	default Set<E> toSet()
+	{
+		return precipitate(Collectors.toUnmodifiableSet());
+	}
+
+	default <K> Map<K, List<E>> groupBy(final Function<? super E, ? extends K> keyExtractor)
+	{
+		return classify(keyExtractor);
+	}
+
+	default <K> Map<K, List<E>> classify(final Function<? super E, ? extends K> essence)
+	{
+		Objects.requireNonNull(essence, "essence may not be null");
+		return precipitate(Collectors.groupingBy(essence));
+	}
+
 	default Unfolding<E> first()
 	{
 		return herald();
@@ -84,6 +106,11 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	 */
 
 	<R, A> R precipitate(final Collector<? super E, A, R> collector);
+
+	default <F> Cascade<Dyad<E, F>> zip(final Cascade<F> other)
+	{
+		return mesh(other);
+	}
 
 	default long tally()
 	{
@@ -438,6 +465,8 @@ public sealed interface Cascade<E> permits Brook, Nadir
 
 	<F, G> Cascade<G> braid(final Cascade<F> consort,
 	                        final BiFunction<Unfolding<E>, Unfolding<F>, ? extends G> weaver);
+
+	<F> Cascade<Dyad<E, F>> mesh(final Cascade<F> other);
 
 	/**
 	 * Folding / reduction

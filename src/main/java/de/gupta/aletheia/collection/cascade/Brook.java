@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 final class Brook<E> implements Cascade<E>
@@ -374,6 +375,19 @@ final class Brook<E> implements Cascade<E>
 			}
 			return zipped.stream();
 		});
+	}
+
+	@Override
+	public <F> Cascade<Dyad<E, F>> mesh(final Cascade<F> other)
+	{
+		Objects.requireNonNull(other, "other may not be null");
+		final var left = source.get().toList();
+		final var right = other.stream().toList();
+		final int size = Math.min(left.size(), right.size());
+		return Cascade.beckon(
+				IntStream.range(0, size)
+				         .mapToObj(i -> Dyad.of(left.get(i), right.get(i)))
+				         .toList());
 	}
 
 	@Override

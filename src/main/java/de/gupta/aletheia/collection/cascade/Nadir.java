@@ -253,6 +253,13 @@ final class Nadir<E> implements Cascade<E>
 	}
 
 	@Override
+	public <F> Cascade<Dyad<E, F>> mesh(final Cascade<F> other)
+	{
+		Objects.requireNonNull(other, "other may not be null");
+		return Nadir.instance();
+	}
+
+	@Override
 	public <R> R weave(final R initial, final BiFunction<? super R, ? super E, ? extends R> operation)
 	{
 		Objects.requireNonNull(operation, "operation may not be null");
