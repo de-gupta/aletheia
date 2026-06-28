@@ -45,4 +45,38 @@ final class FallibleBeckonTest
 		{
 		}
 	}
+
+	@org.junit.jupiter.api.Nested
+	@org.junit.jupiter.api.DisplayName("Conventional factory aliases")
+	final class ConventionalFactories
+	{
+		@org.junit.jupiter.api.Test
+		@org.junit.jupiter.api.DisplayName("failure() creates a failed Fallible from an exception")
+		void failureCreatesFailedFallible()
+		{
+			final var exception = new IllegalArgumentException("bad");
+
+			final Fallible<String> result = Fallible.failure(exception);
+
+			org.assertj.core.api.Assertions.assertThatThrownBy(() -> result.coronate(v -> v, e ->
+			   {
+				   throw new RuntimeException(e);
+			   }))
+			                               .as("failure() wraps the exception — coronate on failure path re-throws")
+			                               .isInstanceOf(RuntimeException.class)
+			                               .hasCause(exception);
+		}
+
+		@org.junit.jupiter.api.Test
+		@org.junit.jupiter.api.DisplayName("map() delegates to metamorphose with no recovery portents")
+		void mapDelegatesToMetamorphose()
+		{
+			final Fallible<Integer> result = Fallible.success("hello").map(String::length);
+
+			final int value = result.coronate(v -> v, _ -> -1);
+			assertThat(value)
+					.as("map() transforms the success value")
+					.isEqualTo(5);
+		}
+	}
 }

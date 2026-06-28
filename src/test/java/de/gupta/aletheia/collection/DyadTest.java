@@ -147,4 +147,73 @@ final class DyadTest
 			}
 		}
 	}
+
+	@Nested
+	@DisplayName("Conventional accessor aliases")
+	final class ConventionalAccessors
+	{
+		@org.junit.jupiter.api.Test
+		@DisplayName("first() returns sinister")
+		void firstReturnsSinister()
+		{
+			assertThat(Dyad.of("a", 1).first()).as("first() == sinister").isEqualTo("a");
+		}
+
+		@org.junit.jupiter.api.Test
+		@DisplayName("left() returns sinister")
+		void leftReturnsSinister()
+		{
+			assertThat(Dyad.of("a", 1).left()).as("left() == sinister").isEqualTo("a");
+		}
+
+		@org.junit.jupiter.api.Test
+		@DisplayName("second() returns dexter")
+		void secondReturnsDexter()
+		{
+			assertThat(Dyad.of("a", 1).second()).as("second() == dexter").isEqualTo(1);
+		}
+
+		@org.junit.jupiter.api.Test
+		@DisplayName("right() returns dexter")
+		void rightReturnsDexter()
+		{
+			assertThat(Dyad.of("a", 1).right()).as("right() == dexter").isEqualTo(1);
+		}
+
+		@org.junit.jupiter.api.Test
+		@DisplayName("mapFirst() transforms sinister — delegates to transformSinister()")
+		void mapFirstTransformsSinister()
+		{
+			assertThat(Dyad.of("hello", 42).mapFirst(String::length))
+					.as("mapFirst delegates to transformSinister")
+					.isEqualTo(Dyad.of(5, 42));
+		}
+
+		@org.junit.jupiter.api.Test
+		@DisplayName("mapLeft() transforms sinister — delegates to transformSinister()")
+		void mapLeftTransformsSinister()
+		{
+			assertThat(Dyad.of("hello", 42).mapLeft(String::toUpperCase))
+					.as("mapLeft delegates to transformSinister")
+					.isEqualTo(Dyad.of("HELLO", 42));
+		}
+
+		@org.junit.jupiter.api.Test
+		@DisplayName("mapSecond() transforms dexter — delegates to transformDexter()")
+		void mapSecondTransformsDexter()
+		{
+			assertThat(Dyad.of("hello", 42).mapSecond(n -> n * 2))
+					.as("mapSecond delegates to transformDexter")
+					.isEqualTo(Dyad.of("hello", 84));
+		}
+
+		@org.junit.jupiter.api.Test
+		@DisplayName("mapRight() transforms dexter — delegates to transformDexter()")
+		void mapRightTransformsDexter()
+		{
+			assertThat(Dyad.of("hello", 42).mapRight(Object::toString))
+					.as("mapRight delegates to transformDexter")
+					.isEqualTo(Dyad.of("hello", "42"));
+		}
+	}
 }

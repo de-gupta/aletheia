@@ -156,4 +156,30 @@ final class TriadTest
 			}
 		}
 	}
+
+	@org.junit.jupiter.api.Nested
+	@DisplayName("Conventional accessor aliases")
+	final class ConventionalAccessors
+	{
+		@org.junit.jupiter.api.Test
+		@DisplayName("first() returns dawn")
+		void firstReturnsDawn()
+		{
+			assertThat(Triad.of("a", "b", "c").first()).as("first() == dawn").isEqualTo("a");
+		}
+
+		@org.junit.jupiter.api.Test
+		@DisplayName("second() returns zenith")
+		void secondReturnsZenith()
+		{
+			assertThat(Triad.of("a", "b", "c").second()).as("second() == zenith").isEqualTo("b");
+		}
+
+		@org.junit.jupiter.api.Test
+		@DisplayName("third() returns dusk")
+		void thirdReturnsDusk()
+		{
+			assertThat(Triad.of("a", "b", "c").third()).as("third() == dusk").isEqualTo("c");
+		}
+	}
 }

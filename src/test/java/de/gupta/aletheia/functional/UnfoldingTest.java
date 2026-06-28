@@ -882,8 +882,7 @@ final class UnfoldingTest
 			unfolding
 					.discern(n -> n > 100)
 					.unlace(n -> n > 0, capturedValues::add)
-					.infuse(99)
-					.toString();
+					.infuse(99);
 
 			assertThat(capturedValues).as("Conditional unlace should not be called after discern makes unfolding empty")
 			                          .isEmpty();
@@ -1056,6 +1055,29 @@ final class UnfoldingTest
 	@DisplayName("Tests for factory methods")
 	class FactoryMethodTests
 	{
+		@Nested
+		@DisplayName("Tests for of() conventional factory")
+		class ConventionalOfTests
+		{
+			@Test
+			@DisplayName("of() wraps a non-null value as a present Unfolding")
+			void ofWrapsNonNullValue()
+			{
+				assertThat(Unfolding.of("hello").summon())
+						.as("of() with non-null value produces present Unfolding")
+						.isEqualTo("hello");
+			}
+
+			@Test
+			@DisplayName("of() throws NullPointerException for null — unlike beckon()")
+			void ofThrowsForNull()
+			{
+				assertThatThrownBy(() -> Unfolding.of(null))
+						.as("of() rejects null — use beckon() for nullable values")
+						.isInstanceOf(NullPointerException.class);
+			}
+		}
+
 		@Nested
 		@DisplayName("Tests for beckon() method")
 		class OfMethodTests

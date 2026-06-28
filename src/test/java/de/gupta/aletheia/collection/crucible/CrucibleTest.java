@@ -137,4 +137,27 @@ final class CrucibleTest
 								 .allSatisfy(crucible -> assertThat(crucible).isInstanceOf(Crucible.class));
 		}
 	}
+
+	@Nested
+	@DisplayName("cascade() — converts Crucible to Cascade")
+	final class CascadeConversion
+	{
+		@Test
+		@DisplayName("Forge.cascade() returns Cascade with same elements")
+		void forgeCascadeReturnsCascadeWithSameElements()
+		{
+			assertThat(Crucible.kindle(List.of(1, 2, 3)).cascade().summon())
+					.as("Forge cascade contains original elements")
+					.containsExactly(1, 2, 3);
+		}
+
+		@Test
+		@DisplayName("Relic.cascade() returns Cascade with same elements")
+		void relicCascadeReturnsCascadeWithSameElements()
+		{
+			assertThat(Crucible.consecrate(List.of("a", "b")).cascade().summon())
+					.as("Relic cascade contains original elements")
+					.containsExactly("a", "b");
+		}
+	}
 }

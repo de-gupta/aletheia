@@ -410,6 +410,30 @@ final class UnfoldingVerdictTest
 			                    .pronounce())
 					.isEqualTo(Unfolding.chaos());
 		}
+
+		@Test
+		@DisplayName("when(pred, Supplier) as first call on empty source returns empty from pronounce()")
+		void whenSupplierOnEmptyIsIgnored()
+		{
+			assertThat(Unfolding.<Integer>chaos()
+			                    .verdict()
+			                    .when(IS_POSITIVE, () -> "from supplier")
+			                    .pronounce())
+					.as("EmptyVerdict.when(pred, Supplier) contributes nothing — pronounce returns chaos")
+					.isEqualTo(Unfolding.chaos());
+		}
+
+		@Test
+		@DisplayName("when(pred, R) as first call on empty source returns empty from pronounce()")
+		void whenRawValueOnEmptyIsIgnored()
+		{
+			assertThat(Unfolding.<Integer>chaos()
+			                    .verdict()
+			                    .when(IS_POSITIVE, "eager value")
+			                    .pronounce())
+					.as("EmptyVerdict.when(pred, R) contributes nothing — pronounce returns chaos")
+					.isEqualTo(Unfolding.chaos());
+		}
 	}
 
 	@Nested
