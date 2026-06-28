@@ -344,6 +344,23 @@ class UnfoldingMetamorphoseTest
 		}
 
 		@Test
+		@DisplayName("Should rethrow the original exception directly when wrath returns the same instance")
+		void testMetamorphoseWrathReturnsSameExceptionAsCaught()
+		{
+			var source = Unfolding.beckon("trigger");
+			RuntimeException shared = new RuntimeException("shared");
+
+			assertThatThrownBy(() -> source.metamorphose(
+					_ ->
+					{
+						throw shared;
+					},
+					() -> shared))
+					.isSameAs(shared)
+					.hasNoCause();
+		}
+
+		@Test
 		@DisplayName("Should handle exception supplier that returns null")
 		void testExceptionSupplierReturnsNull()
 		{
