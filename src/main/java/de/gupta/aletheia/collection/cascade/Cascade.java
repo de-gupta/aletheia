@@ -256,6 +256,11 @@ public sealed interface Cascade<E> permits Brook, Nadir
 		return smelt(operation);
 	}
 
+	default E reduce(final E identity, final BinaryOperator<E> operation)
+	{
+		return smelt(identity, operation);
+	}
+
 	default <K> Cascade<E> normalize(final Function<? super E, ? extends K> keyExtractor,
 	                                 final BinaryOperator<E> combiner)
 	{
@@ -468,6 +473,21 @@ public sealed interface Cascade<E> permits Brook, Nadir
 
 	<F> Cascade<Dyad<E, F>> mesh(final Cascade<F> other);
 
+	E smelt(final E identity, final BinaryOperator<E> operation);
+
+	default Cascade<E> union(final Cascade<E> other)
+	{
+		Objects.requireNonNull(other, "other may not be null");
+		return admit(other).purify();
+	}
+
+	default Cascade<E> intersect(final Cascade<E> other)
+	{
+		Objects.requireNonNull(other, "other may not be null");
+		final var otherSet = other.toSet();
+		return discern(otherSet::contains);
+	}
+
 	/**
 	 * Folding / reduction
 	 */
@@ -475,6 +495,13 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	<R> R weave(final R initial, final BiFunction<? super R, ? super E, ? extends R> operation);
 
 	Unfolding<E> smelt(final BiFunction<? super E, ? super E, ? extends E> operation);
+
+	default Cascade<E> subtract(final Cascade<E> other)
+	{
+		Objects.requireNonNull(other, "other may not be null");
+		final var otherSet = other.toSet();
+		return forsake(otherSet::contains);
+	}
 
 	default <K> Cascade<E> normalize(final Function<? super E, ? extends K> keyExtractor,
 	                                 final BinaryOperator<E> combiner,
@@ -521,6 +548,13 @@ public sealed interface Cascade<E> permits Brook, Nadir
 	Cascade<E> forsake(final int n);
 
 	Cascade<E> forsake(final Predicate<? super E> judgement);
+
+	default Cascade<List<E>> chunk(final int size)
+	{
+		return shard(size);
+	}
+
+	Cascade<List<E>> shard(final int size);
 
 	default Cascade<E> limit(final int n)
 	{

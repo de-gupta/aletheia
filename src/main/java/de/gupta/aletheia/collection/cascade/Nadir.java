@@ -368,6 +368,13 @@ final class Nadir<E> implements Cascade<E>
 	}
 
 	@Override
+	public E smelt(final E identity, final BinaryOperator<E> operation)
+	{
+		Objects.requireNonNull(operation, "operation may not be null");
+		return identity;
+	}
+
+	@Override
 	public <K> Cascade<E> amalgamate(final Function<? super E, ? extends K> essence,
 	                                 final BinaryOperator<E> confluence)
 	{
@@ -393,6 +400,12 @@ final class Nadir<E> implements Cascade<E>
 	{
 		Objects.requireNonNull(operation, "operation may not be null");
 		return Loom.<E>thread(List.of()).forge(operation);
+	}
+
+	@Override
+	public Cascade<List<E>> shard(final int size)
+	{
+		return Nadir.instance();
 	}
 
 	@Override

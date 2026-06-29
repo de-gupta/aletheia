@@ -417,6 +417,13 @@ final class Brook<E> implements Cascade<E>
 	}
 
 	@Override
+	public E smelt(final E identity, final BinaryOperator<E> operation)
+	{
+		Objects.requireNonNull(operation, "operation may not be null");
+		return source.get().reduce(identity, operation);
+	}
+
+	@Override
 	public Cascade<E> temper(final int n)
 	{
 		return channel(s -> s.limit(n));
@@ -519,6 +526,22 @@ final class Brook<E> implements Cascade<E>
 	{
 		Objects.requireNonNull(operation, "operation may not be null");
 		return Loom.thread(materialise()).forge(operation);
+	}
+
+	@Override
+	public Cascade<List<E>> shard(final int size)
+	{
+		if (size <= 0) throw new IllegalArgumentException("size must be positive");
+		return ignite(() ->
+		{
+			final var list = source.get().toList();
+			final var result = new ArrayList<List<E>>();
+			for (int i = 0; i < list.size(); i += size)
+			{
+				result.add(List.copyOf(list.subList(i, Math.min(i + size, list.size()))));
+			}
+			return result.stream();
+		});
 	}
 
 	@Override
