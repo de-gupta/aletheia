@@ -46,6 +46,12 @@ final class EmptyVerdictArmed<T, R> implements VerdictArmed<T, R>
 	}
 
 	@Override
+	public R infuse(final Function<? super T, ? extends R> revelation)
+	{
+		throw EmptyUnfoldingException.instance();
+	}
+
+	@Override
 	public R smite(final Supplier<? extends RuntimeException> wrath)
 	{
 		throw EmptyUnfoldingException.instance();

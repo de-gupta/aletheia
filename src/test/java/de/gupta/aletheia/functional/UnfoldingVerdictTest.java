@@ -233,6 +233,78 @@ final class UnfoldingVerdictTest
 	}
 
 	@Nested
+	@DisplayName("Terminal — infuse(Function) — fallback derived from T")
+	class InfuseFunctionTerminalTests
+	{
+		@Test
+		@DisplayName("returns matched value when a predicate matches — function not called")
+		void returnMatchedValueWhenPredicateMatches()
+		{
+			final AtomicInteger functionCalls = new AtomicInteger();
+
+			final String result = Unfolding.beckon(5)
+			                               .verdict()
+			                               .when(IS_POSITIVE, _ -> "positive")
+			                               .infuse(n ->
+			                               {
+				                               functionCalls.incrementAndGet();
+				                               return "fallback:" + n;
+			                               });
+
+			assertThat(result).as("matched value returned").isEqualTo("positive");
+			assertThat(functionCalls.get()).as("function not called when matched").isEqualTo(0);
+		}
+
+		@Test
+		@DisplayName("applies function to T when no predicate matches")
+		void appliesFunctionToTWhenNoMatch()
+		{
+			final String result = Unfolding.beckon(42)
+			                               .verdict()
+			                               .when(IS_NEGATIVE, _ -> "negative")
+			                               .when(IS_ZERO, _ -> "zero")
+			                               .infuse(n -> "unmatched: " + n);
+
+			assertThat(result).as("fallback computed from T").isEqualTo("unmatched: 42");
+		}
+
+		@Test
+		@DisplayName("function receives the original T value — not a transformed one")
+		void functionReceivesOriginalT()
+		{
+			final String result = Unfolding.beckon(7)
+			                               .verdict()
+			                               .when(IS_NEGATIVE, _ -> "negative")
+			                               .infuse(n -> "value=" + n);
+
+			assertThat(result).as("original T passed to function").isEqualTo("value=7");
+		}
+
+		@Test
+		@DisplayName("throws EmptyUnfoldingException when source is empty")
+		void throwsWhenSourceIsEmpty()
+		{
+			assertThatThrownBy(() -> Unfolding.<Integer>chaos()
+			                                  .verdict()
+			                                  .when(IS_POSITIVE, _ -> "positive")
+			                                  .infuse(n -> "fallback:" + n))
+					.isInstanceOf(EmptyUnfoldingException.class);
+		}
+
+		@Test
+		@DisplayName("throws NullPointerException when revelation function is null")
+		void throwsWhenRevelationIsNull()
+		{
+			assertThatThrownBy(() -> Unfolding.beckon(1)
+			                                  .verdict()
+			                                  .when(IS_NEGATIVE, _ -> "negative")
+			                                  .infuse((java.util.function.Function<Integer, String>) null))
+					.isInstanceOf(NullPointerException.class)
+					.hasMessageContaining("revelation may not be null");
+		}
+	}
+
+	@Nested
 	@DisplayName("Terminal — smite(Supplier)")
 	class SmiteTerminalTests
 	{

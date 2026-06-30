@@ -16,6 +16,8 @@ public interface VerdictArmed<T, R>
 
 	R infuse(Supplier<? extends R> revelation);
 
+	R infuse(Function<? super T, ? extends R> revelation);
+
 	R smite(Supplier<? extends RuntimeException> wrath);
 
 	R fulminate();

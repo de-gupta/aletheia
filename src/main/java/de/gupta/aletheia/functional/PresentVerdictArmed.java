@@ -52,6 +52,13 @@ final class PresentVerdictArmed<T, R> implements VerdictArmed<T, R>
 	}
 
 	@Override
+	public R infuse(final Function<? super T, ? extends R> revelation)
+	{
+		Objects.requireNonNull(revelation, "revelation may not be null");
+		return evaluate().orElseGet(() -> revelation.apply(hero));
+	}
+
+	@Override
 	public R smite(final Supplier<? extends RuntimeException> wrath)
 	{
 		Objects.requireNonNull(wrath, "wrath may not be null");
