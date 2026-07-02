@@ -14,6 +14,18 @@ final class Fury<T> implements Fallible<T>
 	}
 
 	@Override
+	public T summon()
+	{
+		return sneakyThrow(doom);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <E extends Throwable, T> T sneakyThrow(final Throwable t) throws E
+	{
+		throw (E) t;
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public <R> Fallible<R> metamorphose(final Ordeal<? super T, ? extends R> ordeal,
 	                                    final List<Portent<R>> portents)

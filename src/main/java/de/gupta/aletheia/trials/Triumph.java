@@ -14,6 +14,12 @@ final class Triumph<T> implements Fallible<T>
 	}
 
 	@Override
+	public T summon()
+	{
+		return boon;
+	}
+
+	@Override
 	public <R> Fallible<R> metamorphose(final Ordeal<? super T, ? extends R> ordeal,
 	                                    final List<Portent<R>> portents)
 	{

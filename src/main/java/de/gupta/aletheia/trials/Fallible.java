@@ -32,6 +32,11 @@ public sealed interface Fallible<T> permits Triumph, Fury
 		return coronate(onSuccess, onFailure);
 	}
 
+	default T get()
+	{
+		return summon();
+	}
+
 	// ── Mythic (canonical) API ────────────────────────────────────────────────────────────────────
 	// Primary vocabulary. Conventional aliases are above.
 
@@ -42,6 +47,8 @@ public sealed interface Fallible<T> permits Triumph, Fury
 
 	<R> Fallible<R> metamorphose(final Ordeal<? super T, ? extends R> ordeal,
 	                             final List<Portent<R>> portents);
+
+	T summon();
 
 	<R> R coronate(final Function<? super T, ? extends R> triumph,
 	               final Function<? super Exception, ? extends R> fury);
